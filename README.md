@@ -1,2 +1,2 @@
-# Babes4Trades
-My Babes4Trades simple online website. 
+# babes4trades
+An online stock course website for young investors. 

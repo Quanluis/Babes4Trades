@@ -1,0 +1,25 @@
+h1 {
+    font-family: 'Lobster';
+    text-align: center;
+}
+p {
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+body {
+    position: relative;
+}
+footer {
+    position: relative;
+    bottom: 0;
+
+
+}
+nav a:hover{
+   color: red; 
+}
+
+ul li a:hover {
+    color: pink;
+}
