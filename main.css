@@ -23,3 +23,11 @@ nav a:hover{
 ul li a:hover {
     color: pink;
 }
+
+.yearly{
+    float: right;
+}
+
+.yearly1 {
+    float: left;
+}
