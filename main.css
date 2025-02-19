@@ -10,12 +10,10 @@ p {
 body {
     position: relative;
 }
-footer {
+/* footer {
     position: relative;
     bottom: 0;
-
-
-}
+} */
 nav a:hover{
    color: red; 
 }
@@ -24,10 +22,19 @@ ul li a:hover {
     color: pink;
 }
 
-.yearly{
-    float: right;
+
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: #f8f9fa;
+    text-align: center;
+    padding: 10px 0;
+    box-shadow: 0px -1px 5px rgba(0, 0, 0, 0.1);
+    display: none; /* Initially hidden */
 }
 
-.yearly1 {
-    float: left;
+.d-none {
+    display: none;
 }

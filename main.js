@@ -1,4 +1,4 @@
-const { Button } = require("bootstrap");
+// const { Button } = require("bootstrap");
 
 
 
@@ -32,49 +32,21 @@ const { Button } = require("bootstrap");
     console.error("Element not found!");
     }
 
-  }
+  };
 
 
+  window.onscroll = function() {
+    // Get the height of the document, viewport and current scroll position
+    var docHeight = document.documentElement.scrollHeight;
+    var windowHeight = window.innerHeight;
+    var scrollTop = window.scrollY;
 
-
-// function displayText(){
-
-//     // displaymonthly.remove();
-
-//     document.getElementById("yearlySub").innerHTML = 
- 
-//     <div class="container">
-//     <div class="row">
-//       <div class="col-md-6">
-//         <div class="card-container pt-5">
-//           <div class="card">
-//             <div class="card-body">
-//               <h5 class="card-title">Yearly Standard Subscription</h5>
-//               <p class="card-text">This is the first centered card.</p>
-//               <a href="#" class="btn btn-primary">Subscribe</a>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-
-//       <div class="col-md-6">
-//         <div class="card-container pt-5">
-//           <div class="card">
-//             <div class="card-body">
-//               <h5 class="card-title">Yearly Elite Subscription</h5>
-//               <p class="card-text">This is the second centered card.</p>
-//               <a href="#" class="btn btn-primary">Subscribe</a>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//  ' </div> `
-
-//  element.removeChild();
-
-// }
-
-
+    // Show footer when at the bottom
+    if (scrollTop + windowHeight >= docHeight - 100) { // 100px threshold
+        document.getElementById("footer").classList.remove("d-none");
+    } else {
+        document.getElementById("footer").classList.add("d-none");
+    }
+};
 
 
