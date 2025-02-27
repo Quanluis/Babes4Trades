@@ -1,8 +1,5 @@
 // const { Button } = require("bootstrap");
 
-
-
-
   // document.getElementById('containerPrice').style.display = "none";
   // document.getElementById('containerPrice2').style.display = "block";
 
@@ -48,5 +45,3 @@
         document.getElementById("footer").classList.add("d-none");
     }
 };
-
-
