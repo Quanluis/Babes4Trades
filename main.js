@@ -1,11 +1,5 @@
 // const { Button } = require("bootstrap");
 
-  // document.getElementById('containerPrice').style.display = "none";
-  // document.getElementById('containerPrice2').style.display = "block";
-
-  // import { isEmail } from "validator";
-
-
 
   function swapDivsYearly() {
     let monthlyDiv = document.getElementById("containerPrice");  // Monthly Subscription
@@ -50,37 +44,37 @@
 };
 
 
+// IF email verfication turns on the dynamic buttons on the pricing page cease to work.
 
 
 
+// // Email verfication 
 
-// Email verfication 
+// function validateEmail(email){
 
-function validateEmail(email){
+//   let re =/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  let re =/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+//   return re.test(email)
 
-  return re.test(email)
+// };
 
-};
-
-if (validateEmail("user@example.com")){
-  console.log("Email is valid")
-}
-  else{
-    console.log("Email is invalid.");
-};
+// if (validateEmail("user@example.com")){
+//   console.log("Email is valid")
+// }
+//   else{
+//     console.log("Email is invalid.");
+// };
 
 
-import { isEmail } from "validator";
+// import { isEmail } from "validator";
 
-const valid = require("validator");
+// const valid = require("validator");
 
-const emailToValidate = "quanluis@protonmail.com";
+// const emailToValidate = "quanluis@protonmail.com";
 
-console.log(isEmail(emailToValidate)
-    ? "valid email address"
-    : "Invalid email address");
+// console.log(isEmail(emailToValidate)
+//     ? "valid email address"
+//     : "Invalid email address");
 
   
 
