@@ -45,4 +45,21 @@ object {
  margin-bottom: -.5rem;
   
 }
+.dropdown-menu {
+  width: max-content;
+}
+
+/* Center the <h1> within the navbar */
+.navbar .navbar-collapse {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar h1 {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%); /* Moves it back to the center */
+  margin: 0;
+}
 
