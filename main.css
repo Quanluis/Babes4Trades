@@ -56,6 +56,22 @@ object {
   align-items: center;
 } */
 
+@media (min-width: 600px) and (max-width: 992px) {
+  .dropdown-menu {
+      left: 100% !important;
+      top: 0 !important;
+      transform: none !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .dropdown-menu {
+      left: 100% !important;
+      top: 0 !important;
+      transform: none !important;
+  }
+}
+
 .navbar h1 {
   position: absolute;
   left: 50%;
