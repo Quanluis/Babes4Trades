@@ -1,7 +1,27 @@
 h1 {
   font-family: "Lobster";
   text-align: center;
+  color: white;
+  
 }
+
+h2 {
+
+  font-family: "Lobster";
+  text-align: center;
+
+
+  color: #6a11cb;
+
+  /* Chrome 10-25, Safari 5.1-6 */
+  color: -webkit-linear-gradient(to right, rgba(106,17,203,0.65), rgba(37,117,252,0.65));
+
+  /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  color: linear-gradient(to right, rgba(106,17,203,0.65), rgba(37,117,252,0.65))
+
+}
+
+
 p {
   text-align: center;
   font-size: 1.1rem;
@@ -31,9 +51,6 @@ footer {
   margin: -0.1rem;
 }
 
-h2 {
-  color: green;
-}
 
 object {
   height: 30px;
@@ -48,6 +65,24 @@ object {
 .dropdown-menu {
   width: max-content;
 }
+
+
+/* This is the Navbar gradient  */
+
+.gradient-custom {
+  /* fallback for old browsers */
+  background: #6a11cb;
+
+  /* Chrome 10-25, Safari 5.1-6 */
+  background: -webkit-linear-gradient(to right, rgba(106,17,203,0.65), rgba(37,117,252,0.65));
+
+  /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  background: linear-gradient(to right, rgba(106,17,203,0.65), rgba(37,117,252,0.65))
+
+}
+
+
+
 
 
  
