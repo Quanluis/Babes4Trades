@@ -62,6 +62,14 @@ object {
  margin-bottom: -.5rem;
   
 }
+
+#legal {
+  padding-bottom: 30px;
+  font-size: 10px;
+}
+
+
+
 .dropdown-menu {
   width: max-content;
 }
