@@ -44,6 +44,17 @@
 };
 
 
+function subscribeButton(){
+
+  let buttonPressed = document.getElementById("subscribeButton");
+
+  if(buttonPressed == true){
+    console.log("This button has been clicked.")
+  }
+
+}
+
+
 // IF email verfication turns on the dynamic buttons on the pricing page cease to work.
 
 

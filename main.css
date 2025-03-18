@@ -68,7 +68,12 @@ object {
   font-size: 10px;
 }
 
-
+#forgotPass {
+  
+    margin: 0 auto; /* Added */
+    float: none; /* Added */
+    
+}
 
 .dropdown-menu {
   width: max-content;
