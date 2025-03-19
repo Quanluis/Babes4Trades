@@ -55,6 +55,8 @@ function subscribeButton(){
 }
 
 
+
+
 // IF email verfication turns on the dynamic buttons on the pricing page cease to work.
 
 
