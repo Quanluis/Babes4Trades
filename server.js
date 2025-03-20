@@ -13,43 +13,44 @@ const router = express.Router();
 // }));
 
 // Serve static files (CSS, JS, Images, etc.)
+app.use(express.static(path.join(__dirname, '/')))
 app.use(express.static(path.join(__dirname, 'public'))); // Serving static files from the 'public' folder
-
+app.use(express.static(path.join(__dirname, 'pages')));  // Serves static files from the 'Pages' folder
 
 // Routes for HTML pages
 router.get('/', (req, res) => {
   // Serve the main index.html from the root directory
-  res.sendFile(path.join(__dirname, './index.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 router.get('/about', (req, res) => {
   // Serve the about.html from the 'pages' folder
-  res.sendFile(path.join(__dirname, 'pages', './about.html'));
+  res.sendFile(path.join(__dirname, 'pages', 'about.html'));
 });
 
 router.get('/contact', (req, res) => {
   // Serve the sitemap.html from the 'pages' folder
-  res.sendFile(path.join(__dirname, 'pages', '../pages/contact.html'));
+  res.sendFile(path.join(__dirname, 'pages', 'contact.html'));
 });
 
 // Additional route for other pages in the 'pages' folder
 router.get('/course', (req, res) => {
-  res.sendFile(path.join(__dirname, 'pages', '../pages/course.html'));
+  res.sendFile(path.join(__dirname, 'pages', 'course.html'));
 });
 
 router.get('/faq', (req, res) => {
   // Serve the main index.html from the root directory
-  res.sendFile(path.join(__dirname, 'pages', '../pages/faq.html'));
+  res.sendFile(path.join(__dirname, 'pages', 'faq.html'));
 });
 
 router.get('/forgotPass', (req, res) => {
   // Serve the about.html from the 'pages' folder
-  res.sendFile(path.join(__dirname, 'pages', '../pages/forgotPass.html'));
+  res.sendFile(path.join(__dirname, 'pages', 'forgotPass.html'));
 });
 
 router.get('/meetTheGirls', (req, res) => {
   // Serve the sitemap.html from the 'pages' folder
-  res.sendFile(path.join(__dirname, 'pages', '../pages/meetTheGirls.html'));
+  res.sendFile(path.join(__dirname, 'pages', 'meetTheGirls.html'));
 });
 
 // Additional route for other pages in the 'pages' folder
@@ -59,17 +60,22 @@ router.get('/pricing', (req, res) => {
 
 router.get('/signIn', (req, res) => {
   // Serve the sitemap.html from the 'pages' folder
-  res.sendFile(path.join(__dirname, 'pages', '../pages/signIn.html'));
+  res.sendFile(path.join(__dirname, 'pages', 'signIn.html'));
 });
 
 // Additional route for other pages in the 'pages' folder
 router.get('/signUp', (req, res) => {
-  res.sendFile(path.join(__dirname, 'pages', '../pages/signUp.html'));
+  res.sendFile(path.join(__dirname, 'pages', 'signUp.html'));
 });
 
 router.get('/main.js', (req, res) => {
-  res.sendFile(path.join(__dirname, '../babes4trades/main.js'));
+  res.sendFile(path.join(__dirname, 'main.js'));
 });
+
+router.get('/Lobster-Regular', (req, res) => {
+  res.sendFile(path.join(__dirname, '/Fonts/Lobster/Lobster-Regular.ttf'));
+});
+
 
 // Apply the router
 app.use('/', router);

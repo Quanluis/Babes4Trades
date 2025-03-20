@@ -8,7 +8,7 @@ nav {
 
 @font-face {
   font-family: 'Lobster';
-  src: url('../Babes4Trades/Fonts/Lobster/Lobster-Regular.ttf') format('woff2');
+  src: url('/public/Fonts/Lobster/Lobster-Regular.ttf') format('woff2');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
