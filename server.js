@@ -1,55 +1,85 @@
-// import http from "http";
-
-// import 'bootstrap';
-
-// const express = require('express');
-
-// let http = require('http');
-// let fs = require('fs');
-// let port = 8080;
-
-//     const server = http.createServer((request, response) => {
-//         response.writeHead(200, {'Content-Type': 'text/html'});
-//         fs.readFile('index.html', null, function(error, data) {
-//           if (error) {
-//             response.writeHead(404);
-//             respone.write('Whoops! File not found!');
-//           } else {
-//             response.write(data);
-//           }
-//           response.end();
-//         });
-//       });
-
-// server.listen(port, () => {
-//   console.log(`Server is running on port number::${port}`);
-// });
-
-
-// app.js
 const express = require('express');
-const app = express();
 const path = require('path');
+
+const app = express();
 const router = express.Router();
- 
-router.get('/',function(req,res){
-  res.sendFile(path.join(__dirname+'/index.html'));
-  //__dirname : It will resolve to your project folder.
+
+// app.use(express.static('public', {
+//   setHeaders: (res, path) => {
+//       if (path.endsWith('.css')) {
+//           res.setHeader('Content-Type', 'text/css');
+//       }
+//   }
+// }));
+
+// Serve static files (CSS, JS, Images, etc.)
+app.use(express.static(path.join(__dirname, 'public'))); // Serving static files from the 'public' folder
+
+
+// Routes for HTML pages
+router.get('/', (req, res) => {
+  // Serve the main index.html from the root directory
+  res.sendFile(path.join(__dirname, './index.html'));
 });
- 
-router.get('./',function(req,res){
-  res.sendFile(path.join(__dirname+'about.html'));
+
+router.get('/about', (req, res) => {
+  // Serve the about.html from the 'pages' folder
+  res.sendFile(path.join(__dirname, 'pages', './about.html'));
 });
- 
-router.get('/sitemap',function(req,res){
-  res.sendFile(path.join(__dirname+'/sitemap.html'));
+
+router.get('/contact', (req, res) => {
+  // Serve the sitemap.html from the 'pages' folder
+  res.sendFile(path.join(__dirname, 'pages', '../pages/contact.html'));
 });
- 
-//add the router
+
+// Additional route for other pages in the 'pages' folder
+router.get('/course', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', '../pages/course.html'));
+});
+
+router.get('/faq', (req, res) => {
+  // Serve the main index.html from the root directory
+  res.sendFile(path.join(__dirname, 'pages', '../pages/faq.html'));
+});
+
+router.get('/forgotPass', (req, res) => {
+  // Serve the about.html from the 'pages' folder
+  res.sendFile(path.join(__dirname, 'pages', '../pages/forgotPass.html'));
+});
+
+router.get('/meetTheGirls', (req, res) => {
+  // Serve the sitemap.html from the 'pages' folder
+  res.sendFile(path.join(__dirname, 'pages', '../pages/meetTheGirls.html'));
+});
+
+// Additional route for other pages in the 'pages' folder
+router.get('/pricing', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'pricing.html'));
+});
+
+router.get('/signIn', (req, res) => {
+  // Serve the sitemap.html from the 'pages' folder
+  res.sendFile(path.join(__dirname, 'pages', '../pages/signIn.html'));
+});
+
+// Additional route for other pages in the 'pages' folder
+router.get('/signUp', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', '../pages/signUp.html'));
+});
+
+router.get('/main.js', (req, res) => {
+  res.sendFile(path.join(__dirname, '../babes4trades/main.js'));
+});
+
+// Apply the router
 app.use('/', router);
-app.listen(process.env.port || 3000);
- 
-console.log('Running at Port 3000');
+
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+});
+
 
 // app.use(express.static('public'))
 
@@ -94,3 +124,42 @@ console.log('Running at Port 3000');
 // };
 
 // requestListener();
+
+
+// This works below
+
+// app.js
+// const express = require('express');
+// const path = require('path');
+
+// const app = express();
+// const router = express.Router();
+
+// // Serve static files (CSS, JS, Images, etc.)
+// app.use(express.static(path.join(__dirname, 'public')));
+
+// // Routes
+// router.get('/', (req, res) => {
+//   res.sendFile(path.join(__dirname, '../Babes4Trades/pages/signUp.html'));
+// });
+
+// router.get('/main.js', (req, res) => {
+//   res.sendFile(path.join(__dirname, '../babes4trades/main.js'));
+// });
+
+// router.get('/about', (req, res) => {
+//   res.sendFile(path.join(__dirname, 'about.html'));
+// });
+
+// router.get('/sitemap', (req, res) => {
+//   res.sendFile(path.join(__dirname, 'sitemap.html'));
+// });
+
+// // Apply the router
+// app.use('/', router);
+
+// // Start the server
+// const PORT = process.env.PORT || 3000;
+// app.listen(PORT, () => {
+//   console.log(`Server running at http://localhost:${PORT}`);
+// });
