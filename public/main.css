@@ -110,11 +110,25 @@ object {
 
 }
 
-
-
-
-
- 
+.faq-section {
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+.faq-title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #343a40;
+}
+.card-header {
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+/* .card-body {
+  background-color: #f1f1f1;
+}
+  */
  /* Center the <h1> within the navbar */
  /* .navbar .navbar-collapse {
   display: flex;
