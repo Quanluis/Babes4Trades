@@ -54,6 +54,15 @@ function subscribeButton(){
 
 }
 
+function visitPage(){
+  window.location = '/pages/signUp.html'
+
+  console.log("This is working")
+
+}
+
+console.log("This works.")
+
 // // Password validator 
 
 // document.addEventListener("DOMContentLoaded", function () {
