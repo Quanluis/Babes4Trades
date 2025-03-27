@@ -1,8 +1,59 @@
 const express = require('express');
 const path = require('path');
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const cors = require("cors");
+const bodyParser = require("body-parser");
+require('dotenv').config();
 
 const app = express();
 const router = express.Router();
+
+app.use(bodyParser.json());
+
+// MongoDB Connection
+mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+.then(() => console.log("MongoDB Connected"))
+.catch(err => console.log(err));
+
+// User Schema
+const UserSchema = new mongoose.Schema({
+    username: String,
+    email: String,
+    password: String
+});
+
+const User = mongoose.model("User", UserSchema);
+
+// Registration Endpoint
+app.post("/api/register", async (req, res) => {
+    try {
+        const { username, email, password } = req.body;
+
+        // Hash password before saving
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const newUser = new User({
+            username,
+            email,
+            password: hashedPassword
+        });
+
+        await newUser.save();
+        res.status(201).json({ message: "User registered successfully!" });
+    } catch (error) {
+        res.status(500).json({ error: "Error registering user" });
+    }
+});
+
+// Start Server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
 
 // app.use(express.static('public', {
 //   setHeaders: (res, path) => {
@@ -81,10 +132,10 @@ router.get('/Lobster-Regular', (req, res) => {
 app.use('/', router);
 
 // Start the server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-});
+// const PORT = process.env.PORT || 3000;
+// app.listen(PORT, () => {
+//   console.log(`Server running at http://localhost:${PORT}`);
+// });
 
 
 // app.use(express.static('public'))
@@ -169,3 +220,6 @@ app.listen(PORT, () => {
 // app.listen(PORT, () => {
 //   console.log(`Server running at http://localhost:${PORT}`);
 // });
+
+
+console.log("This is working");
