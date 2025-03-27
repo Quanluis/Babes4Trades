@@ -61,7 +61,19 @@ function visitPage(){
 
 }
 
-console.log("This works.")
+
+// document.getElementById('signupForm').addEventListener('submit', function(event) {
+
+//   event.preventDefault();
+
+//   const formData = new FormData(this);
+
+//   formData.get('email')
+
+// });
+
+
+
 
 // // Password validator 
 
@@ -120,9 +132,8 @@ console.log("This works.")
 //   });
 // });
 
-console.log("hello")
-
 document.addEventListener("DOMContentLoaded", function () {
+
   const form = document.getElementById("signupForm");
   const passwordInput = document.getElementById("exampleInputPassword1");
   const confirmPasswordInput = document.getElementById("exampleInputPassword2");
@@ -181,6 +192,9 @@ document.addEventListener("DOMContentLoaded", function () {
   passwordInput.addEventListener("input", updatePasswordFeedback);
   confirmPasswordInput.addEventListener("input", checkPasswordMatch);
 
+  // console.log(form);
+  
+
   form.addEventListener("submit", function (event) {
       if (!updatePasswordFeedback()) {
           event.preventDefault();
@@ -190,14 +204,79 @@ document.addEventListener("DOMContentLoaded", function () {
           event.preventDefault();
           alert("Passwords do not match.");
       }
+
+      const formData = {
+        username: usernameInput.value,
+        email: emailInput.value,
+        password: passwordInput.value
+    };
+     
+    console.log("Form Data:", formData); // Debugging (Remove in production)
+
+    fetch("/api/register", {
+      method: "POST",
+      headers: {
+          "Content-Type": "application/json"
+      },
+      body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+          console.log("Success:", data);
+          alert("Registration successful!");
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        alert("There was an error with your registration.");
+    });
+
   });
+
 });
 
+  // function getValues(event){
+  //   event.preventDefault();
+  
+    
+  //   let formData = {
+  
+  //     "email": this.email.value,
+
+  //     "Name": this.name.value,
+
+  //     "password": this.password.value
 
 
+  
+  
+  //   }
+
+  //   console.log(formData)
+  
+  // }
+
+  // getValues();
+
+
+//   document.addEventListener("DOMContentLoaded", function () {
+//     const form = document.getElementById("signupForm"); // Ensure this matches your form's ID
+//     if (form) {
+//         form.addEventListener("submit", function (event) {
+//             if (!updatePasswordFeedback()) {
+//                 event.preventDefault();
+//                 alert("Please fix password errors before submitting.");
+//             }
+//             if (confirmPasswordInput.value !== passwordInput.value) {
+//                 event.preventDefault();
+//                 alert("Passwords do not match.");
+//             }
+//         });
+//     } else {
+//         console.error("Form not found! Check the ID.");
+//     }
+// });
 
 // IF email verfication turns on the dynamic buttons on the pricing page cease to work.
-
 
 
 // // Email verfication 
