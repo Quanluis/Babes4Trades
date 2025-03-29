@@ -1,13 +1,16 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-require('dotenv').config();
+// require('./main.js');
+
 
 const app = express();
 const router = express.Router();
+app.use(cors());
 
 app.use(bodyParser.json());
 
@@ -28,6 +31,7 @@ const UserSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", UserSchema);
 
+
 // Registration Endpoint
 app.post("/api/register", async (req, res) => {
     try {
@@ -44,16 +48,39 @@ app.post("/api/register", async (req, res) => {
 
         await newUser.save();
         res.status(201).json({ message: "User registered successfully!" });
+
     } catch (error) {
         res.status(500).json({ error: "Error registering user" });
     }
 });
+
+
+// fetch("/api/register", {
+//   method: "POST",
+//   headers: {
+//     "Content-Type": "application/json",
+//   },
+//   body: JSON.stringify(formData),
+// })
+//   .then((response) => response.json())
+//   .then((data) => {
+//     console.log("Success:", data);
+//     alert("Registration successful!");
+//   })
+//   .catch((error) => {
+//     console.error("Error:", error);
+//     alert("There was an error with your registration.");
+//   });
+
+// const authRoutes = require("/main.js");
+// app.use("./main.js", authRoutes);
 
 // Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
+
 
 // app.use(express.static('public', {
 //   setHeaders: (res, path) => {
@@ -131,95 +158,3 @@ router.get('/Lobster-Regular', (req, res) => {
 // Apply the router
 app.use('/', router);
 
-// Start the server
-// const PORT = process.env.PORT || 3000;
-// app.listen(PORT, () => {
-//   console.log(`Server running at http://localhost:${PORT}`);
-// });
-
-
-// app.use(express.static('public'))
-
-// import fs from "fs";
-
-// const server = http.createServer((req, res) => {
-//   res.statusCode = 200;
-//   res.setHeader("Content-Type", "text/plain");
-//   res.end("Hello World\n");
-// });
-
-// const PORT = 3000;
-// server.listen(PORT, () => {
-//   console.log(`Server running at http://localhost:${PORT}/`);
-// });
-
-
-// http.createServer(function (req, res) {
-//   var q = url.parse(req.url, true);
-//   var filename = "." + q.pathname;
-//   fs.readFile(filename, function(err, data) {
-//     if (err) {
-//       res.writeHead(404, {'Content-Type': 'index.html'});
-//       return res.end("404 Not Found");
-//     } 
-//     res.writeHead(200, {'Content-Type': 'about/html'});
-//     res.write(data);
-//     return res.end();
-//   });
-// }).listen(8080); 
-
-
-// require('fs').promises;
-
-// const requestListener = function (req, res) {
-//     fs.readFile(__dirname + "/index.html")
-//         .then(contents => {
-//             res.setHeader("Content-Type", "text/html");
-//             res.writeHead(200);
-//             res.end(contents);
-//         })
-// };
-
-// requestListener();
-
-
-// This works below
-
-// app.js
-// const express = require('express');
-// const path = require('path');
-
-// const app = express();
-// const router = express.Router();
-
-// // Serve static files (CSS, JS, Images, etc.)
-// app.use(express.static(path.join(__dirname, 'public')));
-
-// // Routes
-// router.get('/', (req, res) => {
-//   res.sendFile(path.join(__dirname, '../Babes4Trades/pages/signUp.html'));
-// });
-
-// router.get('/main.js', (req, res) => {
-//   res.sendFile(path.join(__dirname, '../babes4trades/main.js'));
-// });
-
-// router.get('/about', (req, res) => {
-//   res.sendFile(path.join(__dirname, 'about.html'));
-// });
-
-// router.get('/sitemap', (req, res) => {
-//   res.sendFile(path.join(__dirname, 'sitemap.html'));
-// });
-
-// // Apply the router
-// app.use('/', router);
-
-// // Start the server
-// const PORT = process.env.PORT || 3000;
-// app.listen(PORT, () => {
-//   console.log(`Server running at http://localhost:${PORT}`);
-// });
-
-
-console.log("This is working");
