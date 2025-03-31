@@ -5,156 +5,100 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-// require('./main.js');
-
 
 const app = express();
-const router = express.Router();
 app.use(cors());
-
 app.use(bodyParser.json());
 
-// MongoDB Connection
+// ✅ Serve Static Files BEFORE Routes
+app.use(express.static(path.join(__dirname, '/')));
+app.use(express.static(path.join(__dirname, 'public'))); 
+app.use(express.static(path.join(__dirname, 'pages'))); 
+
+// ✅ Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
-.then(() => console.log("MongoDB Connected"))
-.catch(err => console.log(err));
+.then(() => console.log("✅ MongoDB Connected"))
+.catch(err => console.error("❌ MongoDB Connection Error:", err));
 
-// User Schema
+// ✅ User Schema & Model
 const UserSchema = new mongoose.Schema({
-    username: String,
-    email: String,
-    password: String
+    email: { type: String, required: true, unique: true },
+    username: { type: String, required: true, unique: true },
+    password: { type: String, required: true }
 });
-
 const User = mongoose.model("User", UserSchema);
 
-
-// Registration Endpoint
+// ✅ Registration Endpoint
 app.post("/api/register", async (req, res) => {
     try {
-        const { username, email, password } = req.body;
+        const { email, username, password } = req.body;
+        if (!email || !username || !password) {
+            return res.status(400).json({ error: "All fields are required" });
+        }
 
-        // Hash password before saving
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ error: "Email already registered" });
+        }
+
         const hashedPassword = await bcrypt.hash(password, 10);
-
-        const newUser = new User({
-            username,
-            email,
-            password: hashedPassword
-        });
+        const newUser = new User({ email, username, password: hashedPassword });
 
         await newUser.save();
-        res.status(201).json({ message: "User registered successfully!" });
+        res.status(201).json({ message: "User registered successfully!", hashedPassword });
 
     } catch (error) {
-        res.status(500).json({ error: "Error registering user" });
+        console.error("❌ Registration Error:", error);
+        res.status(500).json({ error: "Internal Server Error" });
     }
 });
 
+app.get("/api/user/:email", async (req, res) => {
+  try {
+      const user = await User.findOne({ email: req.params.email });
+      if (!user) {
+          return res.status(404).json({ error: "User not found" });
+      }
+      res.json({ hashedPassword: user.password });
+  } catch (error) {
+      res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
-// fetch("/api/register", {
-//   method: "POST",
-//   headers: {
-//     "Content-Type": "application/json",
-//   },
-//   body: JSON.stringify(formData),
-// })
-//   .then((response) => response.json())
-//   .then((data) => {
-//     console.log("Success:", data);
-//     alert("Registration successful!");
-//   })
-//   .catch((error) => {
-//     console.error("Error:", error);
-//     alert("There was an error with your registration.");
-//   });
+app.post("/api/login", async (req, res) => {
+  try {
+      const { email, password } = req.body;
 
-// const authRoutes = require("/main.js");
-// app.use("./main.js", authRoutes);
+      // ✅ Check if user exists in the database
+      const user = await User.findOne({ email });
+      if (!user) {
+          return res.status(400).json({ error: "Invalid email or password" });
+      }
 
-// Start Server
+      // ✅ Compare the provided password with the hashed password in DB
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+          return res.status(400).json({ error: "Invalid email or password" });
+      }
+
+      res.json({ message: "Login successful!" });
+
+  } catch (error) {
+      console.error("❌ Login Error:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// ✅ Serve HTML Pages
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.get('/about', (req, res) => res.sendFile(path.join(__dirname, 'pages', 'about.html')));
+app.get('/contact', (req, res) => res.sendFile(path.join(__dirname, 'pages', 'contact.html')));
+app.get('/signUp', (req, res) => res.sendFile(path.join(__dirname, 'pages', 'signUp.html')));
+
+// ✅ Start Server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
-
-
-// app.use(express.static('public', {
-//   setHeaders: (res, path) => {
-//       if (path.endsWith('.css')) {
-//           res.setHeader('Content-Type', 'text/css');
-//       }
-//   }
-// }));
-
-// Serve static files (CSS, JS, Images, etc.)
-app.use(express.static(path.join(__dirname, '/')))
-app.use(express.static(path.join(__dirname, 'public'))); // Serving static files from the 'public' folder
-app.use(express.static(path.join(__dirname, 'pages')));  // Serves static files from the 'Pages' folder
-
-// Routes for HTML pages
-router.get('/', (req, res) => {
-  // Serve the main index.html from the root directory
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-router.get('/about', (req, res) => {
-  // Serve the about.html from the 'pages' folder
-  res.sendFile(path.join(__dirname, 'pages', 'about.html'));
-});
-
-router.get('/contact', (req, res) => {
-  // Serve the sitemap.html from the 'pages' folder
-  res.sendFile(path.join(__dirname, 'pages', 'contact.html'));
-});
-
-// Additional route for other pages in the 'pages' folder
-router.get('/course', (req, res) => {
-  res.sendFile(path.join(__dirname, 'pages', 'course.html'));
-});
-
-router.get('/faq', (req, res) => {
-  // Serve the main index.html from the root directory
-  res.sendFile(path.join(__dirname, 'pages', 'faq.html'));
-});
-
-router.get('/forgotPass', (req, res) => {
-  // Serve the about.html from the 'pages' folder
-  res.sendFile(path.join(__dirname, 'pages', 'forgotPass.html'));
-});
-
-router.get('/meetTheGirls', (req, res) => {
-  // Serve the sitemap.html from the 'pages' folder
-  res.sendFile(path.join(__dirname, 'pages', 'meetTheGirls.html'));
-});
-
-// Additional route for other pages in the 'pages' folder
-router.get('/pricing', (req, res) => {
-  res.sendFile(path.join(__dirname, 'pages', 'pricing.html'));
-});
-
-router.get('/signIn', (req, res) => {
-  // Serve the sitemap.html from the 'pages' folder
-  res.sendFile(path.join(__dirname, 'pages', 'signIn.html'));
-});
-
-// Additional route for other pages in the 'pages' folder
-router.get('/signUp', (req, res) => {
-  res.sendFile(path.join(__dirname, 'pages', 'signUp.html'));
-});
-
-router.get('/main.js', (req, res) => {
-  res.sendFile(path.join(__dirname, 'main.js'));
-});
-
-router.get('/Lobster-Regular', (req, res) => {
-  res.sendFile(path.join(__dirname, '/Fonts/Lobster/Lobster-Regular.ttf'));
-});
-
-
-// Apply the router
-app.use('/', router);
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
 

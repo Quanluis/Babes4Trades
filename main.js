@@ -1,3 +1,8 @@
+// This JavaScript file is for maniulating The Dom elements within the Babes4Trades website 
+
+// These functions below enable the switch between price tiers 
+// The code link can be found between these functions and the Pricing.html page
+
 function swapDivsYearly() {
   let monthlyDiv = document.getElementById("containerPrice"); // Monthly Subscription
   let yearlyDiv = document.getElementById("containerPrice2"); // Yearly Subscription
@@ -22,6 +27,9 @@ function swapDivsMonthly() {
   }
 }
 
+
+// Enables persistency within the page elements when scrolling
+
 window.onscroll = function () {
   // Get the height of the document, viewport and current scroll position
   var docHeight = document.documentElement.scrollHeight;
@@ -37,19 +45,7 @@ window.onscroll = function () {
   }
 };
 
-function subscribeButton() {
-  let buttonPressed = document.getElementById("subscribeButton");
-
-  if (buttonPressed == true) {
-    console.log("This button has been clicked.");
-  }
-}
-
-function visitPage() {
-  window.location = "/pages/signUp.html";
-
-  console.log("This is working");
-}
+// The formData content below needs to be linked to the Server.js file.
 
 document.addEventListener("DOMContentLoaded", function () {
   const form = document.getElementById("signupForm");
@@ -154,20 +150,3 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
-
-// fetch("/api/register", {
-//   method: "POST",
-//   headers: {
-//     "Content-Type": "application/json",
-//   },
-//   body: JSON.stringify(formData),
-// })
-//   .then((response) => response.json())
-//   .then((data) => {
-//     console.log("Success:", data);
-//     alert("Registration successful!");
-//   })
-//   .catch((error) => {
-//     console.error("Error:", error);
-//     alert("There was an error with your registration.");
-//   });
