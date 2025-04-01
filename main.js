@@ -45,6 +45,9 @@ window.onscroll = function () {
   }
 };
 
+
+
+
 // The formData content below needs to be linked to the Server.js file.
 
 document.addEventListener("DOMContentLoaded", function () {
