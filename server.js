@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const rateLimit = require("express-rate-limit");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 
@@ -30,6 +31,14 @@ const UserSchema = new mongoose.Schema({
     password: { type: String, required: true }
 });
 const User = mongoose.model("User", UserSchema);
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Allow max 5 login attempts per IP
+  message: { error: "Too many login attempts. Please try again later." },
+  standardHeaders: true, // Return rate limit info in headers
+  legacyHeaders: false, // Disable legacy headers
+});
 
 // ✅ Registration Endpoint
 app.post("/api/register", async (req, res) => {
@@ -68,7 +77,7 @@ app.get("/api/user/:email", async (req, res) => {
   }
 });
 
-app.post("/api/login", async (req, res) => {
+app.post("/api/login", loginLimiter , async (req, res) => {
   try {
       const { email, password } = req.body;
 
