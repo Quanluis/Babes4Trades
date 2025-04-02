@@ -33,7 +33,7 @@ const UserSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    verfied: {type: Boolean, default: false}  // Verfication status
+    verified: {type: Boolean, default: false}  // Verfication status
 });
 const User = mongoose.model("User", UserSchema);
 
@@ -177,7 +177,7 @@ app.post("/api/login", loginLimiter , async (req, res) => {
 
       // Check if the account is verfied
 
-      if(!user.verfied) return res.status(400).json({error: "Please verify your email."});
+      if(!user.verified) return res.status(400).json({error: "Please verify your email."});
 
 
       // ✅ Compare the provided password with the hashed password in DB
@@ -188,13 +188,25 @@ app.post("/api/login", loginLimiter , async (req, res) => {
 
       // Generate JWT Token
 
-      const token = JWT.sign(
-        { userId: user._id, email: user.email },
-        process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN }
-    );
+    //   const token = JWT.sign(
+    //     { userId: user._id, email: user.email },
+    //     process.env.JWT_SECRET,
+    //     { expiresIn: process.env.JWT_EXPIRES_IN }
+    // );
 
-      res.json({ message: "Login successful!" });
+        const token = JWT.sign(
+            { userId: user._id, email: user.email },
+            process.env.JWT_SECRET,
+            { expiresIn: process.env.JWT_EXPIRES_IN || "1h" }  // Default to 1 hour if not set
+        );
+
+      res.json({ message: "Login successful!",
+            token, 
+            user: {
+                email: user.email,
+                username: user.username
+            }
+       });
 
   } catch (error) {
       console.error("❌ Login Error:", error);
