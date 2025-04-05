@@ -1,6 +1,6 @@
-// This JavaScript file is for maniulating The Dom elements within the Babes4Trades website 
+// This JavaScript file is for maniulating The Dom elements within the Babes4Trades website
 
-// These functions below enable the switch between price tiers 
+// These functions below enable the switch between price tiers
 // The code link can be found between these functions and the Pricing.html page
 
 function swapDivsYearly() {
@@ -27,7 +27,6 @@ function swapDivsMonthly() {
   }
 }
 
-
 // Enables persistency within the page elements when scrolling
 
 window.onscroll = function () {
@@ -45,10 +44,7 @@ window.onscroll = function () {
   }
 };
 
-
-
-
-// The formData content below needs to be linked to the Server.js file.
+// The formData from the SignUp content page below needs to be linked to the Server.js file.
 
 document.addEventListener("DOMContentLoaded", function () {
   const form = document.getElementById("signupForm");
@@ -156,29 +152,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
 //The SignIn formData content below needs to be linked to the Server.js file.
 
-document.addEventListener('DOMContentLoaded', function (){
-
+document.addEventListener("DOMContentLoaded", function () {
   const form = document.getElementById("signInForm");
   const signInEmail = document.getElementById("signinMainEmail");
-  const signInPassword = document.getElementById("signInMainPassword");
+  const signInPassword = document.getElementById("current-password");
 
-  form.addEventListener('submit', async function (event){
-
+  form.addEventListener("submit", async function (event) {
     event.preventDefault();
 
     const signInData = {
-
-      email: signInEmail.value, 
-      password: signInPassword.value
-
+      email: signInEmail.value,
+      password: signInPassword.value,
     };
+
+    //Send login data to backend
 
     try {
 
-      //Send login data to backend 
-
-      const sent = await fetch ("http://localhost:5000/api/login", {
-
+      const sent = await fetch("http://localhost:5000/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -186,18 +177,62 @@ document.addEventListener('DOMContentLoaded', function (){
         body: JSON.stringify(signInData),
       });
 
-        const data = await sent.json();
+      const data = await sent.json();
 
-        if (sent.ok) {
-          alert("Data Checked successfully");
-          form.reset(); // Reset form fields
-        } else {
-          alert("Error: " + data.error);
-        }
-      } catch (error) {
-        console.error("Error:", error);
-        alert("Email or password is incorrect. Please try again.");
+      if (sent.ok) {
+        alert("Data Checked successfully");
+        form.reset(); // Reset form fields
+      } else {
+        alert("Error: " + data.error);
       }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Email or password is incorrect. Please try again.");
+    }
+  });
+});
+
+//The SignIn formData content below needs to be linked to the Server.js file.
+
+document.addEventListener('DOMContentLoaded', function () {
+
+  const form = document.getElementById("dropDownSignInForm");
+  const signInDropDownEmail= document.getElementById("signInDropDownEmail");
+  const signInDropDownPassword = document.getElementById("signInDropDownPassword");
+
+  form.addEventListener("submit", async function (event){
+
+    event.preventDefault();
+
+    const dropDownSignInData = {
+      email: signInDropDownEmail.value,
+      password: signInDropDownPassword.value,
+    };
+
+    // Sends dropDownSignInData to backend 
+    try {
+
+      const sent = await fetch("http://localhost:5000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dropDownSignInData),
+      });
+
+      const data = await sent.json();
+
+      if (sent.ok) {
+        alert("Data Checked successfully");
+        form.reset(); // Reset form fields
+        
+      } else {
+        alert("Error: " + data.error);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Email or password is incorrect. Please try again.");
+    }
 
   });
 
