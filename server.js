@@ -153,6 +153,10 @@ app.get("/api/verify/:token", async (req, res) => {
 
         res.json({ message: "Email verified successfully! You can now log in." });
 
+        // redirect to page.
+
+        window.location.href = "localhost:5000/signin.html"
+
     } catch (error) {
 
         if (error.name === "TokenExpiredError") {
@@ -186,14 +190,6 @@ app.post("/api/login", loginLimiter , async (req, res) => {
           return res.status(400).json({ error: "Invalid email or password" });
       }
 
-      // Generate JWT Token
-
-    //   const token = JWT.sign(
-    //     { userId: user._id, email: user.email },
-    //     process.env.JWT_SECRET,
-    //     { expiresIn: process.env.JWT_EXPIRES_IN }
-    // );
-
         const token = JWT.sign(
             { userId: user._id, email: user.email },
             process.env.JWT_SECRET,
@@ -213,6 +209,8 @@ app.post("/api/login", loginLimiter , async (req, res) => {
       res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+
 
 // ✅ Serve HTML Pages
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));

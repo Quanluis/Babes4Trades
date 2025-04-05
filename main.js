@@ -153,3 +153,52 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
+
+//The SignIn formData content below needs to be linked to the Server.js file.
+
+document.addEventListener('DOMContentLoaded', function (){
+
+  const form = document.getElementById("signInForm");
+  const signInEmail = document.getElementById("signinMainEmail");
+  const signInPassword = document.getElementById("signInMainPassword");
+
+  form.addEventListener('submit', async function (event){
+
+    event.preventDefault();
+
+    const signInData = {
+
+      email: signInEmail.value, 
+      password: signInPassword.value
+
+    };
+
+    try {
+
+      //Send login data to backend 
+
+      const sent = await fetch ("http://localhost:5000/api/login", {
+
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(signInData),
+      });
+
+        const data = await sent.json();
+
+        if (sent.ok) {
+          alert("Data Checked successfully");
+          form.reset(); // Reset form fields
+        } else {
+          alert("Error: " + data.error);
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Email or password is incorrect. Please try again.");
+      }
+
+  });
+
+})
