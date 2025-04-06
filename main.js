@@ -277,7 +277,7 @@ document.addEventListener('DOMContentLoaded', function () {
       console.error("Error:", error);
       alert("Email or password is incorrect. Please try again. BRO");
     }
-    
+
   })
   
 })
@@ -331,6 +331,47 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } catch (err) {
       statusMsg.textContent = '❌ An error occurred. Please try again later.';
+    }
+  });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById("contactForm");
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // 💡 Fetch values *when form is submitted*
+    const email = document.getElementById("contactUsEmail").value;
+    const subject = document.getElementById("contactUsSubject").value;
+    const text = document.getElementById("contactUsText").value;
+
+    console.log("Contact Form Submission", { email, subject, text });
+
+    try {
+      const send = await fetch("http://localhost:5000/api/contact-us", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email,
+          subject,
+          text
+        }),  
+      });
+
+      const dataSent = await send.json();
+
+      if(send.ok) {
+        alert('✅ Message sent!');
+        form.reset();
+      } else {
+        alert("❌ Error: " + dataSent.error);
+      }
+    } catch(error) {
+      console.error("Error:", error);
+      alert("❌ Something went wrong. Please try again.");
     }
   });
 });

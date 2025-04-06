@@ -268,6 +268,28 @@ app.post("/api/reset-password", async (req, res) => {
   }
 });
 
+
+app.post("/api/contact-us", async (req, res) => {
+  try {
+    const { email, subject, text } = req.body;
+
+    console.log("Contact Form Submission", req.body);
+
+    await transporter.sendMail({
+      from: email,
+      to: process.env.EMAIL_USER,
+      subject: subject,
+      html: `${text}`
+    });
+
+    res.status(200).json({ message: "Email sent successfully!" });
+
+  } catch(error){
+    console.error("❌ Email Send Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 // ✅ Serve HTML Pages
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
 app.get("/about", (req, res) =>
