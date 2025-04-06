@@ -237,3 +237,100 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
 })
+
+
+// Logic for resetting the password
+
+document.addEventListener('DOMContentLoaded', function () {
+
+  const formForForgottenPass = document.getElementById("formForForgottenPass");
+  const emailForReset =  document.getElementById("emailForForgottenPass");
+
+  formForForgottenPass.addEventListener("submit", async function (event){
+
+    event.preventDefault();
+
+    const forgotPassData = {
+      email: emailForReset.value,
+    };
+
+    try {
+
+      const sent = await fetch("http://localhost:5000/api/request-password-reset", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(forgotPassData),
+      });
+
+      const data = await sent.json();
+
+      if (sent.ok) {
+        alert("Data Checked successfully");
+        form.reset(); // Reset form fields
+        
+      } else {
+        alert("Error: " + data.error);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Email or password is incorrect. Please try again. BRO");
+    }
+    
+  })
+  
+})
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('resetPasswordForm');
+  const newPassword = document.getElementById('newPassword');
+  const repeatPassword = document.getElementById('repeatPassword');
+  const statusMsg = document.getElementById('resetStatus');
+
+  const queryParams = new URLSearchParams(window.location.search);
+  const token = queryParams.get('token');
+  // const token = decodeURIComponent(queryParams.get('token'));
+
+  if (!token) {
+    statusMsg.textContent = 'Invalid or missing reset token.';
+    form.style.display = 'none';
+    return;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // Basic validation
+    if (newPassword.value !== repeatPassword.value) {
+      statusMsg.textContent = 'Passwords do not match.';
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/reset-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          token: token,
+          newPassword: newPassword.value
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        statusMsg.textContent = '✅ Password successfully reset. You can now sign in.';
+        form.reset();
+        form.style.display = 'none';
+      } else {
+        statusMsg.textContent = `❌ ${data.error || 'Reset failed. Please try again.'}`;
+      }
+    } catch (err) {
+      statusMsg.textContent = '❌ An error occurred. Please try again later.';
+    }
+  });
+});

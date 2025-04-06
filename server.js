@@ -10,6 +10,7 @@ const nodemailer = require("nodemailer");
 const JWT = require("jsonwebtoken");
 const { type } = require("os");
 const { error } = require("console");
+const { hash } = require("crypto");
 
 const app = express();
 app.use(cors());
@@ -200,6 +201,70 @@ app.post("/api/login", loginLimiter, async (req, res) => {
   } catch (error) {
     console.error("❌ Login Error:", error);
     res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Request Password Reset
+
+app.post('/api/request-password-reset', async (req, res) => {
+  
+  const {email} = req.body;
+
+  const user = await User.findOne({ email });
+
+  if(!user){
+    return res.json({ message: "If that email exist, a reset link has been sent to that email."})
+  }
+
+  const token = JWT.sign(
+
+    { userId: user._id},
+    process.env.RESET_PASSWORD_SECRET,
+    {expiresIn: '1h'}
+
+
+  );
+
+  const resetLink = `http://localhost:5000/reset-password.html?token=${token}`;
+
+  // send the email 
+
+  await transporter.sendMail({
+    from: process.env.RESET_PASSWORD_SECRET,
+    to: user.email,
+    subject: "Reset your email - Babes4Trades",
+    html: `<p>Click the link below to reset your email:</p>
+                 <a href="${resetLink}">Reset Email</a>
+                 <p>This link expires in 1 hour.</p>`,
+  });
+  
+  res.json({ message: "If that email exist, a reset link has been sent to that email."})
+
+})
+
+
+app.post("/api/reset-password", async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  try {
+    console.log('Received token:', token);
+
+    const payload = JWT.verify(token, process.env.RESET_PASSWORD_SECRET);
+    console.log('Decoded payload:', payload);
+
+    const user = await User.findById(payload.userId);
+    if (!user) {
+      return res.status(400).json({ error: 'Invalid token or user does not exist' });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    res.json({ message: "Password reset successful" });
+
+  } catch (error) {
+    console.error('Token error:', error);
+    return res.status(400).json({ error: error.message || "Invalid or expired token BRO" });
   }
 });
 
