@@ -191,9 +191,9 @@ app.post("/api/login", loginLimiter, async (req, res) => {
       user: {
         email: user.email,
         username: user.username,
-        password: user.password,
       },
     });
+    
   } catch (error) {
     console.error("❌ Login Error:", error);
     res.status(500).json({ error: "Internal Server Error" });

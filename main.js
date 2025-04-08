@@ -44,6 +44,14 @@ window.onscroll = function () {
   }
 };
 
+document.addEventListener('DOMContentLoaded', () => {
+  const savedUser = localStorage.getItem('user');
+  if (savedUser) {
+    const user = JSON.parse(savedUser);
+    document.getElementById("welcomeUser").textContent = `Welcome, ${user.username}!`;
+  }
+});
+
 // The formData from the SignUp content page below needs to be linked to the Server.js file.
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -150,12 +158,19 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-//The SignIn formData content below needs to be linked to the Server.js file.
-
 document.addEventListener("DOMContentLoaded", function () {
   const form = document.getElementById("signInForm");
   const signInEmail = document.getElementById("signinMainEmail");
   const signInPassword = document.getElementById("current-password");
+
+  // 🟢 Show username if already logged in
+  const savedUser = localStorage.getItem("user");
+  if (savedUser) {
+    const user = JSON.parse(savedUser);
+    document.getElementById("welcomeUser").textContent = `Welcome, ${user.username}!`;
+    signInDropdown.classList.add("d-none");
+    signOutBtn.classList.remove("d-none");
+  }
 
   form.addEventListener("submit", async function (event) {
     event.preventDefault();
@@ -164,8 +179,6 @@ document.addEventListener("DOMContentLoaded", function () {
       email: signInEmail.value,
       password: signInPassword.value,
     };
-
-    //Send login data to backend
 
     try {
       const sent = await fetch("http://localhost:5000/api/login", {
@@ -180,7 +193,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (sent.ok) {
         alert("Data Checked successfully");
-        form.reset(); // Reset form fields
+
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        // ✅ Update welcome message
+        document.getElementById("welcomeUser").textContent = `Welcome, ${data.user.username}!`;
+
+        // Optional redirect
+        window.location.href = "index.html";
+        
       } else {
         alert("Error: " + data.error);
       }
@@ -191,14 +213,85 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+  const loginForm = document.getElementById('dropDownSignInForm');
+
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById('signInDropDownEmail').value;
+    const password = document.getElementById('signInDropDownPassword').value;
+
+    try {
+      const response = await fetch("http://localhost:5000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        document.getElementById("welcomeUser").textContent = `Welcome, ${data.user.username}!`;
+        document.getElementById("signOutBtn").classList.remove("d-none");
+        document.getElementById("signInDropdown").classList.add("d-none");
+
+        // Redirect to homepage or reload if needed
+        window.location.href = "index.html";
+      } else {
+        alert(data.error);
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      alert("Something went wrong.");
+    }
+  });
+});
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const signOutBtn = document.getElementById('signOutBtn');
+  const welcomeUser = document.getElementById('welcomeUser');
+  const signInDropdown = document.getElementById('signInDropdown');
+
+  // If user is already logged in, show Sign Out and welcome message
+  const storedUser = localStorage.getItem('user');
+  if (storedUser) {
+    const user = JSON.parse(storedUser);
+    welcomeUser.textContent = `Welcome, ${user.username}!`;
+    signInDropdown.classList.add('d-none');
+    signOutBtn.classList.remove('d-none');
+  }
+
+  // ✅ Add the logout click handler
+  if (signOutBtn) {
+    signOutBtn.addEventListener('click', () => {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+
+      welcomeUser.textContent = '';
+      signOutBtn.classList.add('d-none');
+      signInDropdown.classList.remove('d-none');
+
+      // Optional redirect or page reload
+      window.location.href = 'index.html'; // or location.reload();
+    });
+  }
+});
+
+
+
 //The SignIn formData content below needs to be linked to the Server.js file.
 
 document.addEventListener("DOMContentLoaded", function () {
   const form = document.getElementById("dropDownSignInForm");
   const signInDropDownEmail = document.getElementById("signInDropDownEmail");
-  const signInDropDownPassword = document.getElementById(
-    "signInDropDownPassword"
-  );
+  const signInDropDownPassword = document.getElementById("signInDropDownPassword");
 
   form.addEventListener("submit", async function (event) {
     event.preventDefault();
