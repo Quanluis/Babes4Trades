@@ -168,7 +168,6 @@ document.addEventListener("DOMContentLoaded", function () {
     //Send login data to backend
 
     try {
-
       const sent = await fetch("http://localhost:5000/api/login", {
         method: "POST",
         headers: {
@@ -194,14 +193,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
 //The SignIn formData content below needs to be linked to the Server.js file.
 
-document.addEventListener('DOMContentLoaded', function () {
-
+document.addEventListener("DOMContentLoaded", function () {
   const form = document.getElementById("dropDownSignInForm");
-  const signInDropDownEmail= document.getElementById("signInDropDownEmail");
-  const signInDropDownPassword = document.getElementById("signInDropDownPassword");
+  const signInDropDownEmail = document.getElementById("signInDropDownEmail");
+  const signInDropDownPassword = document.getElementById(
+    "signInDropDownPassword"
+  );
 
-  form.addEventListener("submit", async function (event){
-
+  form.addEventListener("submit", async function (event) {
     event.preventDefault();
 
     const dropDownSignInData = {
@@ -209,9 +208,8 @@ document.addEventListener('DOMContentLoaded', function () {
       password: signInDropDownPassword.value,
     };
 
-    // Sends dropDownSignInData to backend 
+    // Sends dropDownSignInData to backend
     try {
-
       const sent = await fetch("http://localhost:5000/api/login", {
         method: "POST",
         headers: {
@@ -225,7 +223,6 @@ document.addEventListener('DOMContentLoaded', function () {
       if (sent.ok) {
         alert("Data Checked successfully");
         form.reset(); // Reset form fields
-        
       } else {
         alert("Error: " + data.error);
       }
@@ -233,21 +230,16 @@ document.addEventListener('DOMContentLoaded', function () {
       console.error("Error:", error);
       alert("Email or password is incorrect. Please try again.");
     }
-
   });
-
-})
-
+});
 
 // Logic for resetting the password
 
-document.addEventListener('DOMContentLoaded', function () {
-
+document.addEventListener("DOMContentLoaded", function () {
   const formForForgottenPass = document.getElementById("formForForgottenPass");
-  const emailForReset =  document.getElementById("emailForForgottenPass");
+  const emailForReset = document.getElementById("emailForForgottenPass");
 
-  formForForgottenPass.addEventListener("submit", async function (event){
-
+  formForForgottenPass.addEventListener("submit", async function (event) {
     event.preventDefault();
 
     const forgotPassData = {
@@ -255,90 +247,90 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     try {
-
-      const sent = await fetch("http://localhost:5000/api/request-password-reset", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(forgotPassData),
-      });
+      const sent = await fetch(
+        "http://localhost:5000/api/request-password-reset",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(forgotPassData),
+        }
+      );
 
       const data = await sent.json();
 
       if (sent.ok) {
-        alert("Data Checked successfully");
-        form.reset(); // Reset form fields
-        
+        alert("If you have an account with us please check your email.");
       } else {
         alert("Error: " + data.error);
       }
     } catch (error) {
       console.error("Error:", error);
-      alert("Email or password is incorrect. Please try again. BRO");
     }
+    form.reset(); // Reset form fields
+  });
+});
 
-  })
-  
-})
-
-
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('resetPasswordForm');
-  const newPassword = document.getElementById('newPassword');
-  const repeatPassword = document.getElementById('repeatPassword');
-  const statusMsg = document.getElementById('resetStatus');
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("resetPasswordForm");
+  const newPassword = document.getElementById("newPassword");
+  const repeatPassword = document.getElementById("repeatPassword");
+  const statusMsg = document.getElementById("resetStatus");
 
   const queryParams = new URLSearchParams(window.location.search);
-  const token = queryParams.get('token');
+  const token = queryParams.get("token");
   // const token = decodeURIComponent(queryParams.get('token'));
 
   if (!token) {
-    statusMsg.textContent = 'Invalid or missing reset token.';
-    form.style.display = 'none';
+    statusMsg.textContent = "Invalid or missing reset token.";
+    form.style.display = "none";
     return;
   }
 
-  form.addEventListener('submit', async (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     // Basic validation
     if (newPassword.value !== repeatPassword.value) {
-      statusMsg.textContent = 'Passwords do not match.';
+      statusMsg.textContent = "Passwords do not match.";
       return;
     }
 
     try {
-      const response = await fetch('/api/reset-password', {
-        method: 'POST',
+      const response = await fetch("/api/reset-password", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           token: token,
-          newPassword: newPassword.value
-        })
+          newPassword: newPassword.value,
+        }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        statusMsg.textContent = '✅ Password successfully reset. You can now sign in.';
+        statusMsg.textContent =
+          "✅ Password successfully reset. You can now sign in.";
         form.reset();
-        form.style.display = 'none';
+        form.style.display = "none";
       } else {
-        statusMsg.textContent = `❌ ${data.error || 'Reset failed. Please try again.'}`;
+        statusMsg.textContent = `❌ ${
+          data.error || "Reset failed. Please try again."
+        }`;
       }
     } catch (err) {
-      statusMsg.textContent = '❌ An error occurred. Please try again later.';
+      statusMsg.textContent = "❌ An error occurred. Please try again later.";
     }
   });
 });
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("contactForm");
 
-  form.addEventListener('submit', async (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     // 💡 Fetch values *when form is submitted*
@@ -350,26 +342,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       const send = await fetch("http://localhost:5000/api/contact-us", {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email,
           subject,
-          text
-        }),  
+          text,
+        }),
       });
 
       const dataSent = await send.json();
 
-      if(send.ok) {
-        alert('✅ Message sent!');
+      if (send.ok) {
+        alert("✅ Message sent!");
         form.reset();
       } else {
         alert("❌ Error: " + dataSent.error);
       }
-    } catch(error) {
+    } catch (error) {
       console.error("Error:", error);
       alert("❌ Something went wrong. Please try again.");
     }

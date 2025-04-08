@@ -103,12 +103,10 @@ app.post("/api/register", async (req, res) => {
                    <p>This link expires in 1 hour.</p>`,
     });
 
-    res
-      .status(201)
-      .json({
-        message:
-          "User registered successfully! Please check your email to verify your account.",
-      });
+    res.status(201).json({
+      message:
+        "User registered successfully! Please check your email to verify your account.",
+    });
   } catch (error) {
     console.error("❌ Registration Error:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -149,11 +147,9 @@ app.get("/api/verify/:token", async (req, res) => {
     res.json({ message: "Email verified successfully! You can now log in." });
   } catch (error) {
     if (error.name === "TokenExpiredError") {
-      return res
-        .status(400)
-        .json({
-          error: "Verification link has expired. Please request a new one.",
-        });
+      return res.status(400).json({
+        error: "Verification link has expired. Please request a new one.",
+      });
     }
     res.status(400).json({ error: "Invalid verification token." });
 
@@ -206,28 +202,26 @@ app.post("/api/login", loginLimiter, async (req, res) => {
 
 // Request Password Reset
 
-app.post('/api/request-password-reset', async (req, res) => {
-  
-  const {email} = req.body;
+app.post("/api/request-password-reset", async (req, res) => {
+  const { email } = req.body;
 
   const user = await User.findOne({ email });
 
-  if(!user){
-    return res.json({ message: "If that email exist, a reset link has been sent to that email."})
+  if (!user) {
+    return res.json({
+      message: "If that email exist, a reset link has been sent to that email.",
+    });
   }
 
   const token = JWT.sign(
-
-    { userId: user._id},
+    { userId: user._id },
     process.env.RESET_PASSWORD_SECRET,
-    {expiresIn: '1h'}
-
-
+    { expiresIn: "1h" }
   );
 
   const resetLink = `http://localhost:5000/reset-password.html?token=${token}`;
 
-  // send the email 
+  // send the email
 
   await transporter.sendMail({
     from: process.env.RESET_PASSWORD_SECRET,
@@ -237,37 +231,39 @@ app.post('/api/request-password-reset', async (req, res) => {
                  <a href="${resetLink}">Reset Email</a>
                  <p>This link expires in 1 hour.</p>`,
   });
-  
-  res.json({ message: "If that email exist, a reset link has been sent to that email."})
 
-})
-
+  res.json({
+    message: "If that email exist, a reset link has been sent to that email.",
+  });
+});
 
 app.post("/api/reset-password", async (req, res) => {
   const { token, newPassword } = req.body;
 
   try {
-    console.log('Received token:', token);
+    console.log("Received token:", token);
 
     const payload = JWT.verify(token, process.env.RESET_PASSWORD_SECRET);
-    console.log('Decoded payload:', payload);
+    console.log("Decoded payload:", payload);
 
     const user = await User.findById(payload.userId);
     if (!user) {
-      return res.status(400).json({ error: 'Invalid token or user does not exist' });
+      return res
+        .status(400)
+        .json({ error: "Invalid token or user does not exist" });
     }
 
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
 
     res.json({ message: "Password reset successful" });
-
   } catch (error) {
-    console.error('Token error:', error);
-    return res.status(400).json({ error: error.message || "Invalid or expired token BRO" });
+    console.error("Token error:", error);
+    return res
+      .status(400)
+      .json({ error: error.message || "Invalid or expired token BRO" });
   }
 });
-
 
 app.post("/api/contact-us", async (req, res) => {
   try {
@@ -279,12 +275,11 @@ app.post("/api/contact-us", async (req, res) => {
       from: email,
       to: process.env.EMAIL_USER,
       subject: subject,
-      html: `${text}`
+      html: `${text}`,
     });
 
     res.status(200).json({ message: "Email sent successfully!" });
-
-  } catch(error){
+  } catch (error) {
     console.error("❌ Email Send Error:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
