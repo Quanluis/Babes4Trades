@@ -23,18 +23,27 @@
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav me-auto">
       <li class="nav-item">
-        <a class="nav-link" href="../index.html">Home</a>
+        <a class="nav-link" href="index.html">Home</a>
       </li>
-      <li class="nav-item">
+      <li class="nav-item hide-when-logged-in">
         <a class="nav-link" href="meetTheGirls.html">Meet the Babes</a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="course.html">Courses</a>
-      </li> 
-      <li class="nav-item">
+      <li class="nav-item hide-when-logged-in">
         <a class="nav-link" href="pricing.html">Pricing</a>
       </li>
-      <li class="nav-item">
+      <li class="nav-item show-when-logged-in d-none">
+        <a class="nav-link" href="pricing.html">Subscribe</a>
+      </li>
+      <li class="nav-item show-when-logged-in d-none">
+        <a class="nav-link" href="meetTheGirls.html">BabesGallery</a>
+      </li>
+      <li class="nav-item hide-when-logged-in">
+        <a class="nav-link" href="course.html">Courses</a>
+      </li>
+      <li class="nav-item show-when-logged-in d-none">
+        <a class="nav-link" href="https://wistia.com">Courses</a>
+      </li>
+      <li class="nav-item hide-when-logged-in">
         <a class="nav-link" href="about.html">About</a>
       </li>
     </ul>

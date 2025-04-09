@@ -239,6 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.getElementById("welcomeUser").textContent = `Welcome, ${data.user.username}!`;
         document.getElementById("signOutBtn").classList.remove("d-none");
+        document.getElementById("babesGallary").classList.remove('d-none');
         document.getElementById("signInDropdown").classList.add("d-none");
 
         // Redirect to homepage or reload if needed
@@ -254,21 +255,174 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+// document.addEventListener('DOMContentLoaded', () => {
+//   const signOutBtn = document.getElementById('signOutBtn');
+//   const welcomeUser = document.getElementById('welcomeUser');
+//   const signInDropdown = document.getElementById('signInDropdown');
+
+//   function toggleAuthLinks(isLoggedIn) {
+//     const toHide = document.querySelectorAll('.hide-when-logged-in');
+//     const toShow = document.querySelectorAll('.show-when-logged-in');
+
+//     toHide.forEach(el => el.classList.toggle('d-none', isLoggedIn));
+//     toShow.forEach(el => el.classList.toggle('d-none', !isLoggedIn));
+//   }
+
+//   toggleAuthLinks(true); // when user is logged in
+  
+
+//   // If user is already logged in, show Sign Out and welcome message
+//   const storedUser = localStorage.getItem('user');
+//   if (storedUser) {
+//     const user = JSON.parse(storedUser);
+//     welcomeUser.textContent = `Welcome, ${user.username}!`;
+//     signInDropdown.classList.add('d-none');
+//     signOutBtn.classList.remove('d-none');
+    
+//   }
+
+//   // ✅ Add the logout click handler
+//   if (signOutBtn) {
+//     signOutBtn.addEventListener('click', () => {
+//       localStorage.removeItem('token');
+//       localStorage.removeItem('user');
+
+//       welcomeUser.textContent = '';
+//       signOutBtn.classList.add('d-none');
+//       signInDropdown.classList.remove('d-none');
+//       babesGallary.classList.add('d-none');
+
+//       // Optional redirect or page reload
+//       window.location.href = 'index.html'; // or location.reload();
+//     });
+//   }
+// });
+
+
+
+// //The SignIn formData content below needs to be linked to the Server.js file.
+
+// document.addEventListener("DOMContentLoaded", function () {
+//   const form = document.getElementById("dropDownSignInForm");
+//   const signInDropDownEmail = document.getElementById("signInDropDownEmail");
+//   const signInDropDownPassword = document.getElementById("signInDropDownPassword");
+
+//   function toggleAuthLinks(isLoggedIn) {
+//     const toHide = document.querySelectorAll('.hide-when-logged-in');
+//     const toShow = document.querySelectorAll('.show-when-logged-in');
+
+//     toHide.forEach(el => el.classList.toggle('d-none', isLoggedIn));
+//     toShow.forEach(el => el.classList.toggle('d-none', !isLoggedIn));
+//   }
+
+//   toggleAuthLinks(false); // when user logs out
+
+//   form.addEventListener("submit", async function (event) {
+//     event.preventDefault();
+
+//     const dropDownSignInData = {
+//       email: signInDropDownEmail.value,
+//       password: signInDropDownPassword.value,
+//     };
+
+//     // Sends dropDownSignInData to backend
+//     try {
+//       const sent = await fetch("http://localhost:5000/api/login", {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify(dropDownSignInData),
+//       });
+
+//       const data = await sent.json();
+
+//       if (sent.ok) {
+//         alert("Data Checked successfully");
+//         form.reset(); // Reset form fields
+//       } else {
+//         alert("Error: " + data.error);
+//       }
+//     } catch (error) {
+//       console.error("Error:", error);
+//       alert("Email or password is incorrect. Please try again.");
+//     }
+//   });
+// });
+
 document.addEventListener('DOMContentLoaded', () => {
   const signOutBtn = document.getElementById('signOutBtn');
   const welcomeUser = document.getElementById('welcomeUser');
   const signInDropdown = document.getElementById('signInDropdown');
+  const loginForm = document.getElementById('dropDownSignInForm');
+  const signInDropDownEmail = document.getElementById('signInDropDownEmail');
+  const signInDropDownPassword = document.getElementById('signInDropDownPassword');
 
-  // If user is already logged in, show Sign Out and welcome message
+  // ✅ Define once: show/hide links
+  function toggleAuthLinks(isLoggedIn) {
+    const toHide = document.querySelectorAll('.hide-when-logged-in');
+    const toShow = document.querySelectorAll('.show-when-logged-in');
+
+    toHide.forEach(el => el.classList.toggle('d-none', isLoggedIn));
+    toShow.forEach(el => el.classList.toggle('d-none', !isLoggedIn));
+  }
+
+  // ✅ Check for existing user on page load
   const storedUser = localStorage.getItem('user');
   if (storedUser) {
     const user = JSON.parse(storedUser);
     welcomeUser.textContent = `Welcome, ${user.username}!`;
     signInDropdown.classList.add('d-none');
     signOutBtn.classList.remove('d-none');
+    toggleAuthLinks(true); // user is logged in
+  } else {
+    toggleAuthLinks(false); // user is NOT logged in
   }
 
-  // ✅ Add the logout click handler
+  // ✅ Handle Sign In Form Submit
+  if (loginForm) {
+    loginForm.addEventListener('submit', async function (event) {
+      event.preventDefault();
+
+      const dropDownSignInData = {
+        email: signInDropDownEmail.value,
+        password: signInDropDownPassword.value,
+      };
+
+      try {
+        const sent = await fetch("http://localhost:5000/api/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(dropDownSignInData),
+        });
+
+        const data = await sent.json();
+
+        if (sent.ok) {
+          // ✅ Store user and update UI
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("user", JSON.stringify(data.user));
+
+          welcomeUser.textContent = `Welcome, ${data.user.username}!`;
+          signInDropdown.classList.add('d-none');
+          signOutBtn.classList.remove('d-none');
+          toggleAuthLinks(true);
+
+          form.reset(); // Reset form fields
+          window.location.href = "/pricing.html";
+        } else {
+          alert("Error: " + data.error);
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Email or password is incorrect. Please try again.");
+      }
+    });
+  }
+
+  // ✅ Handle Sign Out
   if (signOutBtn) {
     signOutBtn.addEventListener('click', () => {
       localStorage.removeItem('token');
@@ -277,54 +431,14 @@ document.addEventListener('DOMContentLoaded', () => {
       welcomeUser.textContent = '';
       signOutBtn.classList.add('d-none');
       signInDropdown.classList.remove('d-none');
+      toggleAuthLinks(false);
 
-      // Optional redirect or page reload
-      window.location.href = 'index.html'; // or location.reload();
+      window.location.href = 'index.html';
     });
   }
 });
 
 
-
-//The SignIn formData content below needs to be linked to the Server.js file.
-
-document.addEventListener("DOMContentLoaded", function () {
-  const form = document.getElementById("dropDownSignInForm");
-  const signInDropDownEmail = document.getElementById("signInDropDownEmail");
-  const signInDropDownPassword = document.getElementById("signInDropDownPassword");
-
-  form.addEventListener("submit", async function (event) {
-    event.preventDefault();
-
-    const dropDownSignInData = {
-      email: signInDropDownEmail.value,
-      password: signInDropDownPassword.value,
-    };
-
-    // Sends dropDownSignInData to backend
-    try {
-      const sent = await fetch("http://localhost:5000/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(dropDownSignInData),
-      });
-
-      const data = await sent.json();
-
-      if (sent.ok) {
-        alert("Data Checked successfully");
-        form.reset(); // Reset form fields
-      } else {
-        alert("Error: " + data.error);
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("Email or password is incorrect. Please try again.");
-    }
-  });
-});
 
 // Logic for resetting the password
 
@@ -460,3 +574,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
+
+
