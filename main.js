@@ -254,102 +254,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-
-// document.addEventListener('DOMContentLoaded', () => {
-//   const signOutBtn = document.getElementById('signOutBtn');
-//   const welcomeUser = document.getElementById('welcomeUser');
-//   const signInDropdown = document.getElementById('signInDropdown');
-
-//   function toggleAuthLinks(isLoggedIn) {
-//     const toHide = document.querySelectorAll('.hide-when-logged-in');
-//     const toShow = document.querySelectorAll('.show-when-logged-in');
-
-//     toHide.forEach(el => el.classList.toggle('d-none', isLoggedIn));
-//     toShow.forEach(el => el.classList.toggle('d-none', !isLoggedIn));
-//   }
-
-//   toggleAuthLinks(true); // when user is logged in
-  
-
-//   // If user is already logged in, show Sign Out and welcome message
-//   const storedUser = localStorage.getItem('user');
-//   if (storedUser) {
-//     const user = JSON.parse(storedUser);
-//     welcomeUser.textContent = `Welcome, ${user.username}!`;
-//     signInDropdown.classList.add('d-none');
-//     signOutBtn.classList.remove('d-none');
-    
-//   }
-
-//   // ✅ Add the logout click handler
-//   if (signOutBtn) {
-//     signOutBtn.addEventListener('click', () => {
-//       localStorage.removeItem('token');
-//       localStorage.removeItem('user');
-
-//       welcomeUser.textContent = '';
-//       signOutBtn.classList.add('d-none');
-//       signInDropdown.classList.remove('d-none');
-//       babesGallary.classList.add('d-none');
-
-//       // Optional redirect or page reload
-//       window.location.href = 'index.html'; // or location.reload();
-//     });
-//   }
-// });
-
-
-
-// //The SignIn formData content below needs to be linked to the Server.js file.
-
-// document.addEventListener("DOMContentLoaded", function () {
-//   const form = document.getElementById("dropDownSignInForm");
-//   const signInDropDownEmail = document.getElementById("signInDropDownEmail");
-//   const signInDropDownPassword = document.getElementById("signInDropDownPassword");
-
-//   function toggleAuthLinks(isLoggedIn) {
-//     const toHide = document.querySelectorAll('.hide-when-logged-in');
-//     const toShow = document.querySelectorAll('.show-when-logged-in');
-
-//     toHide.forEach(el => el.classList.toggle('d-none', isLoggedIn));
-//     toShow.forEach(el => el.classList.toggle('d-none', !isLoggedIn));
-//   }
-
-//   toggleAuthLinks(false); // when user logs out
-
-//   form.addEventListener("submit", async function (event) {
-//     event.preventDefault();
-
-//     const dropDownSignInData = {
-//       email: signInDropDownEmail.value,
-//       password: signInDropDownPassword.value,
-//     };
-
-//     // Sends dropDownSignInData to backend
-//     try {
-//       const sent = await fetch("http://localhost:5000/api/login", {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify(dropDownSignInData),
-//       });
-
-//       const data = await sent.json();
-
-//       if (sent.ok) {
-//         alert("Data Checked successfully");
-//         form.reset(); // Reset form fields
-//       } else {
-//         alert("Error: " + data.error);
-//       }
-//     } catch (error) {
-//       console.error("Error:", error);
-//       alert("Email or password is incorrect. Please try again.");
-//     }
-//   });
-// });
-
 document.addEventListener('DOMContentLoaded', () => {
   const signOutBtn = document.getElementById('signOutBtn');
   const welcomeUser = document.getElementById('welcomeUser');
@@ -438,6 +342,41 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+document.querySelectorAll('.subscribe-btn').forEach(btn => {
+  btn.addEventListener('click', async (e) => {
+    e.preventDefault();
+
+    const priceId = btn.dataset.price;
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    if (!user) {
+      return window.location.href = '/signUp.html';
+    }
+
+    try {
+      const response = await fetch('/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ user, priceId })
+      });
+
+      const sessionUrl = await response.text();
+
+      if (sessionUrl.startsWith('http')) {
+        window.location.href = sessionUrl; // ✅ Redirect to Stripe Checkout
+      } else {
+        console.error("Unexpected response:", sessionUrl);
+        alert("Checkout could not be started.");
+      }
+
+    } catch (err) {
+      console.error("Checkout Error:", err);
+      alert("Something went wrong.");
+    }
+  });
+});
 
 
 // Logic for resetting the password
@@ -575,5 +514,54 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+document.addEventListener("DOMContentLoaded", () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const tier = localStorage.getItem("subscriptionTier");
 
+  document.getElementById("thanksMessage").textContent =
+    user?.username
+      ? `Thank you, ${user.username}, for subscribing!`
+      : `Thank you for your subscription!`;
 
+  if (tier) {
+    document.getElementById("tierMessage").textContent = `You've subscribed to the ${tier} plan.`;
+  }
+
+  // Confetti 🎉
+  const canvas = document.getElementById("confettiCanvas");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const pieces = Array.from({ length: 150 }, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height - canvas.height,
+    radius: Math.random() * 6 + 4,
+    color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+    speed: Math.random() * 3 + 2,
+    angle: Math.random() * 2 * Math.PI,
+    spin: Math.random() * 0.2 - 0.1
+  }));
+
+  function drawConfetti() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pieces.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, 2 * Math.PI);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+
+      p.y += p.speed;
+      p.x += Math.sin(p.angle) * 1.5;
+      p.angle += p.spin;
+
+      if (p.y > canvas.height) {
+        p.y = 0;
+        p.x = Math.random() * canvas.width;
+      }
+    });
+    requestAnimationFrame(drawConfetti);
+  }
+
+  drawConfetti();
+});

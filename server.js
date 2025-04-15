@@ -8,13 +8,82 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const nodemailer = require("nodemailer");
 const JWT = require("jsonwebtoken");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const { type } = require("os");
 const { error } = require("console");
 const { hash } = require("crypto");
-
 const app = express();
+
 app.use(cors());
-app.use(bodyParser.json());
+
+app.post(
+  "/webhook",
+  express.raw({ type: "application/json" }),
+  async (req, res) => {
+    console.log("🔥 Webhook triggered");
+
+    const sig = req.headers["stripe-signature"];
+
+    let event;
+
+    try {
+      event = stripe.webhooks.constructEvent(
+        req.body,
+        sig,
+        process.env.STRIPE_WEBHOOK_SECRET
+      );
+    } catch (err) {
+      console.error("❌ Webhook signature error:", err.message);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    console.log("🔔 Webhook event type:", event.type);
+    console.log("📦 Full session payload:", event.data.object);
+
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object;
+      const email = session.customer_email;
+
+      if (!email) {
+        console.log("❌ No customer_email in session!");
+        return res.status(400).send("No email provided in session.");
+      }
+
+      console.log("📧 Updating paidSubscription for:", email);
+
+      const updatedUser = await User.findOneAndUpdate(
+        { email: new RegExp(`^${email}$`, "i") },
+        { paidSubscription: true },
+        { new: true }
+      );
+
+      if (!updatedUser) {
+        console.log("⚠️ No matching user found in DB for email:", email);
+        const users = await User.find(); // debug all users
+        console.log(
+          "🧠 All user emails in DB:",
+          users.map((u) => u.email)
+        );
+      } else {
+        console.log("✅ User updated:", updatedUser.email);
+      }
+    }
+
+    res.status(200).send("Webhook received");
+  }
+);
+
+app.use(express.json());
+
+app.get("/check-sub-status", async (req, res) => {
+  const email = req.query.email;
+  if (!email) return res.send("No email provided");
+
+  const user = await User.findOne({ email });
+  if (!user) return res.send("No user found");
+
+  res.send(`Paid Subscription: ${user.paidSubscription}`);
+});
 
 // ✅ Serve Static Files BEFORE Routes
 app.use(express.static(path.join(__dirname, "/")));
@@ -36,6 +105,7 @@ const UserSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   verified: { type: Boolean, default: false }, // Verfication status
+  paidSubscription: { type: Boolean, default: false }, // Paid subscription status
 });
 const User = mongoose.model("User", UserSchema);
 
@@ -193,7 +263,6 @@ app.post("/api/login", loginLimiter, async (req, res) => {
         username: user.username,
       },
     });
-    
   } catch (error) {
     console.error("❌ Login Error:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -282,6 +351,35 @@ app.post("/api/contact-us", async (req, res) => {
   } catch (error) {
     console.error("❌ Email Send Error:", error);
     res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.post("/checkout", async (req, res) => {
+  try {
+    const { user, priceId } = req.body || {};
+
+    if (!user || !priceId) {
+      return res.status(400).json({ error: "Missing user or price ID" });
+    }
+
+    const session = await stripe.checkout.sessions.create({
+      mode: "subscription",
+      line_items: [
+        {
+          price: priceId,
+          quantity: 1,
+        },
+      ],
+      customer_email: user.email,
+      success_url: "http://localhost:5000/pages/paymentsuccess.html",
+      cancel_url: "http://localhost:5000/pages/paymentcancelled.html", // ✅ use full URLs
+    });
+
+    // ✅ SEND the session URL (do NOT redirect)
+    res.send(session.url);
+  } catch (error) {
+    console.error("❌ Stripe checkout error:", error);
+    res.status(500).send("Failed to start checkout.");
   }
 });
 
