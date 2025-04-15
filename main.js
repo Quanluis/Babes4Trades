@@ -44,11 +44,13 @@ window.onscroll = function () {
   }
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-  const savedUser = localStorage.getItem('user');
+document.addEventListener("DOMContentLoaded", () => {
+  const savedUser = localStorage.getItem("user");
   if (savedUser) {
     const user = JSON.parse(savedUser);
-    document.getElementById("welcomeUser").textContent = `Welcome, ${user.username}!`;
+    document.getElementById(
+      "welcomeUser"
+    ).textContent = `Welcome, ${user.username}!`;
   }
 });
 
@@ -167,7 +169,9 @@ document.addEventListener("DOMContentLoaded", function () {
   const savedUser = localStorage.getItem("user");
   if (savedUser) {
     const user = JSON.parse(savedUser);
-    document.getElementById("welcomeUser").textContent = `Welcome, ${user.username}!`;
+    document.getElementById(
+      "welcomeUser"
+    ).textContent = `Welcome, ${user.username}!`;
     signInDropdown.classList.add("d-none");
     signOutBtn.classList.remove("d-none");
   }
@@ -198,11 +202,12 @@ document.addEventListener("DOMContentLoaded", function () {
         localStorage.setItem("user", JSON.stringify(data.user));
 
         // ✅ Update welcome message
-        document.getElementById("welcomeUser").textContent = `Welcome, ${data.user.username}!`;
+        document.getElementById(
+          "welcomeUser"
+        ).textContent = `Welcome, ${data.user.username}!`;
 
         // Optional redirect
         window.location.href = "index.html";
-        
       } else {
         alert("Error: " + data.error);
       }
@@ -213,14 +218,14 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-  const loginForm = document.getElementById('dropDownSignInForm');
+document.addEventListener("DOMContentLoaded", () => {
+  const loginForm = document.getElementById("dropDownSignInForm");
 
-  loginForm.addEventListener('submit', async (e) => {
+  loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const email = document.getElementById('signInDropDownEmail').value;
-    const password = document.getElementById('signInDropDownPassword').value;
+    const email = document.getElementById("signInDropDownEmail").value;
+    const password = document.getElementById("signInDropDownPassword").value;
 
     try {
       const response = await fetch("http://localhost:5000/api/login", {
@@ -237,9 +242,11 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
 
-        document.getElementById("welcomeUser").textContent = `Welcome, ${data.user.username}!`;
+        document.getElementById(
+          "welcomeUser"
+        ).textContent = `Welcome, ${data.user.username}!`;
         document.getElementById("signOutBtn").classList.remove("d-none");
-        document.getElementById("babesGallary").classList.remove('d-none');
+        document.getElementById("babesGallary").classList.remove("d-none");
         document.getElementById("signInDropdown").classList.add("d-none");
 
         // Redirect to homepage or reload if needed
@@ -254,30 +261,32 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-  const signOutBtn = document.getElementById('signOutBtn');
-  const welcomeUser = document.getElementById('welcomeUser');
-  const signInDropdown = document.getElementById('signInDropdown');
-  const loginForm = document.getElementById('dropDownSignInForm');
-  const signInDropDownEmail = document.getElementById('signInDropDownEmail');
-  const signInDropDownPassword = document.getElementById('signInDropDownPassword');
+document.addEventListener("DOMContentLoaded", () => {
+  const signOutBtn = document.getElementById("signOutBtn");
+  const welcomeUser = document.getElementById("welcomeUser");
+  const signInDropdown = document.getElementById("signInDropdown");
+  const loginForm = document.getElementById("dropDownSignInForm");
+  const signInDropDownEmail = document.getElementById("signInDropDownEmail");
+  const signInDropDownPassword = document.getElementById(
+    "signInDropDownPassword"
+  );
 
   // ✅ Define once: show/hide links
   function toggleAuthLinks(isLoggedIn) {
-    const toHide = document.querySelectorAll('.hide-when-logged-in');
-    const toShow = document.querySelectorAll('.show-when-logged-in');
+    const toHide = document.querySelectorAll(".hide-when-logged-in");
+    const toShow = document.querySelectorAll(".show-when-logged-in");
 
-    toHide.forEach(el => el.classList.toggle('d-none', isLoggedIn));
-    toShow.forEach(el => el.classList.toggle('d-none', !isLoggedIn));
+    toHide.forEach((el) => el.classList.toggle("d-none", isLoggedIn));
+    toShow.forEach((el) => el.classList.toggle("d-none", !isLoggedIn));
   }
 
   // ✅ Check for existing user on page load
-  const storedUser = localStorage.getItem('user');
+  const storedUser = localStorage.getItem("user");
   if (storedUser) {
     const user = JSON.parse(storedUser);
     welcomeUser.textContent = `Welcome, ${user.username}!`;
-    signInDropdown.classList.add('d-none');
-    signOutBtn.classList.remove('d-none');
+    signInDropdown.classList.add("d-none");
+    signOutBtn.classList.remove("d-none");
     toggleAuthLinks(true); // user is logged in
   } else {
     toggleAuthLinks(false); // user is NOT logged in
@@ -285,7 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ✅ Handle Sign In Form Submit
   if (loginForm) {
-    loginForm.addEventListener('submit', async function (event) {
+    loginForm.addEventListener("submit", async function (event) {
       event.preventDefault();
 
       const dropDownSignInData = {
@@ -310,8 +319,8 @@ document.addEventListener('DOMContentLoaded', () => {
           localStorage.setItem("user", JSON.stringify(data.user));
 
           welcomeUser.textContent = `Welcome, ${data.user.username}!`;
-          signInDropdown.classList.add('d-none');
-          signOutBtn.classList.remove('d-none');
+          signInDropdown.classList.add("d-none");
+          signOutBtn.classList.remove("d-none");
           toggleAuthLinks(true);
 
           form.reset(); // Reset form fields
@@ -328,56 +337,54 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ✅ Handle Sign Out
   if (signOutBtn) {
-    signOutBtn.addEventListener('click', () => {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+    signOutBtn.addEventListener("click", () => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
 
-      welcomeUser.textContent = '';
-      signOutBtn.classList.add('d-none');
-      signInDropdown.classList.remove('d-none');
+      welcomeUser.textContent = "";
+      signOutBtn.classList.add("d-none");
+      signInDropdown.classList.remove("d-none");
       toggleAuthLinks(false);
 
-      window.location.href = 'index.html';
+      window.location.href = "index.html";
     });
   }
 });
 
-document.querySelectorAll('.subscribe-btn').forEach(btn => {
-  btn.addEventListener('click', async (e) => {
+document.querySelectorAll(".subscribe-btn").forEach((btn) => {
+  btn.addEventListener("click", async (e) => {
     e.preventDefault();
 
     const priceId = btn.dataset.price;
-    const user = JSON.parse(localStorage.getItem('user'));
+    const user = JSON.parse(localStorage.getItem("user"));
 
     if (!user) {
-      return window.location.href = '/signUp.html';
+      return (window.location.href = "/signUp.html");
     }
 
     try {
-      const response = await fetch('/checkout', {
-        method: 'POST',
+      const response = await fetch("/checkout", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ user, priceId })
+        body: JSON.stringify({ user, priceId }),
       });
 
       const sessionUrl = await response.text();
 
-      if (sessionUrl.startsWith('http')) {
+      if (sessionUrl.startsWith("http")) {
         window.location.href = sessionUrl; // ✅ Redirect to Stripe Checkout
       } else {
         console.error("Unexpected response:", sessionUrl);
         alert("Checkout could not be started.");
       }
-
     } catch (err) {
       console.error("Checkout Error:", err);
       alert("Something went wrong.");
     }
   });
 });
-
 
 // Logic for resetting the password
 
@@ -518,13 +525,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const user = JSON.parse(localStorage.getItem("user"));
   const tier = localStorage.getItem("subscriptionTier");
 
-  document.getElementById("thanksMessage").textContent =
-    user?.username
-      ? `Thank you, ${user.username}, for subscribing!`
-      : `Thank you for your subscription!`;
+  document.getElementById("thanksMessage").textContent = user?.username
+    ? `Thank you, ${user.username}, for subscribing!`
+    : `Thank you for your subscription!`;
 
   if (tier) {
-    document.getElementById("tierMessage").textContent = `You've subscribed to the ${tier} plan.`;
+    document.getElementById(
+      "tierMessage"
+    ).textContent = `You've subscribed to the ${tier} plan.`;
   }
 
   // Confetti 🎉
@@ -540,12 +548,12 @@ document.addEventListener("DOMContentLoaded", () => {
     color: `hsl(${Math.random() * 360}, 100%, 50%)`,
     speed: Math.random() * 3 + 2,
     angle: Math.random() * 2 * Math.PI,
-    spin: Math.random() * 0.2 - 0.1
+    spin: Math.random() * 0.2 - 0.1,
   }));
 
   function drawConfetti() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    pieces.forEach(p => {
+    pieces.forEach((p) => {
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.radius, 0, 2 * Math.PI);
       ctx.fillStyle = p.color;
