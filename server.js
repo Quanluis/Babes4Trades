@@ -223,8 +223,6 @@ app.get("/api/verify/:token", async (req, res) => {
     }
     res.status(400).json({ error: "Invalid verification token." });
 
-    // console.error("Verification Error:", error);
-    // res.status(500).json({ error: "Invalid or expired token" });
   }
 });
 

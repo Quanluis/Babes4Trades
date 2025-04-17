@@ -7,8 +7,8 @@ nav {
 }
 
 @font-face {
-  font-family: 'Lobster';
-  src: url('/public/Fonts/Lobster/Lobster-Regular.ttf') format('woff2');
+  font-family: "Lobster";
+  src: url("/public/Fonts/Lobster/Lobster-Regular.ttf") format("woff2");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -18,29 +18,36 @@ h1 {
   font-family: "Lobster";
   text-align: center;
   color: white;
-  
 }
 
 h2 {
-
   font-family: "Lobster";
   text-align: center;
-
 
   color: #6a11cb;
 
   /* Chrome 10-25, Safari 5.1-6 */
-  color: -webkit-linear-gradient(to right, rgba(106,17,203,0.65), rgba(37,117,252,0.65));
+  color: -webkit-linear-gradient(
+    to right,
+    rgba(106, 17, 203, 0.65),
+    rgba(37, 117, 252, 0.65)
+  );
 
   /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-  color: linear-gradient(to right, rgba(106,17,203,0.65), rgba(37,117,252,0.65))
-
+  color: linear-gradient(
+    to right,
+    rgba(106, 17, 203, 0.65),
+    rgba(37, 117, 252, 0.65)
+  );
 }
-
 
 p {
   text-align: center;
   font-size: 1.1rem;
+}
+
+#signUpP {
+  font-size: 0.7rem;
 }
 
 body {
@@ -67,16 +74,13 @@ footer {
   margin: -0.1rem;
 }
 
-
 object {
   height: 30px;
-  padding-left: .5rem;
+  padding-left: 0.5rem;
 }
 
 #socialsvg {
-  
- margin-bottom: -.5rem;
-  
+  margin-bottom: -0.5rem;
 }
 
 #legal {
@@ -85,16 +89,13 @@ object {
 }
 
 #forgotPass {
-  
-    margin: 0 auto; /* Added */
-    float: none; /* Added */
-    
+  margin: 0 auto; /* Added */
+  float: none; /* Added */
 }
 
 .dropdown-menu {
   width: max-content;
 }
-
 
 /* This is the Navbar gradient  */
 
@@ -103,11 +104,18 @@ object {
   background: #6a11cb;
 
   /* Chrome 10-25, Safari 5.1-6 */
-  background: -webkit-linear-gradient(to right, rgba(106,17,203,0.65), rgba(37,117,252,0.65));
+  background: -webkit-linear-gradient(
+    to right,
+    rgba(106, 17, 203, 0.65),
+    rgba(37, 117, 252, 0.65)
+  );
 
   /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-  background: linear-gradient(to right, rgba(106,17,203,0.65), rgba(37,117,252,0.65))
-
+  background: linear-gradient(
+    to right,
+    rgba(106, 17, 203, 0.65),
+    rgba(37, 117, 252, 0.65)
+  );
 }
 
 .faq-section {
@@ -125,59 +133,11 @@ object {
   color: white;
   cursor: pointer;
 }
-/* .card-body {
-  background-color: #f1f1f1;
-}
-  */
- /* Center the <h1> within the navbar */
- /* .navbar .navbar-collapse {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}   */
 
-  /* @media (min-width: 600px) and (max-width: 992px) {
+/* Fix dropdown positioning on small screens */
+@media (max-width: 991px) {
   .dropdown-menu {
-      left: 100% !important;
-      top: 0 !important;
-      transform: none !important;
+    width: 100%; /* Make dropdown full-width for better visibility */
+    text-align: center; /* Center the dropdown content */
   }
-} 
-
-@media (max-width: 600px) {
-  .dropdown-menu {
-      left: 100% !important;
-      top: 0 !important;
-      transform: none !important;
-  }
-}  */
-
-
-        /* Fix dropdown positioning on small screens */
-        @media (max-width: 991px) {
-          .dropdown-menu {
-              width: 100%; /* Make dropdown full-width for better visibility */
-              text-align: center; /* Center the dropdown content */
-          }
-      }
-
- /* .navbar h1 {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%); 
-  margin: 0; 
-}   */
-
-/* #authContainer {
-  display: flex;
-  align-items: center;
 }
-
-#signInDropdown {
-  display: block;
-}
-
-#signOutBtn {
-  display: none;
-}
-  */
