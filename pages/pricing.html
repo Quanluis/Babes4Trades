@@ -41,7 +41,7 @@
           <a class="nav-link" href="course.html">Courses</a>
         </li>
         <li class="nav-item show-when-logged-in d-none">
-          <a class="nav-link" href="https://wistia.com">Courses</a>
+          <a class="nav-link" href="video.html">My Courses</a>
         </li>
         <li class="nav-item hide-when-logged-in">
           <a class="nav-link" href="about.html">About</a>
@@ -51,6 +51,14 @@
       <!-- ✅ Username + Auth Button -->
       <div class="d-flex align-items-center gap-3">
         <span id="welcomeUser" class="navbar-text text-white"></span>
+        <span class="show-when-logged-in d-none">
+          
+            <a href="settings.html">
+              
+            <img id="gear" src="/SVG/gear-svgrepo-com.svg"/>
+            
+            </a>
+        </span>
 
         <div id="authContainer" class="d-flex align-items-center">
           <!-- Sign In Button (Visible when user is logged out) -->
@@ -166,60 +174,11 @@
   </div>
 </div>
 
-<!-- https://buy.stripe.com/test_8wM8zs4kT9qc2ZifYY  -->
 
 </div>
 
-  <!-- <div id="containerPrice" class="container">
-    <div` class="row">
-      <div class="col-md-6">
-        <div class="card-container pt-5">
-          <div class="card text-center">
-            <div class="card-body">
-              <h5 class="card-title" >Standard Monthly Subscription</h5>
-    
-              <div>
-                <p id="perks" class="card-text">Access to all available courses videos and quizzes.</p>
-                <p id="perks" class="card-text">Model Gallery and Bio's</p>
-              </div>
 
-              <br>
-
-              <h2>9.99$</h2>
-              
-              <br>
-              
-              <a href="https://buy.stripe.com/test_8wM8zs4kT9qc2ZifYY" class="btn btn-primary">Subscribe</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-6">
-        <div class="card-container pt-5">
-          <div class="card text-center">
-            <div class="card-body">
-              <h5 class="card-title">Elite Monthly Subscription</h5>
-              
-              <div>
-                <p id="perks" class="card-text">Benefits of Standard subscription.</p>
-                <p id="perks" class="card-text">Exclusive access to behind the scenes with the girls.</p>
-                <p id="perks" class="card-text">Early access to new models and courses.</p>
-                
-              </div>
-
-              <br>
-
-              <h2>14.99$</h2>
-
-              <br>
-
-              <a href="#" class="btn btn-primary">Subscribe</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div> -->
+  </div> -->
   
    <!-- Yearly subscription -->
 
@@ -234,6 +193,7 @@
                 <p id="perks" class="card-text">Model Gallery and Bio's</p>
               </div>
               <div class="mt-auto">
+                
                 <!-- Optional footer content if needed -->
     
                 <br>
@@ -241,8 +201,7 @@
                 <h2>104.99$</h2>
     
                 <br>
-    
-                <!-- <a href="signUp.html" class="btn btn-primary">Subscribe</a>   -->
+
 
                 <a href="#" data-price="price_1REHGRGO8SKWxsEAzyKDQuj4" class="btn btn-primary subscribe-btn">Subscribe</a>  
     
@@ -279,102 +238,7 @@
       </div>
     </div>
 
-    <!-- https://buy.stripe.com/test_8wM8zs4kT9qc2ZifYY -->
-
-  
-   <!-- <div id="containerPrice2" class="container" style="display: none;" >
-    <div class="row">
-      <div class="col-md-6">
-        <div class="card-container pt-5">
-          <div class="card text-center">
-            <div class="card-body">
-              <h5 class="card-title">Yearly Standard Subscription</h5>
-              
-              <div>
-                <p id="perks" class="card-text">Access to all available courses videos and quizzes.</p>
-                <p id="perks" class="card-text">Model Gallery and Bio's</p>
-                <p id="perks" class="card-text">Bundled up in a yearly package (discount included)</p>
-              </div>
-
-              <br>
-              <br>
-
-              <h2>105$</h2>
-
-              <a href="#" class="btn btn-primary">Subscribe</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-6">
-        <div class="card-container pt-5">
-          <div class="card text-center">
-            <div class="card-body">
-              <h5 class="card-title">Yearly Elite Subscription</h5>
-              <div>
-                <p id="perks" class="card-text">Benefits of Standard subscription.</p>
-                <p id="perks" class="card-text">Exclusive access to behind the scenes with the girls.</p>
-                <p id="perks" class="card-text">Early access to new models and courses.</p>
-                <p id="perks" class="card-text">Bundled up in a yearly package (discount included)</p>
-              </div>
-
-              <br>
-
-              <h2>158$</h2>
-      
-              <a href="#" class="btn btn-primary">Subscribe</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>  -->
-
-
- <!-- <div id="footer" class="footer"> -->
-  <!-- <ul class="nav justify-content-center border-bottom pb-3 mb-3">
-      <li class="nav-item"><a href="index.html" class="nav-link px-2 text-muted">Home</a></li>
-      <li class="nav-item"><a href="../pages/about.html" class="nav-link px-2 text-muted">About</a></li>
-      <li class="nav-item"><a href="../pages/faq.html" class="nav-link px-2 text-muted">FAQs</a></li>
-  </ul>
-  <p class="text-center text-muted">© 2024 Company, Inc</p>
-</div>
-
-
-<footer class="footer text-center fixed-bottom">
-  <div class="container justify-content-center">
-    <ul class="nav justify-content-center border-bottom pb-3 mb-3">
-      <li class="nav-item"><a href="../index.html" class="nav-link px-2 text-muted">Home</a></li>
-      <li class="nav-item"><a href="about.html" class="nav-link px-2 text-muted">About</a></li>
-      <li class="nav-item"><a href="faq.html" class="nav-link px-2 text-muted">FAQs</a></li>
-    </ul>
-    <p class="text-center text-muted">© 2024 Company, Inc</p>
-  </div>
-</footer> -->
-
-
 </body>
-
-
-  <!-- <div class="fixed-bottom">
-    <ul class="nav justify-content-center border-bottom pb-3 mb-3">
-      <li class="nav-item"><a href="../index.html" class="nav-link px-2 text-muted">Home</a></li>
-      <li class="nav-item"><a href="about.html" class="nav-link px-2 text-muted">About</a></li>
-      <li class="nav-item"><a href="faq.html" class="nav-link px-2 text-muted">FAQs</a></li>
-    </ul>
-    <p class="text-center text-muted">© 2024 Company, Inc</p>
-</div> -->
-
-
-<!-- <div id="footer" class="footer">
-  <ul class="nav justify-content-center border-bottom pb-3 mb-3">
-      <li class="nav-item"><a href="index.html" class="nav-link px-2 text-muted">Home</a></li>
-      <li class="nav-item"><a href="../pages/about.html" class="nav-link px-2 text-muted">About</a></li>
-      <li class="nav-item"><a href="../pages/faq.html" class="nav-link px-2 text-muted">FAQs</a></li>
-  </ul>
-  <p class="text-center text-muted">© 2024 Company, Inc</p>
-</div> -->
 
 <footer class="mt-auto">
   <div class="fixed">

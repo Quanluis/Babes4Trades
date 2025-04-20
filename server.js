@@ -12,6 +12,7 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const { type } = require("os");
 const { error } = require("console");
 const { hash } = require("crypto");
+const { allowedNodeEnvironmentFlags } = require("process");
 const app = express();
 
 app.use(cors());
@@ -379,6 +380,17 @@ app.post("/checkout", async (req, res) => {
     console.error("❌ Stripe checkout error:", error);
     res.status(500).send("Failed to start checkout.");
   }
+});
+
+
+// This will delete the user's account
+
+app.post('/deleteAccount', async (req, res) => {
+
+  
+
+
+
 });
 
 // ✅ Serve HTML Pages

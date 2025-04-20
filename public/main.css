@@ -83,6 +83,10 @@ object {
   margin-bottom: -0.5rem;
 }
 
+#gear {
+  height: 32px;
+}
+
 #legal {
   padding-bottom: 30px;
   font-size: 10px;
