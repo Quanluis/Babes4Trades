@@ -96,18 +96,25 @@
 
   <body  class="d-flex flex-column min-vh-100">
 
-    <h3 class="d-flex justify-content-center pt-5">Settings</h3> 
-    
-    <!-- <button class="btn btn-danger w-100">Delete Account</button> -->
+ <div class="align-items-center d-flex justify-content-center container mt-1">
 
-    <button onclick="window.location.href='reset-password.html'" class="btn btn-primary w-auto mx-auto d-block mt-3">Reset Password</button>
-    <button onclick="window.location.href='removeSubscription.html'" class="btn btn-primary w-auto mx-auto d-block mt-3">Remove Subscription</button>
-    <button onclick="window.location.href='deleteAccount.html'" class="btn btn-danger w-auto mx-auto d-block mt-3">Delete Account</button>
+    <form id="deleteAccountForm" class="px-4 py-3">
+        <div class="w-auto mx-auto d-block mt-3">
+            <label for="deleteAccountLabelEmail" class="form-label">Email address</label>
+            <input type="email" class="form-control" id="deleteAccountEmail" placeholder="email@example.com">
+        </div>
+        <div class="w-auto mx-auto d-block mt-3">
+            <label for="deleteAccountLabelPassword" class="form-label">Password</label>
+            <input type="password" class="form-control" id="deleteAccountPassword" placeholder="Password">
+        </div>
 
+        <button type="submit" class="btn btn-danger w-auto mx-auto d-block mt-3">Delete Account</button>
+    </form> 
+
+ </div>
 
   </body>
   
-
   <footer class="mt-auto">
     <div class="fixed">
       <ul class="nav justify-content-center border-bottom pb-3 mb-3">

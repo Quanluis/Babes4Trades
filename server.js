@@ -44,8 +44,9 @@ app.post(
     if (event.type === "checkout.session.completed") {
       const session = event.data.object;
       const email = session.customer_email;
+      const subscriptionId = session.subscription; //
 
-      if (!email) {
+      if (!email || !subscriptionId) {
         console.log("❌ No customer_email in session!");
         return res.status(400).send("No email provided in session.");
       }
@@ -54,7 +55,9 @@ app.post(
 
       const updatedUser = await User.findOneAndUpdate(
         { email: new RegExp(`^${email}$`, "i") },
-        { paidSubscription: true },
+        { paidSubscription: true,
+          subscriptionId: subscriptionId
+        },
         { new: true }
       );
 
@@ -107,6 +110,8 @@ const UserSchema = new mongoose.Schema({
   password: { type: String, required: true },
   verified: { type: Boolean, default: false }, // Verfication status
   paidSubscription: { type: Boolean, default: false }, // Paid subscription status
+  subscriptionId: {type: String}
+
 });
 const User = mongoose.model("User", UserSchema);
 
@@ -385,13 +390,35 @@ app.post("/checkout", async (req, res) => {
 
 // This will delete the user's account
 
-app.post('/deleteAccount', async (req, res) => {
+app.post("/delete-account", async (req, res) => {
+  const { email, password } = req.body;
 
-  
+  try {
+    const user = await User.findOne({ email });
 
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
 
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ error: "Incorrect password." });
+    }
 
+    if (user.subscriptionId) {
+      await stripe.subscriptions.del(user.subscriptionId);
+      console.log('✅ Stripe subscription canceled');
+    }
+
+    await User.deleteOne({ email });
+    res.json({ message: "Account deleted successfully." });
+
+  } catch (error) {
+    console.error("❌ Account deletion error:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
 });
+
 
 // ✅ Serve HTML Pages
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));

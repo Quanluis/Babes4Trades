@@ -573,3 +573,49 @@ document.addEventListener("DOMContentLoaded", () => {
 
   drawConfetti();
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+
+  const deleteAccountForm = document.getElementById("deleteAccountForm");
+
+  deleteAccountForm.addEventListener("submit", async function (event) {
+
+    event.preventDefault();
+
+    const email = document.getElementById("deleteAccountEmail").value;
+    const password = document.getElementById("deleteAccountPassword").value;
+
+     // ✅ Confirmation popup
+     const confirmed = confirm("Are you sure you want to delete your account? This action cannot be undone.");
+     if (!confirmed) return;
+  
+    try {
+      const response = await fetch("/delete-account", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, password })
+      });
+
+      const result = await response.json();
+
+    if (response.ok){
+
+      alert("Your account has been deleted.");
+
+      // ✅ Clear localStorage
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+    
+      window.location.href = "/index.html" // Redirect to homepage
+    
+    }else {
+      alert(result.error || "Failed to delete account");
+    }
+  } catch (err){
+    console.error("Error", err);
+    alert("An error occurred. Please try again.")
+  }
+});
+});
