@@ -101,6 +101,11 @@ object {
   width: max-content;
 }
 
+.card-img-top {
+  height: 250px;
+  object-fit: cover;
+}
+
 /* This is the Navbar gradient  */
 
 .gradient-custom {

@@ -387,6 +387,48 @@ app.post("/checkout", async (req, res) => {
   }
 });
 
+const authenticate = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ message: "Unauthorized" });
+
+  const token = authHeader.split(" ")[1];
+  try {
+    const decoded = JWT.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    res.status(401).json({ message: "Invalid or expired token" });
+  }
+};
+
+app.post("/api/unsubscribe", authenticate, async (req, res) => {
+  try {
+    const email = req.body.email;
+
+    const user = await User.findOne({ email });
+
+    if (!user || !user.subscriptionId) {
+      return res
+        .status(400)
+        .json({ message: "No active subscription found." });
+    }
+
+    await stripe.subscriptions.del(user.subscriptionId);
+
+    user.paidSubscription = false;
+    user.subscriptionId = null;
+    await user.save();
+
+    console.log(`✅ Subscription canceled for ${user.email}`);
+    res.json({ message: "Subscription canceled successfully." });
+  } catch (err) {
+    console.error("❌ Unsubscribe error:", err);
+    res.status(500).json({ message: "Something went wrong." });
+  }
+});
+
+
+
 
 // This will delete the user's account
 

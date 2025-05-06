@@ -574,6 +574,52 @@ document.addEventListener("DOMContentLoaded", () => {
   drawConfetti();
 });
 
+document.addEventListener("DOMContentLoaded", () => {
+  const unsubscribeBtn = document.getElementById("unsubscribeBtn");
+
+  if (unsubscribeBtn) {
+    unsubscribeBtn.addEventListener("click", async () => {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const token = localStorage.getItem("token");
+
+      if (!user || !token) {
+        return alert("You must be logged in to unsubscribe.");
+      }
+
+      const confirmUnsub = confirm(
+        "Are you sure you want to cancel your subscription? This will remove access to premium features."
+      );
+
+      if (!confirmUnsub) return;
+
+      try {
+        const response = await fetch("/api/unsubscribe", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // 🔒 optional security
+          },
+          body: JSON.stringify({ email: user.email }),
+        });
+
+        const result = await response.json();
+        alert(result.message);
+
+        if (response.ok) {
+          // Log them out and redirect
+          localStorage.removeItem("user");
+          localStorage.removeItem("token");
+          window.location.href = "/index.html";
+        }
+      } catch (error) {
+        console.error("Unsubscribe error:", error);
+        alert("Something went wrong while unsubscribing.");
+      }
+    });
+  }
+});
+
+
 document.addEventListener("DOMContentLoaded", function () {
 
   const deleteAccountForm = document.getElementById("deleteAccountForm");
@@ -586,7 +632,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const password = document.getElementById("deleteAccountPassword").value;
 
      // ✅ Confirmation popup
-     const confirmed = confirm("Are you sure you want to delete your account? This action cannot be undone.");
+     const confirmed = confirm("Are you sure you want to delete your account? Your subscription will be cancelled along with your account deleted. This action cannot be undone.");
      if (!confirmed) return;
   
     try {
