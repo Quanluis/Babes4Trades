@@ -189,18 +189,6 @@ app.post("/api/register", async (req, res) => {
   }
 });
 
-app.get("/api/user/:email", async (req, res) => {
-  try {
-    const user = await User.findOne({ email: req.params.email });
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-    res.json({ hashedPassword: user.password });
-  } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
 app.get("/api/verify/:token", async (req, res) => {
   try {
     const { token } = req.params;
@@ -413,7 +401,7 @@ app.post("/api/unsubscribe", authenticate, async (req, res) => {
         .json({ message: "No active subscription found." });
     }
 
-    await stripe.subscriptions.del(user.subscriptionId);
+    await stripe.subscriptions.cancel(user.subscriptionId);
 
     user.paidSubscription = false;
     user.subscriptionId = null;
@@ -426,8 +414,6 @@ app.post("/api/unsubscribe", authenticate, async (req, res) => {
     res.status(500).json({ message: "Something went wrong." });
   }
 });
-
-
 
 
 // This will delete the user's account
@@ -461,6 +447,26 @@ app.post("/delete-account", async (req, res) => {
   }
 });
 
+app.get("/api/user/:email", async (req, res) => {
+  try {
+    const user = await User.findOne({
+      email: new RegExp(`^${req.params.email}$`, "i"),
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json({
+      username: user.username,
+      email: user.email,
+      paidSubscription: user.paidSubscription,
+    });
+  } catch (error) {
+    console.error("User fetch error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
 // ✅ Serve HTML Pages
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));

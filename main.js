@@ -218,6 +218,8 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
+
+
 document.addEventListener("DOMContentLoaded", () => {
   const loginForm = document.getElementById("dropDownSignInForm");
 
@@ -664,4 +666,36 @@ document.addEventListener("DOMContentLoaded", function () {
     alert("An error occurred. Please try again.")
   }
 });
+});
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const storedUser = localStorage.getItem("user");
+
+  if (!storedUser) {
+    document.getElementById("userProfile").innerHTML =
+      "<p class='text-center'>Please log in to view your profile.</p>";
+    return;
+  }
+
+  const user = JSON.parse(storedUser);
+
+  try {
+    const response = await fetch(`/api/user/${encodeURIComponent(user.email)}`);
+    const data = await response.json();
+
+    if (data.error) {
+      return console.error("User fetch error:", data.error);
+    }
+
+    document.getElementById("profileUsername").textContent = `Username: ${data.username}`;
+    document.getElementById("profileEmail").textContent = `Email: ${data.email}`;
+
+    const statusEl = document.getElementById("profileStatus");
+    statusEl.textContent = data.paidSubscription ? "Paid Subscriber" : "Free Account";
+    statusEl.className = `badge fs-6 px-3 py-2 mt-2 ${
+      data.paidSubscription ? "bg-success text-white" : "bg-secondary text-white"
+    }`;
+  } catch (err) {
+    console.error("Failed to load user profile:", err);
+  }
 });
