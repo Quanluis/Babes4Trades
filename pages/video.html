@@ -38,27 +38,42 @@
       <!-- Navbar Links -->
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav me-auto">
+          <!-- Always visible -->
           <li class="nav-item">
             <a class="nav-link" href="../index.html">Home</a>
           </li>
-          <li class="nav-item hide-when-logged-in">
+        
+          <!-- Guest or unpaid user -->
+          <li class="nav-item show-when-free d-none">
             <a class="nav-link" href="meetTheGirls.html">Meet the Babes</a>
           </li>
+        
+          <!-- Guests only -->
           <li class="nav-item hide-when-logged-in">
             <a class="nav-link" href="pricing.html">Pricing</a>
           </li>
+        
+          <!-- Logged-in users (unpaid or paid) -->
           <li class="nav-item show-when-logged-in d-none">
             <a class="nav-link" href="pricing.html">Subscribe</a>
           </li>
-          <li class="nav-item show-when-logged-in d-none">
+        
+          <!-- Paid subscribers only -->
+          <li class="nav-item show-when-paid d-none">
             <a class="nav-link" href="babesGallery.html">BabesGallery</a>
           </li>
-          <li class="nav-item hide-when-logged-in">
+        
+          <!-- Guest or unpaid users -->
+          <li class="nav-item show-when-free d-none">
             <a class="nav-link" href="course.html">Courses</a>
           </li>
-          <li class="nav-item show-when-logged-in d-none">
+        
+          <!-- Logged-in paid subscribers -->
+          <li class="nav-item show-when-paid d-none">
             <a class="nav-link" href="video.html">My Courses</a>
           </li>
+        
+          <!-- Guests only -->
           <li class="nav-item hide-when-logged-in">
             <a class="nav-link" href="about.html">About</a>
           </li>

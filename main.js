@@ -388,6 +388,32 @@ document.querySelectorAll(".subscribe-btn").forEach((btn) => {
   });
 });
 
+document.addEventListener("DOMContentLoaded", async () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  if (!user) return;
+
+  try {
+    const response = await fetch(`/api/user/${encodeURIComponent(user.email)}`);
+    const freshUser = await response.json();
+
+    if (response.ok && !freshUser.error) {
+      // Update localStorage with the fresh user (should now have paidSubscription: true)
+      localStorage.setItem("user", JSON.stringify(freshUser));
+
+      // Optionally update the navbar or redirect if needed
+      if (typeof updateNavbarBasedOnUser === "function") {
+        updateNavbarBasedOnUser(freshUser);
+      }
+
+      console.log("✅ User updated after payment:", freshUser);
+    } else {
+      console.warn("⚠️ Could not fetch fresh user info:", freshUser.error);
+    }
+  } catch (err) {
+    console.error("❌ Error fetching updated user after payment:", err);
+  }
+});
+
 // Logic for resetting the password
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -698,4 +724,34 @@ document.addEventListener("DOMContentLoaded", async () => {
   } catch (err) {
     console.error("Failed to load user profile:", err);
   }
+});
+
+function updateNavbarBasedOnUser(user) {
+  const guestOnly = document.querySelectorAll(".hide-when-logged-in");
+  const loggedInOnly = document.querySelectorAll(".show-when-logged-in");
+  const paidOnly = document.querySelectorAll(".show-when-paid");
+  const freeOnly = document.querySelectorAll(".show-when-free");
+
+  if (user) {
+    guestOnly.forEach(el => el.classList.add("d-none"));
+    loggedInOnly.forEach(el => el.classList.remove("d-none"));
+
+    if (user.paidSubscription) {
+      paidOnly.forEach(el => el.classList.remove("d-none"));
+      freeOnly.forEach(el => el.classList.add("d-none"));
+    } else {
+      paidOnly.forEach(el => el.classList.add("d-none"));
+      freeOnly.forEach(el => el.classList.remove("d-none"));
+    }
+  } else {
+    guestOnly.forEach(el => el.classList.remove("d-none"));
+    loggedInOnly.forEach(el => el.classList.add("d-none"));
+    paidOnly.forEach(el => el.classList.add("d-none"));
+    freeOnly.forEach(el => el.classList.remove("d-none")); // Guests count as free users
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  updateNavbarBasedOnUser(user);
 });
