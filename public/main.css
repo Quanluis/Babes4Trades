@@ -4,6 +4,12 @@ html {
 
 nav {
   font-display: swap; /* Ensures a smooth transition to the font */
+  
+}
+
+.navbar {
+  padding-top: 1.2rem;
+  padding-bottom: 1.2rem;
 }
 
 @font-face {
@@ -74,10 +80,16 @@ footer {
   margin: -0.1rem;
 }
 
-object {
+
+#logoSVG {
+  height: 8rem;
+  margin-top: .5rem;
+}
+
+#socialSVG {
   height: 30px;
   padding-left: 0.5rem;
-}
+} */
 
 #socialsvg {
   margin-bottom: -0.5rem;
@@ -108,7 +120,7 @@ object {
 
 .bg-text-overlay {
   position: absolute;
-  top: 8%;
+  top: 20%;
   left: 24%;
   transform: translate(-50%, -50%);
   z-index: 10;
