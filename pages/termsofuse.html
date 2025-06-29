@@ -25,7 +25,6 @@
 
     <!-- Navbar Links -->
     <div class="collapse navbar-collapse" id="navbarNav">
- 
       <ul class="navbar-nav me-auto">
         <!-- Always visible -->
         <li class="nav-item">
@@ -68,33 +67,48 @@
         </li>
       </ul>
 
-      <!-- Sign-In Dropdown -->
-      <div class="dropdown">
-        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-          Sign In
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end">
-          <form class="px-4 py-3">
-            <div class="mb-3">
-              <label for="exampleDropdownFormEmail1" class="form-label">Email address</label>
-              <input type="email" class="form-control" id="exampleDropdownFormEmail1" placeholder="email@example.com">
-            </div>
-            <div class="mb-3">
-              <label for="exampleDropdownFormPassword1" class="form-label">Password</label>
-              <input type="password" class="form-control" id="exampleDropdownFormPassword1" placeholder="Password">
-            </div>
-            <div class="mb-3 form-check">
-              <input type="checkbox" class="form-check-input" id="dropdownCheck">
-              <label class="form-check-label" for="dropdownCheck">Remember me</label>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Sign in</button>
-          </form> 
-          <div class="dropdown-divider"></div>
-          <a class="dropdown-item" href="signUp.html">New around here? Sign up</a>
-          <a class="dropdown-item" href="forgotPass.html">Forgot password?</a>
-        </ul>
-      </div>
+      <!-- ✅ Username + Auth Button -->
+      <div class="d-flex align-items-center gap-3">
+        <span id="welcomeUser" class="navbar-text text-white"></span>
 
+        <span class="show-when-logged-in d-none">
+          
+          <a href="settings.html">
+            
+          <img id="gear" src="/SVG/gear-svgrepo-com.svg"/>
+          
+          </a>
+        </span>
+
+        <div id="authContainer" class="d-flex align-items-center">
+          <!-- Sign In Button (Visible when user is logged out) -->
+          <div id="signInDropdown" class="d-block">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+              Sign In
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <form id="dropDownSignInForm" class="px-4 py-3">
+                <div class="mb-3">
+                  <label for="signInDropDownEmail" class="form-label">Email address</label>
+                  <input type="email" class="form-control" id="signInDropDownEmail" placeholder="email@example.com">
+                </div>
+                <div class="mb-3">
+                  <label for="signInDropDownPassword" class="form-label">Password</label>
+                  <input type="password" class="form-control" id="signInDropDownPassword" placeholder="Password">
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Sign in</button>
+              </form> 
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="signUp.html">New around here? Sign up</a>
+              <a class="dropdown-item" href="forgotPass.html">Forgot password?</a>
+            </ul>
+          </div>
+
+          <!-- Sign Out Button (Visible when user is logged in) -->
+          <button id="signOutBtn" class="btn btn-danger d-none">Sign Out</button>
+          
+        </div>
+      </div>
     </div>
   </div>
 </nav>
@@ -102,7 +116,7 @@
   <body  class="d-flex flex-column min-vh-100"  >
     <div class="pt-1">
 
-      <div class="container mt-5">
+      <div class="container mt-3">
 
         <h2>Terms of Use</h2>
 
@@ -186,9 +200,9 @@
   <footer class="mt-auto">
     <div class="fixed">
       <ul class="nav justify-content-center border-bottom pb-3 mb-3">
-        <li class="nav-item"><a href="../index.html" class="nav-link px-2 text-muted">Home</a></li>
-        <li class="nav-item"><a href="about.html" class="nav-link px-2 text-muted">About</a></li>
-        <li class="nav-item"><a href="contact.html" class="nav-link px-2 text-muted">Contact</a></li>
+        <li class="nav-item"><a href="../index.html" class="px-2 text-muted footer-links">Home</a></li>
+        <li class="nav-item"><a href="about.html" class="px-2 text-muted footer-links">About</a></li>
+        <li class="nav-item"><a href="contact.html" class="px-2 text-muted footer-links">Contact</a></li>
       </ul>
       <div class="fixed gap-3">
         <ul class="nav justify-content-center">

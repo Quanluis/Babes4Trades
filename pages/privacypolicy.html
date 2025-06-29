@@ -11,10 +11,10 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark gradient-custom">
   <div class="container-fluid">
-  <!-- Navbar Toggle Button (for Mobile) -->
-  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
+    <!-- Navbar Toggle Button (for Mobile) -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
     <!-- Centered Company Name -->
     <span class="navbar-brand position-absolute start-50 translate-middle-x text-white fs-4"><h1>
@@ -23,97 +23,164 @@
 
     </h1></span>
 
-  <!-- Navbar Links -->
-  <div class="collapse navbar-collapse" id="navbarNav">
-    <ul class="navbar-nav me-auto">
-      <!-- Always visible -->
-      <li class="nav-item">
-        <a class="nav-link" href="../index.html">Home</a>
-      </li>
-    
-      <!-- Guest or unpaid user -->
-      <li class="nav-item show-when-free d-none">
-        <a class="nav-link" href="meetTheGirls.html">Meet the Babes</a>
-      </li>
-    
-      <!-- Guests only -->
-      <li class="nav-item hide-when-logged-in">
-        <a class="nav-link" href="pricing.html">Pricing</a>
-      </li>
-    
-      <!-- Logged-in users (unpaid or paid) -->
-      <li class="nav-item show-when-logged-in d-none">
-        <a class="nav-link" href="pricing.html">Subscribe</a>
-      </li>
-    
-      <!-- Paid subscribers only -->
-      <li class="nav-item show-when-paid d-none">
-        <a class="nav-link" href="babesGallery.html">BabesGallery</a>
-      </li>
-    
-      <!-- Guest or unpaid users -->
-      <li class="nav-item show-when-free d-none">
-        <a class="nav-link" href="course.html">Courses</a>
-      </li>
-    
-      <!-- Logged-in paid subscribers -->
-      <li class="nav-item show-when-paid d-none">
-        <a class="nav-link" href="video.html">My Courses</a>
-      </li>
-    
-      <!-- Guests only -->
-      <li class="nav-item hide-when-logged-in">
-        <a class="nav-link" href="about.html">About</a>
-      </li>
-    </ul>
+    <!-- Navbar Links -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <!-- Always visible -->
+        <li class="nav-item">
+          <a class="nav-link" href="../index.html">Home</a>
+        </li>
+      
+        <!-- Guest or unpaid user -->
+        <li class="nav-item show-when-free d-none">
+          <a class="nav-link" href="meetTheGirls.html">Meet the Babes</a>
+        </li>
+      
+        <!-- Guests only -->
+        <li class="nav-item hide-when-logged-in">
+          <a class="nav-link" href="pricing.html">Pricing</a>
+        </li>
+      
+        <!-- Logged-in users (unpaid or paid) -->
+        <li class="nav-item show-when-logged-in d-none">
+          <a class="nav-link" href="pricing.html">Subscribe</a>
+        </li>
+      
+        <!-- Paid subscribers only -->
+        <li class="nav-item show-when-paid d-none">
+          <a class="nav-link" href="babesGallery.html">BabesGallery</a>
+        </li>
+      
+        <!-- Guest or unpaid users -->
+        <li class="nav-item show-when-free d-none">
+          <a class="nav-link" href="course.html">Courses</a>
+        </li>
+      
+        <!-- Logged-in paid subscribers -->
+        <li class="nav-item show-when-paid d-none">
+          <a class="nav-link" href="video.html">My Courses</a>
+        </li>
+      
+        <!-- Guests only -->
+        <li class="nav-item hide-when-logged-in">
+          <a class="nav-link" href="about.html">About</a>
+        </li>
+      </ul>
 
-      <!-- Sign-In Dropdown -->
-      <div class="dropdown">
-        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-          Sign In
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end">
-          <form id="dropDownSignInForm" class="px-4 py-3">
-            <div class="mb-3">
-              <label for="exampleDropdownFormEmail1" class="form-label">Email address</label>
-              <input type="email" class="form-control" id="signInDropDownEmail" placeholder="email@example.com">
-            </div>
-            <div class="mb-3">
-              <label for="exampleDropdownFormPassword1" class="form-label">Password</label>
-              <input type="password" class="form-control" id="signInDropDownPassword" placeholder="Password">
-            </div>
-            <div class="mb-3 form-check">
-              <input type="checkbox" class="form-check-input" id="dropdownCheck">
-              <label class="form-check-label" for="dropdownCheck">Remember me</label>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Sign in</button>
-          </form> 
-          <div class="dropdown-divider"></div>
-          <a class="dropdown-item" href="signUp.html">New around here? Sign up</a>
-          <a class="dropdown-item" href="forgotPass.html">Forgot password?</a>
-        </ul>
+      <!-- ✅ Username + Auth Button -->
+      <div class="d-flex align-items-center gap-3">
+        <span id="welcomeUser" class="navbar-text text-white"></span>
+
+        <span class="show-when-logged-in d-none">
+          
+          <a href="settings.html">
+            
+          <img id="gear" src="/SVG/gear-svgrepo-com.svg"/>
+          
+          </a>
+        </span>
+
+        <div id="authContainer" class="d-flex align-items-center">
+          <!-- Sign In Button (Visible when user is logged out) -->
+          <div id="signInDropdown" class="d-block">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+              Sign In
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <form id="dropDownSignInForm" class="px-4 py-3">
+                <div class="mb-3">
+                  <label for="signInDropDownEmail" class="form-label">Email address</label>
+                  <input type="email" class="form-control" id="signInDropDownEmail" placeholder="email@example.com">
+                </div>
+                <div class="mb-3">
+                  <label for="signInDropDownPassword" class="form-label">Password</label>
+                  <input type="password" class="form-control" id="signInDropDownPassword" placeholder="Password">
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Sign in</button>
+              </form> 
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="signUp.html">New around here? Sign up</a>
+              <a class="dropdown-item" href="forgotPass.html">Forgot password?</a>
+            </ul>
+          </div>
+
+          <!-- Sign Out Button (Visible when user is logged in) -->
+          <button id="signOutBtn" class="btn btn-danger d-none">Sign Out</button>
+          
+        </div>
       </div>
-
+    </div>
   </div>
-</div>
 </nav>
 
-  <body  class="d-flex flex-column min-vh-100"  >
-    <div class="pt-5">
-     
-      
-    </div>
+<body  class="d-flex flex-column min-vh-100"  >
 
-  </body>
+<section class="container pt-3  " >
+
+  <h2>Privacy Policy</h2>
+
+  <p><strong>Effective Date:</strong> Janurary 1st 2025</p>
+
+  <p>Welcome to <strong>Babes4Trades</strong>! Your privacy is important to us. This Privacy Policy explains how we collect, use, and protect your information when you use our website and services.</p>
+
+  <h2 style="font-size: 1.75rem; margin-top: 2rem; color: #333; font-weight: bold; border-bottom: 1px solid #ccc; padding-bottom: 0.5rem;">1. Information We Collect</h2>
+  <ul>
+    <li><strong>Personal Information</strong> – such as your name, email address, and payment information when you sign up, subscribe, or contact us.</li>
+    <li><strong>Usage Data</strong> – including your IP address, browser type, pages visited, and time spent on the site.</li>
+    <li><strong>Cookies & Tracking</strong> – we use cookies and similar technologies to enhance your experience and analyze usage.</li>
+  </ul>
+
+  <h2 style="font-size: 1.75rem; margin-top: 2rem; color: #333; font-weight: bold; border-bottom: 1px solid #ccc; padding-bottom: 0.5rem;">2. How We Use Your Information</h2>
+  <ul>
+    <li>Provide and maintain our services</li>
+    <li>Process payments and manage subscriptions</li>
+    <li>Send you updates, newsletters, or promotional content (you can opt out)</li>
+    <li>Improve our website functionality and user experience</li>
+    <li>Detect and prevent fraud or abuse</li>
+  </ul>
+
+  <h2 style="font-size: 1.75rem; margin-top: 2rem; color: #333; font-weight: bold; border-bottom: 1px solid #ccc; padding-bottom: 0.5rem;">3. How We Share Your Information</h2>
+  <p>We <strong>do not sell</strong> your personal information. We may share data with trusted third-party services to help us run our business, such as:</p>
+  <ul>
+    <li>Payment processors (e.g., Stripe)</li>
+    <li>Email and newsletter services</li>
+    <li>Analytics platforms</li>
+  </ul>
+  <p>These providers only receive the information they need and are required to safeguard your data.</p>
+
+  <h2 style="font-size: 1.75rem; margin-top: 2rem; color: #333; font-weight: bold; border-bottom: 1px solid #ccc; padding-bottom: 0.5rem;">4. Your Choices & Rights</h2>
+  <p>You have the right to:</p>
+  <ul>
+    <li>Access, update, or delete your personal information</li>
+    <li>Opt out of promotional emails at any time</li>
+    <li>Disable cookies in your browser settings</li>
+  </ul>
+  <p>To make a request, email us at <a href="mailto:noreply@babes4trades.com">noreply@babes4trades.com</a>.</p>
+
+  <h2 style="font-size: 1.75rem; margin-top: 2rem; color: #333; font-weight: bold; border-bottom: 1px solid #ccc; padding-bottom: 0.5rem;">5. Data Security</h2>
+  <p>We take appropriate security measures to protect your data, but no online platform is 100% secure. Please use strong passwords and protect your account credentials.</p>
+
+  <h2 style="font-size: 1.75rem; margin-top: 2rem; color: #333; font-weight: bold; border-bottom: 1px solid #ccc; padding-bottom: 0.5rem;">6. Children's Privacy</h2>
+  <p>Babes4Trades is not intended for children under 18. We do not knowingly collect data from minors. If you believe a minor has provided us information, contact us to have it removed.</p>
+
+  <h2 style="font-size: 1.75rem; margin-top: 2rem; color: #333; font-weight: bold; border-bottom: 1px solid #ccc; padding-bottom: 0.5rem;">7. Changes to This Policy</h2>
+  <p>We may update this Privacy Policy from time to time. Changes will be posted on this page with the updated "Effective Date."</p>
+
+  <h2 style="font-size: 1.75rem; margin-top: 2rem; color: #333; font-weight: bold; border-bottom: 1px solid #ccc; padding-bottom: 0.5rem;">8. Contact Us</h2>
+  <p>If you have any questions or concerns about this Privacy Policy, please email us at <a href="mailto:noreply@babes4trades.com">noreply@babes4trades.com</a>.</p>
+</section>
+     
+
+</body>
 
 </div>
 
   <footer class="mt-auto">
     <div class="fixed">
       <ul class="nav justify-content-center border-bottom pb-3 mb-3">
-        <li class="nav-item"><a href="../index.html" class="nav-link px-2 text-muted">Home</a></li>
-        <li class="nav-item"><a href="about.html" class="nav-link px-2 text-muted">About</a></li>
-        <li class="nav-item"><a href="contact.html" class="nav-link px-2 text-muted">Contact</a></li>
+        <li class="nav-item"><a href="../index.html" class="px-2 text-muted footer-links">Home</a></li>
+        <li class="nav-item"><a href="about.html" class="px-2 text-muted footer-links">About</a></li>
+        <li class="nav-item"><a href="contact.html" class="px-2 text-muted footer-links">Contact</a></li>
       </ul>
       <div class="fixed gap-3">
         <ul class="nav justify-content-center">

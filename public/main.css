@@ -72,6 +72,18 @@ footer {
   padding-top: 1rem;
 }
 
+.footer-links {
+  color: #ccc; /* initial color */
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-links:hover,
+#legal .nav-link:hover {
+  color: #6a11cb !important; /* or your brand color */
+  text-decoration: none; /* optional */
+}
+
 .d-none {
   display: none;
 }
