@@ -65,6 +65,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const passwordHelp = document.getElementById("passwordHelp");
   const confirmPasswordHelp = document.getElementById("confirmPasswordHelp");
 
+
   const criteria = {
     minLength: /.{12,}/,
     uppercase: /[A-Z]/,
@@ -127,10 +128,13 @@ document.addEventListener("DOMContentLoaded", function () {
       alert("Passwords do not match.");
     }
 
+    const discordInput = document.getElementById("InputDiscord").value.trim();
+
     const formData = {
       email: email.value,
       username: exampleInputUsername.value,
       password: confirmPasswordInput.value,
+      discordId: discordInput || null, // Store null if left blank
     };
 
     console.log("Form Data:", formData); // Debugging (Remove in production)

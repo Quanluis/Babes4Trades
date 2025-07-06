@@ -108,6 +108,7 @@ const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  discordId: { type: String, unique: true, sparse: true, default: null },
   verified: { type: Boolean, default: false }, // Verfication status
   paidSubscription: { type: Boolean, default: false }, // Paid subscription status
   subscriptionId: {type: String}
@@ -139,7 +140,10 @@ const transporter = nodemailer.createTransport({
 // ✅ Registration Endpoint
 app.post("/api/register", async (req, res) => {
   try {
-    const { email, username, password } = req.body;
+    const { email, username, password, discordId} = req.body;
+
+    console.log("📩 Received by server:", { email, username, password, discordId });
+
     if (!email || !username || !password) {
       return res.status(400).json({ error: "All fields are required" });
     }
@@ -150,11 +154,14 @@ app.post("/api/register", async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    
     const newUser = new User({
       email,
       username,
       password: hashedPassword,
-      verfied: false,
+      verified: false,
+      discordId,
+       // Can store raw string or resolve to ID later
     }); // Not yet verified
 
     await newUser.save();

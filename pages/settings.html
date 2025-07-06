@@ -113,35 +113,51 @@
   </div>
 </nav>
 
-  <body  class="d-flex flex-column min-vh-100">
+<body class="d-flex flex-column min-vh-100 bg-light">
 
-    <h3 class="d-flex justify-content-center pt-5">Settings</h3>
-    
-    <div class="container mt-5">
-      <h2 class="text-center mb-4">Your Profile</h2>
-      <div class="card mx-auto profile-card shadow-lg p-4 rounded" style="max-width: 500px;">
-        <div class="card-body text-center">
-          <img src="/public/PNG/icons8-user-100.png" alt="User Icon" width="80" class="mb-3">
-          <!-- <h4 id="profileUsername" class="card-title">Username: ...</h4>
-          <h4 id="profileEmail" class="card-title">Email: ...</h4>
-          <span id="profileStatus" class="badge fs-6 px-3 py-2 mt-2"></span> -->
-          <div id="userProfile">
-            <p id="profileUsername"></p>
-            <p id="profileEmail"></p>
-            <p id="profileStatus"></p>
-          </div>
+  <h3 class="text-center pt-5">Settings</h3>
+
+  <div class="container mt-4">
+    <h2 class="text-center mb-4">Your Profile</h2>
+
+    <div class="card mx-auto shadow rounded-4 p-4" style="max-width: 500px;">
+      <div class="card-body text-center">
+        <img src="/public/PNG/icons8-user-100.png" alt="User Icon" width="80" class="mb-3">
+        
+        <div id="userProfile" class="mb-3">
+          <p id="profileUsername" class="mb-1 fw-bold"></p>
+          <p id="profileEmail" class="mb-1 text-muted"></p>
+          <p id="profileStatus" class="badge bg-secondary px-3 py-2"></p>
         </div>
+
+        <hr class="my-4">
+
+        <!-- 🎮 Discord Update Form -->
+        <form id="updateDiscordForm" class="text-start">
+          <label for="discordId" class="form-label">Update Discord Username</label>
+          <input
+            type="text"
+            class="form-control mb-2"
+            id="discordId"
+            placeholder="e.g. MyName#1234"
+          />
+          <div id="discordUpdateFeedback" class="form-text text-success mb-2" style="display: none;">
+            ✅ Discord ID updated successfully!
+          </div>
+          <button type="submit" class="btn btn-outline-primary w-100">Save Discord</button>
+        </form>
       </div>
     </div>
-    
-    <!-- <button class="btn btn-danger w-100">Delete Account</button> -->
 
-    <button onclick="window.location.href='forgotPass.html'" class="btn btn-primary w-auto mx-auto d-block mt-3">Reset Password</button>
-    <!-- <button onclick="window.location.href='removeSubscription.html'" class="btn btn-primary w-auto mx-auto d-block mt-3">Remove Subscription</button> -->
-    <button id="unsubscribeBtn" class="btn btn-danger w-auto mx-auto d-block mt-3">Cancel My Subscription</button>
-    <button onclick="window.location.href='deleteAccount.html'" class="btn btn-danger w-auto mx-auto d-block mt-3">Delete Account</button>
+    <!-- 🔐 User Action Buttons -->
+    <div class="d-flex flex-column align-items-center mt-4 gap-3">
+      <button onclick="window.location.href='forgotPass.html'" class="btn btn-outline-secondary w-75">Reset Password</button>
+      <button id="unsubscribeBtn" class="btn btn-outline-danger w-75">Cancel My Subscription</button>
+      <button onclick="window.location.href='deleteAccount.html'" class="btn btn-danger w-75">Delete Account</button>
+    </div>
+  </div>
 
-  </body>
+</body>
   
 
   <footer class="mt-auto">
