@@ -651,6 +651,54 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+document.addEventListener("DOMContentLoaded", () => {
+  // Save Discord handler
+  const discordForm = document.getElementById("updateDiscordForm");
+
+  if (discordForm) {
+    discordForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const discordId = document.getElementById("discordId").value.trim();
+      const user = JSON.parse(localStorage.getItem("user"));
+
+      if (!user || !user.email) {
+        alert("You must be logged in to update Discord.");
+        return;
+      }
+
+      try {
+        const response = await fetch("/api/user/discord", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: user.email, discordId }),
+        });
+
+        const result = await response.json();
+        const feedback = document.getElementById("discordUpdateFeedback");
+
+        if (result.message) {
+          feedback.style.display = "block";
+          feedback.classList.remove("text-danger");
+          feedback.classList.add("text-success");
+          feedback.textContent = result.message;
+
+          // Optional: refresh localStorage
+          user.discordId = discordId;
+          localStorage.setItem("user", JSON.stringify(user));
+        } else {
+          feedback.style.display = "block";
+          feedback.classList.remove("text-success");
+          feedback.classList.add("text-danger");
+          feedback.textContent = result.error || "An error occurred.";
+        }
+      } catch (error) {
+        console.error("❌ Error updating Discord ID:", error);
+      }
+    });
+  }
+});
+
 
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -725,6 +773,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     statusEl.className = `badge fs-6 px-3 py-2 mt-2 ${
       data.paidSubscription ? "bg-success text-white" : "bg-secondary text-white"
     }`;
+
+        // ✅ Autofill Discord input if available
+    if (data.discordId) {
+      document.getElementById("discordId").value = data.discordId;
+    }
+
+
+
   } catch (err) {
     console.error("Failed to load user profile:", err);
   }

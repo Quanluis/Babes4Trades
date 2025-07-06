@@ -9,6 +9,8 @@ const bodyParser = require("body-parser");
 const nodemailer = require("nodemailer");
 const JWT = require("jsonwebtoken");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const { discordClient } = require("./discordBot");
+const { assignPremiumRole } = require("./discordBot");
 const { type } = require("os");
 const { error } = require("console");
 const { hash } = require("crypto");
@@ -70,6 +72,15 @@ app.post(
         );
       } else {
         console.log("✅ User updated:", updatedUser.email);
+
+        if (updatedUser.discordId) {
+          console.log("🎯 Calling assignPremiumRole with:", updatedUser.discordId);
+        await assignPremiumRole(updatedUser.discordId);
+          console.log("✅ assignPremiumRole finished");
+  }     else {
+          console.log("⚠️ No discordId on updated user");
+  }
+
       }
     }
 
@@ -154,7 +165,7 @@ app.post("/api/register", async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    
+
     const newUser = new User({
       email,
       username,
@@ -362,6 +373,7 @@ app.post("/checkout", async (req, res) => {
     }
 
     const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
       mode: "subscription",
       line_items: [
         {
@@ -369,9 +381,9 @@ app.post("/checkout", async (req, res) => {
           quantity: 1,
         },
       ],
-      customer_email: user.email,
       success_url: "http://localhost:5000/pages/paymentsuccess.html",
       cancel_url: "http://localhost:5000/pages/paymentcancelled.html", // ✅ use full URLs
+      customer_email: user.email,
     });
 
     // ✅ SEND the session URL (do NOT redirect)
@@ -441,7 +453,7 @@ app.post("/delete-account", async (req, res) => {
     }
 
     if (user.subscriptionId) {
-      await stripe.subscriptions.del(user.subscriptionId);
+      await stripe.subscriptions.cancel(user.subscriptionId);
       console.log('✅ Stripe subscription canceled');
     }
 
@@ -468,12 +480,137 @@ app.get("/api/user/:email", async (req, res) => {
       username: user.username,
       email: user.email,
       paidSubscription: user.paidSubscription,
+      discordId: user.discordId,
     });
   } catch (error) {
     console.error("User fetch error:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+app.post("/api/user/discord", async (req, res) => {
+  const { email, discordId } = req.body;
+
+  try {
+    const updated = await User.findOneAndUpdate(
+      { email },
+      { discordId: discordId?.trim() || null },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    res.json({ message: "Discord ID updated successfully." });
+  } catch (error) {
+    console.error("❌ Error updating Discord:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// app.post("/webhook", express.raw({ type: "application/json" }), async (req, res) => {
+//   const sig = req.headers["stripe-signature"];
+
+//   let event;
+//   try {
+//     event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+//   } catch (err) {
+//     console.error("❌ Webhook signature error:", err.message);
+//     return res.status(400).send(`Webhook Error: ${err.message}`);
+//   }
+
+//   if (event.type === "checkout.session.completed") {
+//     const session = event.data.object;
+//     const email = session.customer_email;
+
+//     // 🔍 Find user in DB by email
+//     const user = await User.findOneAndUpdate(
+//       { email },
+//       { paidSubscription: true },
+//       { new: true }
+//     );
+
+//     if (user && user.discordId) {
+//       try {
+//         const guild = await discordClient.guilds.fetch(process.env.DISCORD_GUILD_ID);
+//         const member = await guild.members.fetch(user.discordId); // user.discordId must be actual user ID
+//         const role = guild.roles.cache.find(r => r.name === "💎 Premium Member");
+
+//         if (role && member) {
+//           await member.roles.add(role);
+//           console.log(`✅ Gave premium role to ${member.user.tag}`);
+//         }
+//       } catch (err) {
+//         console.error("❌ Error assigning Discord role:", err.message);
+//       }
+//     }
+
+//     res.sendStatus(200);
+//   } else {
+//     res.sendStatus(200); // Ignore other event types for now
+//   }
+// });
+
+app.post(
+  "/webhook",
+  express.raw({ type: "application/json" }),
+  async (req, res) => {
+    const sig = req.headers["stripe-signature"];
+    let event;
+
+    try {
+      event = stripe.webhooks.constructEvent(
+        req.body,
+        sig,
+        process.env.STRIPE_WEBHOOK_SECRET
+      );
+    } catch (err) {
+      console.error("❌ Webhook signature error:", err.message);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    console.log("🔔 Webhook event type:", event.type);
+
+    // ✅ Handle checkout success
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object;
+      const email = session.customer_email;
+      const subscriptionId = session.subscription;
+
+      if (!email || !subscriptionId) {
+        console.log("❌ Missing email or subscription ID");
+        return res.status(400).send("Missing email or subscription ID");
+      }
+
+      try {
+        const user = await User.findOneAndUpdate(
+          { email },
+          {
+            paidSubscription: true,
+            subscriptionId,
+          },
+          { new: true }
+        );
+
+        // ✅ Trigger Discord role assignment if discordId is present
+        if (user && user.discordId) {
+          await assignPremiumRole(user.discordId);
+        }
+
+        console.log("✅ Subscription updated & Discord role (if applicable) assigned");
+        res.status(200).send("Webhook processed");
+      } catch (err) {
+        console.error("❌ DB update or Discord role error:", err);
+        res.status(500).send("Server error");
+      }
+    } else {
+      res.status(200).send("Event type not handled");
+    }
+  }
+);
+
+
 
 // ✅ Serve HTML Pages
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
