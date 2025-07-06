@@ -10,7 +10,7 @@ const nodemailer = require("nodemailer");
 const JWT = require("jsonwebtoken");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const { discordClient } = require("./discordBot");
-const { assignPremiumRole } = require("./discordBot");
+const { assignPremiumRole, removePremiumRole} = require("./discordBot");
 const { type } = require("os");
 const { error } = require("console");
 const { hash } = require("crypto");
@@ -435,6 +435,9 @@ app.post("/api/unsubscribe", authenticate, async (req, res) => {
 });
 
 
+
+
+
 // This will delete the user's account
 
 app.post("/delete-account", async (req, res) => {
@@ -607,6 +610,103 @@ app.post(
     } else {
       res.status(200).send("Event type not handled");
     }
+  }
+);
+
+
+// app.post(
+//   "/webhook",
+//   express.raw({ type: "application/json" }),
+//   async (req, res) => {
+//     const sig = req.headers["stripe-signature"];
+//     let event;
+
+//     try {
+//       event = stripe.webhooks.constructEvent(
+//         req.body,
+//         sig,
+//         process.env.STRIPE_WEBHOOK_SECRET
+//       );
+//     } catch (err) {
+//       console.error("❌ Webhook signature error:", err.message);
+//       return res.status(400).send(`Webhook Error: ${err.message}`);
+//     }
+
+//     console.log("🔔 Webhook event type:", event.type);
+
+//     if (event.type === "customer.subscription.deleted") {
+//       const subscription = event.data.object;
+//       const subscriptionId = subscription.id;
+
+//       const user = await User.findOneAndUpdate(
+//         { subscriptionId },
+//         { paidSubscription: false },
+//         { new: true }
+//       );
+
+//       if (user && user.discordId) {
+//         await removePremiumRole(user.discordId);
+//         console.log("❌ Removed premium role from:", user.email);
+//       } else {
+//         console.log("⚠️ No matching user found for sub ID:", subscriptionId);
+//       }
+//     }
+
+//     res.status(200).send("Webhook received");
+//   }
+// );
+
+
+app.post(
+  "/webhook",
+  express.raw({ type: "application/json" }),
+  async (req, res) => {
+    const sig = req.headers["stripe-signature"];
+    let event;
+
+    try {
+      event = stripe.webhooks.constructEvent(
+        req.body,
+        sig,
+        process.env.STRIPE_WEBHOOK_SECRET
+      );
+    } catch (err) {
+      console.error("❌ Webhook signature error:", err.message);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    console.log("🔔 Webhook event type:", event.type);
+
+    if (event.type === "customer.subscription.deleted") {
+      const subscription = event.data.object;
+      const subscriptionId = subscription.id;
+
+      console.log("📛 Canceling subscription:", subscriptionId);
+
+      const user = await User.findOneAndUpdate(
+        { subscriptionId },
+        {
+          paidSubscription: false,
+          subscriptionId: null, // Clean up the old sub ID
+        },
+        { new: true }
+      );
+
+      if (!user) {
+        console.log("⚠️ No user found for canceled subscription ID:", subscriptionId);
+      } else {
+        console.log("✅ Subscription canceled for:", user.email);
+
+        if (user.discordId) {
+          console.log("🎯 Removing premium role from:", user.discordId);
+          await removePremiumRole(user.discordId);
+        } else {
+          console.log("⚠️ No discordId on user");
+        }
+      }
+    }
+
+    res.status(200).send("Webhook received");
   }
 );
 
