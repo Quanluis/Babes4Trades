@@ -65,7 +65,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const passwordHelp = document.getElementById("passwordHelp");
   const confirmPasswordHelp = document.getElementById("confirmPasswordHelp");
 
-
   const criteria = {
     minLength: /.{12,}/,
     uppercase: /[A-Z]/,
@@ -221,8 +220,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
-
-
 
 document.addEventListener("DOMContentLoaded", () => {
   const loginForm = document.getElementById("dropDownSignInForm");
@@ -699,51 +696,48 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-
 document.addEventListener("DOMContentLoaded", function () {
-
   const deleteAccountForm = document.getElementById("deleteAccountForm");
 
   deleteAccountForm.addEventListener("submit", async function (event) {
-
     event.preventDefault();
 
     const email = document.getElementById("deleteAccountEmail").value;
     const password = document.getElementById("deleteAccountPassword").value;
 
-     // ✅ Confirmation popup
-     const confirmed = confirm("Are you sure you want to delete your account? Your subscription will be cancelled along with your account deleted. This action cannot be undone.");
-     if (!confirmed) return;
-  
+    // ✅ Confirmation popup
+    const confirmed = confirm(
+      "Are you sure you want to delete your account? Your subscription will be cancelled along with your account deleted. This action cannot be undone."
+    );
+    if (!confirmed) return;
+
     try {
       const response = await fetch("/delete-account", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
       });
 
       const result = await response.json();
 
-    if (response.ok){
+      if (response.ok) {
+        alert("Your account has been deleted.");
 
-      alert("Your account has been deleted.");
+        // ✅ Clear localStorage
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
 
-      // ✅ Clear localStorage
-      localStorage.removeItem("user");
-      localStorage.removeItem("token");
-    
-      window.location.href = "/index.html" // Redirect to homepage
-    
-    }else {
-      alert(result.error || "Failed to delete account");
+        window.location.href = "/index.html"; // Redirect to homepage
+      } else {
+        alert(result.error || "Failed to delete account");
+      }
+    } catch (err) {
+      console.error("Error", err);
+      alert("An error occurred. Please try again.");
     }
-  } catch (err){
-    console.error("Error", err);
-    alert("An error occurred. Please try again.")
-  }
-});
+  });
 });
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -765,22 +759,27 @@ document.addEventListener("DOMContentLoaded", async () => {
       return console.error("User fetch error:", data.error);
     }
 
-    document.getElementById("profileUsername").textContent = `Username: ${data.username}`;
-    document.getElementById("profileEmail").textContent = `Email: ${data.email}`;
+    document.getElementById(
+      "profileUsername"
+    ).textContent = `Username: ${data.username}`;
+    document.getElementById(
+      "profileEmail"
+    ).textContent = `Email: ${data.email}`;
 
     const statusEl = document.getElementById("profileStatus");
-    statusEl.textContent = data.paidSubscription ? "Paid Subscriber" : "Free Account";
+    statusEl.textContent = data.paidSubscription
+      ? "Paid Subscriber"
+      : "Free Account";
     statusEl.className = `badge fs-6 px-3 py-2 mt-2 ${
-      data.paidSubscription ? "bg-success text-white" : "bg-secondary text-white"
+      data.paidSubscription
+        ? "bg-success text-white"
+        : "bg-secondary text-white"
     }`;
 
-        // ✅ Autofill Discord input if available
+    // ✅ Autofill Discord input if available
     if (data.discordId) {
       document.getElementById("discordId").value = data.discordId;
     }
-
-
-
   } catch (err) {
     console.error("Failed to load user profile:", err);
   }
@@ -793,21 +792,21 @@ function updateNavbarBasedOnUser(user) {
   const freeOnly = document.querySelectorAll(".show-when-free");
 
   if (user) {
-    guestOnly.forEach(el => el.classList.add("d-none"));
-    loggedInOnly.forEach(el => el.classList.remove("d-none"));
+    guestOnly.forEach((el) => el.classList.add("d-none"));
+    loggedInOnly.forEach((el) => el.classList.remove("d-none"));
 
     if (user.paidSubscription) {
-      paidOnly.forEach(el => el.classList.remove("d-none"));
-      freeOnly.forEach(el => el.classList.add("d-none"));
+      paidOnly.forEach((el) => el.classList.remove("d-none"));
+      freeOnly.forEach((el) => el.classList.add("d-none"));
     } else {
-      paidOnly.forEach(el => el.classList.add("d-none"));
-      freeOnly.forEach(el => el.classList.remove("d-none"));
+      paidOnly.forEach((el) => el.classList.add("d-none"));
+      freeOnly.forEach((el) => el.classList.remove("d-none"));
     }
   } else {
-    guestOnly.forEach(el => el.classList.remove("d-none"));
-    loggedInOnly.forEach(el => el.classList.add("d-none"));
-    paidOnly.forEach(el => el.classList.add("d-none"));
-    freeOnly.forEach(el => el.classList.remove("d-none")); // Guests count as free users
+    guestOnly.forEach((el) => el.classList.remove("d-none"));
+    loggedInOnly.forEach((el) => el.classList.add("d-none"));
+    paidOnly.forEach((el) => el.classList.add("d-none"));
+    freeOnly.forEach((el) => el.classList.remove("d-none")); // Guests count as free users
   }
 }
 

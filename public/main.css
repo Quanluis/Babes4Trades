@@ -4,7 +4,6 @@ html {
 
 nav {
   font-display: swap; /* Ensures a smooth transition to the font */
-  
 }
 
 .navbar {
@@ -56,14 +55,6 @@ h2 {
   z-index: 0;
   pointer-events: none;
 }
-/* 
-#payment-success {
-  position: relative;
-  z-index: 1;
-  text-align: center;
-  margin-top: 100px;
-  color: #000;
-} */
 
 p {
   text-align: center;
@@ -110,18 +101,16 @@ footer {
   margin: -0.1rem;
 }
 
-
 #logoSVG {
   height: 8rem;
-  margin-top: .5rem;
+  margin-top: 0.5rem;
 }
 
 #socialSVG {
   height: 30px;
   padding-left: 0.5rem;
-} */
-
-#socialsvg {
+}
+*/ #socialsvg {
   margin-bottom: -0.5rem;
 }
 
@@ -188,9 +177,7 @@ footer {
 }
 
 #indexH1 {
-
   color: #6a11cb;
-
 }
 
 /* This is the Navbar gradient  */

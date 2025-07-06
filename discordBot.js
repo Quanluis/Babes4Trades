@@ -34,7 +34,9 @@ discordClient.on("messageCreate", async (message) => {
 
   if (message.content.trim().toLowerCase() === "!botassign") {
     const member = await message.guild.members.fetch(message.author.id);
-    const role = message.guild.roles.cache.find(r => r.name === "💎 Premium Member");
+    const role = message.guild.roles.cache.find(
+      (r) => r.name === "💎 Premium Member"
+    );
     if (role) {
       await member.roles.add(role);
       message.reply("✅ Premium role assigned.");
@@ -44,8 +46,13 @@ discordClient.on("messageCreate", async (message) => {
   }
 
   if (message.content.trim().toLowerCase() === "!botremove") {
-    const member = await message.guild.members.fetch({ user: message.author.id, force: true });
-    const role = message.guild.roles.cache.find(r => r.name === "💎 Premium Member");
+    const member = await message.guild.members.fetch({
+      user: message.author.id,
+      force: true,
+    });
+    const role = message.guild.roles.cache.find(
+      (r) => r.name === "💎 Premium Member"
+    );
     if (role && member.roles.cache.has(role.id)) {
       await member.roles.remove(role);
       message.reply("🛑 Premium role removed.");
@@ -58,7 +65,9 @@ discordClient.on("messageCreate", async (message) => {
 // ✅ Function to assign "Premium" role
 async function assignPremiumRole(discordId) {
   try {
-    const guild = await discordClient.guilds.fetch(process.env.DISCORD_GUILD_ID);
+    const guild = await discordClient.guilds.fetch(
+      process.env.DISCORD_GUILD_ID
+    );
     const member = await guild.members.fetch(discordId);
     await guild.roles.fetch(); // Load all roles into cache
     const role = guild.roles.cache.find((r) => r.name === "💎 Premium Member");
@@ -73,19 +82,21 @@ async function assignPremiumRole(discordId) {
   } catch (err) {
     console.error("❌ Error assigning premium role:", err);
   }
-};
+}
 
 async function removePremiumRole(discordId) {
   try {
     console.log("🔧 Starting role removal for Discord ID:", discordId);
 
-    const guild = await discordClient.guilds.fetch(process.env.DISCORD_GUILD_ID);
+    const guild = await discordClient.guilds.fetch(
+      process.env.DISCORD_GUILD_ID
+    );
 
     // Force fresh fetch of member (avoid relying on cache)
     const member = await guild.members.fetch({ user: discordId, force: true });
 
     // Re-fetch roles too
-    await guild.roles.fetch(); 
+    await guild.roles.fetch();
     await member.fetch(true); // force latest member data
 
     console.log("👤 Fetched member:", member.user.tag);
@@ -109,40 +120,6 @@ async function removePremiumRole(discordId) {
     console.error("❌ Error in removePremiumRole:", error);
   }
 }
-
-
-// async function removePremiumRole(discordId) {
-//   try {
-//     console.log("🔧 Starting role removal for Discord ID:", discordId);
-
-//     const guild = await discordClient.guilds.fetch(process.env.DISCORD_GUILD_ID);
-//     await guild.roles.fetch(); // Ensure all roles are cached
-
-//     // Force fetch latest member info
-//     const member = await guild.members.fetch({ user: discordId, force: true });
-
-//     console.log("👤 Fetched member:", member.user.tag);
-
-//     const roleName = "💎 Premium Member";
-//     const roleToRemove = guild.roles.cache.find((role) => role.name === roleName);
-
-//     if (!roleToRemove) {
-//       console.log(`⚠️ Role "${roleName}" not found in guild.`);
-//       return;
-//     }
-
-//     if (!member.roles.cache.has(roleToRemove.id)) {
-//       console.log(`ℹ️ ${member.user.tag} does not have the role "${roleName}".`);
-//       return;
-//     }
-
-//     await member.roles.remove(roleToRemove);
-//     console.log(`🛑 Successfully removed "${roleName}" from ${member.user.tag}.`);
-//   } catch (error) {
-//     console.error("❌ Error in removePremiumRole:", error);
-//   }
-// }
-
 
 // Export for use in server.js
 module.exports = { assignPremiumRole, removePremiumRole };
