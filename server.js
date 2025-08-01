@@ -5,16 +5,9 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const rateLimit = require("express-rate-limit");
 const cors = require("cors");
-const bodyParser = require("body-parser");
 const nodemailer = require("nodemailer");
 const JWT = require("jsonwebtoken");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-const { discordClient } = require("./discordBot");
-const { assignPremiumRole, removePremiumRole} = require("./discordBot");
-const { type } = require("os");
-const { error } = require("console");
-const { hash } = require("crypto");
-const { allowedNodeEnvironmentFlags } = require("process");
 const app = express();
 
 app.use(cors());
@@ -26,7 +19,6 @@ app.post(
     console.log("🔥 Webhook triggered");
 
     const sig = req.headers["stripe-signature"];
-
     let event;
 
     try {
@@ -46,47 +38,110 @@ app.post(
     if (event.type === "checkout.session.completed") {
       const session = event.data.object;
       const email = session.customer_email;
-      const subscriptionId = session.subscription; //
+      const subscriptionId = session.subscription;
 
       if (!email || !subscriptionId) {
-        console.log("❌ No customer_email in session!");
-        return res.status(400).send("No email provided in session.");
+        console.log("❌ No customer_email or subscriptionId in session!");
+        return res.status(400).send("Missing required session data.");
       }
 
       console.log("📧 Updating paidSubscription for:", email);
 
-      const updatedUser = await User.findOneAndUpdate(
-        { email: new RegExp(`^${email}$`, "i") },
-        { paidSubscription: true,
-          subscriptionId: subscriptionId
-        },
-        { new: true }
-      );
-
-      if (!updatedUser) {
-        console.log("⚠️ No matching user found in DB for email:", email);
-        const users = await User.find(); // debug all users
-        console.log(
-          "🧠 All user emails in DB:",
-          users.map((u) => u.email)
+      try {
+        const updatedUser = await User.findOneAndUpdate(
+          { email: new RegExp(`^${email}$`, "i") }, // case-insensitive match
+          {
+            paidSubscription: true,
+            subscriptionId: subscriptionId,
+          },
+          { new: true }
         );
-      } else {
-        console.log("✅ User updated:", updatedUser.email);
 
-        if (updatedUser.discordId) {
-          console.log("🎯 Calling assignPremiumRole with:", updatedUser.discordId);
-        await assignPremiumRole(updatedUser.discordId);
-          console.log("✅ assignPremiumRole finished");
-  }     else {
-          console.log("⚠️ No discordId on updated user");
-  }
+        if (!updatedUser) {
+          console.log("⚠️ No matching user found in DB for email:", email);
 
+          // Debug: list all users for troubleshooting
+          const users = await User.find();
+          console.log(
+            "🧠 All user emails in DB:",
+            users.map((u) => u.email)
+          );
+        } else {
+          console.log("✅ User updated:", updatedUser.email);
+
+          // ✅ Discord logic removed, we still keep discordId in DB for bot use
+          if (!updatedUser.discordId) {
+            console.log("⚠️ User has no discordId stored (DB only)");
+          }
+        }
+      } catch (err) {
+        console.error("❌ Database update error:", err);
+        return res.status(500).send("Server error");
       }
     }
 
     res.status(200).send("Webhook received");
   }
 );
+
+app.post("/role-update", async (req, res) => {
+  const { discordId, paid } = req.body;
+
+  console.log("🔹 Role update requested for:", discordId, "| Paid:", paid);
+
+  if (!discordId) return res.status(400).send("No discordId provided");
+
+  try {
+    // ✅ Ensure bot is ready
+    if (!client.readyAt) {
+      console.error("⚠️ Bot not ready yet");
+      return res.status(503).send("Bot not ready yet");
+    }
+
+    // ✅ Fetch guild
+    const guild =
+      client.guilds.cache.get(process.env.DISCORD_GUILD_ID) ||
+      (await client.guilds.fetch(process.env.DISCORD_GUILD_ID));
+
+    if (!guild) {
+      console.error("❌ Guild not found. Check DISCORD_GUILD_ID");
+      return res.status(404).send("Guild not found");
+    }
+
+    // ✅ Fetch role
+    await guild.roles.fetch();
+    const role = guild.roles.cache.get(process.env.PREMIUM_ROLE_ID);
+    if (!role) {
+      console.error("❌ Premium role not found. Check PREMIUM_ROLE_ID");
+      return res.status(404).send("Premium role not found");
+    }
+
+    // ✅ Fetch member
+    let member;
+    try {
+      member = await guild.members.fetch(discordId);
+    } catch (err) {
+      console.error("❌ Could not fetch member:", err.message);
+      return res.status(404).send("Member not found in guild");
+    }
+
+    console.log("✅ Member found in server:", member.user.tag);
+
+    // ✅ Assign or remove role
+    if (paid) {
+      await member.roles.add(role);
+      console.log(`🎉 Added premium role to ${discordId}`);
+    } else {
+      await member.roles.remove(role);
+      console.log(`🎉 Removed premium role from ${discordId}`);
+    }
+
+    res.send("Role updated");
+  } catch (err) {
+    console.error("❌ Role update failed:", err);
+    res.status(500).send("Error updating role");
+  }
+});
 
 app.use(express.json());
 
@@ -122,8 +177,7 @@ const UserSchema = new mongoose.Schema({
   discordId: { type: String, unique: true, sparse: true, default: null },
   verified: { type: Boolean, default: false }, // Verfication status
   paidSubscription: { type: Boolean, default: false }, // Paid subscription status
-  subscriptionId: {type: String}
-
+  subscriptionId: { type: String },
 });
 const User = mongoose.model("User", UserSchema);
 
@@ -151,9 +205,14 @@ const transporter = nodemailer.createTransport({
 // ✅ Registration Endpoint
 app.post("/api/register", async (req, res) => {
   try {
-    const { email, username, password, discordId} = req.body;
+    const { email, username, password, discordId } = req.body;
 
-    console.log("📩 Received by server:", { email, username, password, discordId });
+    console.log("📩 Received by server:", {
+      email,
+      username,
+      password,
+      discordId,
+    });
 
     if (!email || !username || !password) {
       return res.status(400).json({ error: "All fields are required" });
@@ -172,7 +231,7 @@ app.post("/api/register", async (req, res) => {
       password: hashedPassword,
       verified: false,
       discordId,
-       // Can store raw string or resolve to ID later
+      // Can store raw string or resolve to ID later
     }); // Not yet verified
 
     await newUser.save();
@@ -234,9 +293,10 @@ app.get("/api/verify/:token", async (req, res) => {
       });
     }
     res.status(400).json({ error: "Invalid verification token." });
-
   }
 });
+
+//  ====== User actions  241-472  =======
 
 app.post("/api/login", loginLimiter, async (req, res) => {
   try {
@@ -262,7 +322,7 @@ app.post("/api/login", loginLimiter, async (req, res) => {
     const token = JWT.sign(
       { userId: user._id, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || "1h" } // Default to 1 hour if not set
+      { expiresIn: process.env.JWT_EXPIRES_IN || "24h" } // Default to 1 hour if not set
     );
 
     res.json({
@@ -373,7 +433,7 @@ app.post("/checkout", async (req, res) => {
     }
 
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
+      payment_method_types: ["card"],
       mode: "subscription",
       line_items: [
         {
@@ -408,35 +468,58 @@ const authenticate = (req, res, next) => {
   }
 };
 
-app.post("/api/unsubscribe", authenticate, async (req, res) => {
+app.post("/api/cancel-subscription", authenticate, async (req, res) => {
   try {
     const email = req.body.email;
+    console.log("🔹 Cancel-subscription request for:", email);
 
     const user = await User.findOne({ email });
+    console.log(
+      "🔹 User found?",
+      !!user,
+      " | SubscriptionId:",
+      user?.subscriptionId
+    );
 
     if (!user || !user.subscriptionId) {
-      return res
-        .status(400)
-        .json({ message: "No active subscription found." });
+      console.log("⚠️ No active subscription for:", email);
+      return res.status(400).json({ message: "No active subscription found." });
     }
 
-    await stripe.subscriptions.cancel(user.subscriptionId);
+    // ✅ Cancel subscription in Stripe
+    try {
+      console.log(
+        "🔹 Attempting to cancel Stripe subscription:",
+        user.subscriptionId
+      );
+      await stripe.subscriptions.cancel(user.subscriptionId);
+      console.log("✅ Stripe subscription canceled");
+    } catch (stripeError) {
+      console.error("❌ Stripe cancellation error:", stripeError);
+      return res
+        .status(500)
+        .json({ message: "Stripe subscription cancellation failed." });
+    }
 
-    user.paidSubscription = false;
-    user.subscriptionId = null;
-    await user.save();
+    // ✅ Update MongoDB
+    try {
+      user.paidSubscription = false;
+      user.subscriptionId = null;
+      await user.save();
+      console.log(`✅ Subscription canceled and DB updated for ${user.email}`);
+    } catch (dbError) {
+      console.error("❌ MongoDB update error:", dbError);
+      return res.status(500).json({ message: "Database update failed." });
+    }
 
-    console.log(`✅ Subscription canceled for ${user.email}`);
     res.json({ message: "Subscription canceled successfully." });
   } catch (err) {
-    console.error("❌ Unsubscribe error:", err);
-    res.status(500).json({ message: "Something went wrong." });
+    console.error("❌ Unsubscribe endpoint error:", err.message || err);
+    res
+      .status(500)
+      .json({ message: "Something went wrong while unsubscribing." });
   }
 });
-
-
-
-
 
 // This will delete the user's account
 
@@ -457,17 +540,18 @@ app.post("/delete-account", async (req, res) => {
 
     if (user.subscriptionId) {
       await stripe.subscriptions.cancel(user.subscriptionId);
-      console.log('✅ Stripe subscription canceled');
+      console.log("✅ Stripe subscription canceled");
     }
 
     await User.deleteOne({ email });
     res.json({ message: "Account deleted successfully." });
-
   } catch (error) {
     console.error("❌ Account deletion error:", error);
     res.status(500).json({ error: "Internal server error." });
   }
 });
+
+// End of user actions
 
 app.get("/api/user/:email", async (req, res) => {
   try {
@@ -512,49 +596,6 @@ app.post("/api/user/discord", async (req, res) => {
   }
 });
 
-// app.post("/webhook", express.raw({ type: "application/json" }), async (req, res) => {
-//   const sig = req.headers["stripe-signature"];
-
-//   let event;
-//   try {
-//     event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
-//   } catch (err) {
-//     console.error("❌ Webhook signature error:", err.message);
-//     return res.status(400).send(`Webhook Error: ${err.message}`);
-//   }
-
-//   if (event.type === "checkout.session.completed") {
-//     const session = event.data.object;
-//     const email = session.customer_email;
-
-//     // 🔍 Find user in DB by email
-//     const user = await User.findOneAndUpdate(
-//       { email },
-//       { paidSubscription: true },
-//       { new: true }
-//     );
-
-//     if (user && user.discordId) {
-//       try {
-//         const guild = await discordClient.guilds.fetch(process.env.DISCORD_GUILD_ID);
-//         const member = await guild.members.fetch(user.discordId); // user.discordId must be actual user ID
-//         const role = guild.roles.cache.find(r => r.name === "💎 Premium Member");
-
-//         if (role && member) {
-//           await member.roles.add(role);
-//           console.log(`✅ Gave premium role to ${member.user.tag}`);
-//         }
-//       } catch (err) {
-//         console.error("❌ Error assigning Discord role:", err.message);
-//       }
-//     }
-
-//     res.sendStatus(200);
-//   } else {
-//     res.sendStatus(200); // Ignore other event types for now
-//   }
-// });
-
 app.post(
   "/webhook",
   express.raw({ type: "application/json" }),
@@ -575,7 +616,9 @@ app.post(
 
     console.log("🔔 Webhook event type:", event.type);
 
-    // ✅ Handle checkout success
+    // ------------------------------------------------------
+    // ✅ Handle new subscription (Stripe checkout success)
+    // ------------------------------------------------------
     if (event.type === "checkout.session.completed") {
       const session = event.data.object;
       const email = session.customer_email;
@@ -587,6 +630,7 @@ app.post(
       }
 
       try {
+        // ✅ Update MongoDB
         const user = await User.findOneAndUpdate(
           { email },
           {
@@ -596,66 +640,116 @@ app.post(
           { new: true }
         );
 
-        // ✅ Trigger Discord role assignment if discordId is present
-        if (user && user.discordId) {
-          await assignPremiumRole(user.discordId);
+        if (user) {
+          console.log(`✅ Subscription activated for ${user.email}`);
+
+          // 🔹 Notify bot if Discord ID exists
+          if (user.discordId) {
+            const payload = { discordId: user.discordId, paid: true };
+            console.log("🔹 Preparing to notify bot with:", payload);
+
+            try {
+              const botResponse = await fetch(
+                "http://localhost:4000/role-update",
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(payload),
+                }
+              );
+
+              const botText = await botResponse.text();
+              console.log(
+                `🔹 Bot responded with: ${botResponse.status} - ${botText}`
+              );
+            } catch (err) {
+              console.error("❌ Failed to notify Discord bot:", err);
+            }
+          } else {
+            console.log(`⚠️ User ${user.email} has no discordId in DB`);
+          }
+        } else {
+          console.log(`⚠️ No user found for ${email}`);
         }
 
-        console.log("✅ Subscription updated & Discord role (if applicable) assigned");
         res.status(200).send("Webhook processed");
       } catch (err) {
-        console.error("❌ DB update or Discord role error:", err);
+        console.error("❌ Database update error:", err);
         res.status(500).send("Server error");
       }
-    } else {
-      res.status(200).send("Event type not handled");
+
+      return; // ✅ Exit after processing
     }
+
+    // ------------------------------------------------------
+    // ✅ Handle subscription cancellation (unsubscribe)
+    // ------------------------------------------------------
+    if (event.type === "customer.subscription.deleted") {
+      const subscription = event.data.object;
+      const subscriptionId = subscription.id;
+
+      console.log("📛 Canceling subscription:", subscriptionId);
+
+      try {
+        // ✅ Update MongoDB
+        const user = await User.findOneAndUpdate(
+          { subscriptionId },
+          {
+            paidSubscription: false,
+            subscriptionId: null, // clear old sub ID
+          },
+          { new: true }
+        );
+
+        if (user) {
+          console.log(`✅ Subscription canceled for ${user.email}`);
+
+          // 🔹 Notify bot if Discord ID exists
+          if (user.discordId) {
+            const payload = { discordId: user.discordId, paid: false };
+            console.log("🔹 Preparing to notify bot with:", payload);
+
+            try {
+              const botResponse = await fetch(
+                "http://localhost:4000/role-update",
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(payload),
+                }
+              );
+
+              const botText = await botResponse.text();
+              console.log(
+                `🔹 Bot responded with: ${botResponse.status} - ${botText}`
+              );
+            } catch (err) {
+              console.error("❌ Failed to notify Discord bot:", err);
+            }
+          } else {
+            console.log(`⚠️ User ${user.email} has no discordId in DB`);
+          }
+        } else {
+          console.log(
+            `⚠️ No user found for canceled subscription ID: ${subscriptionId}`
+          );
+        }
+
+        res.status(200).send("Webhook processed");
+      } catch (err) {
+        console.error("❌ Database update error during cancellation:", err);
+        res.status(500).send("Server error");
+      }
+
+      return; // ✅ Exit after processing
+    }
+
+    // ------------------------------------------------------
+    // ✅ Unhandled event
+    // ------------------------------------------------------
+    res.status(200).send("Event type not handled");
   }
 );
-
-
-// app.post(
-//   "/webhook",
-//   express.raw({ type: "application/json" }),
-//   async (req, res) => {
-//     const sig = req.headers["stripe-signature"];
-//     let event;
-
-//     try {
-//       event = stripe.webhooks.constructEvent(
-//         req.body,
-//         sig,
-//         process.env.STRIPE_WEBHOOK_SECRET
-//       );
-//     } catch (err) {
-//       console.error("❌ Webhook signature error:", err.message);
-//       return res.status(400).send(`Webhook Error: ${err.message}`);
-//     }
-
-//     console.log("🔔 Webhook event type:", event.type);
-
-//     if (event.type === "customer.subscription.deleted") {
-//       const subscription = event.data.object;
-//       const subscriptionId = subscription.id;
-
-//       const user = await User.findOneAndUpdate(
-//         { subscriptionId },
-//         { paidSubscription: false },
-//         { new: true }
-//       );
-
-//       if (user && user.discordId) {
-//         await removePremiumRole(user.discordId);
-//         console.log("❌ Removed premium role from:", user.email);
-//       } else {
-//         console.log("⚠️ No matching user found for sub ID:", subscriptionId);
-//       }
-//     }
-
-//     res.status(200).send("Webhook received");
-//   }
-// );
-
 
 app.post(
   "/webhook",
@@ -677,40 +771,74 @@ app.post(
 
     console.log("🔔 Webhook event type:", event.type);
 
+    // ------------------------------------------------------
+    // ✅ Handle subscription cancellation (unsubscribe)
+    // ------------------------------------------------------
     if (event.type === "customer.subscription.deleted") {
       const subscription = event.data.object;
       const subscriptionId = subscription.id;
 
       console.log("📛 Canceling subscription:", subscriptionId);
 
-      const user = await User.findOneAndUpdate(
-        { subscriptionId },
-        {
-          paidSubscription: false,
-          subscriptionId: null, // Clean up the old sub ID
-        },
-        { new: true }
-      );
+      try {
+        // ✅ Update MongoDB
+        const user = await User.findOneAndUpdate(
+          { subscriptionId },
+          {
+            paidSubscription: false,
+            subscriptionId: null, // Clean up old subscription ID
+          },
+          { new: true }
+        );
 
-      if (!user) {
-        console.log("⚠️ No user found for canceled subscription ID:", subscriptionId);
-      } else {
-        console.log("✅ Subscription canceled for:", user.email);
+        if (user) {
+          console.log(`✅ Subscription canceled for ${user.email}`);
 
-        if (user.discordId) {
-          console.log("🎯 Removing premium role from:", user.discordId);
-          await removePremiumRole(user.discordId);
+          // 🔹 Notify Discord bot if user has discordId
+          if (user.discordId) {
+            const payload = {
+              discordId: user.discordId,
+              paid: false, // unsub
+            };
+            console.log("🔹 Preparing to notify bot with:", payload);
+
+            try {
+              const botResponse = await fetch(
+                "http://localhost:4000/role-update",
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(payload),
+                }
+              );
+
+              const botText = await botResponse.text();
+              console.log(
+                `🔹 Bot responded with: ${botResponse.status} - ${botText}`
+              );
+            } catch (err) {
+              console.error("❌ Failed to notify Discord bot:", err);
+            }
+          } else {
+            console.log(`⚠️ User ${user.email} has no discordId in DB`);
+          }
         } else {
-          console.log("⚠️ No discordId on user");
+          console.log(
+            `⚠️ No user found for canceled subscription ID: ${subscriptionId}`
+          );
         }
+      } catch (err) {
+        console.error("❌ Database update error during cancellation:", err);
+        return res.status(500).send("Server error");
       }
     }
 
-    res.status(200).send("Webhook received");
+    // ------------------------------------------------------
+    // ✅ Always respond 200 to Stripe so it stops retrying
+    // ------------------------------------------------------
+    res.status(200).send("Webhook processed");
   }
 );
-
-
 
 // ✅ Serve HTML Pages
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));

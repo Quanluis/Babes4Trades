@@ -622,26 +622,27 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!confirmUnsub) return;
 
       try {
-        const response = await fetch("/api/unsubscribe", {
+        // ✅ Call the new cancel-subscription endpoint
+        const response = await fetch("/api/cancel-subscription", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // 🔒 optional security
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ email: user.email }),
         });
 
         const result = await response.json();
-        alert(result.message);
+        alert(result.message || "Subscription canceled.");
 
         if (response.ok) {
-          // Log them out and redirect
+          // ✅ Clear localStorage and redirect to home
           localStorage.removeItem("user");
           localStorage.removeItem("token");
           window.location.href = "/index.html";
         }
       } catch (error) {
-        console.error("Unsubscribe error:", error);
+        console.error("❌ Unsubscribe error:", error);
         alert("Something went wrong while unsubscribing.");
       }
     });
