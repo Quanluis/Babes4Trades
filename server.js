@@ -12,77 +12,296 @@ const app = express();
 
 app.use(cors());
 
-app.post(
-  "/webhook",
-  express.raw({ type: "application/json" }),
-  async (req, res) => {
-    console.log("🔥 Webhook triggered");
 
-    const sig = req.headers["stripe-signature"];
-    let event;
 
-    try {
-      event = stripe.webhooks.constructEvent(
-        req.body,
-        sig,
-        process.env.STRIPE_WEBHOOK_SECRET
-      );
-    } catch (err) {
-      console.error("❌ Webhook signature error:", err.message);
-      return res.status(400).send(`Webhook Error: ${err.message}`);
-    }
+// ✅ Serve Static Files BEFORE Routes
+app.use(express.static(path.join(__dirname, "/")));
+app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "pages")));
 
-    console.log("🔔 Webhook event type:", event.type);
-    console.log("📦 Full session payload:", event.data.object);
+// ✅ Connect to MongoDB
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
-    if (event.type === "checkout.session.completed") {
-      const session = event.data.object;
-      const email = session.customer_email;
-      const subscriptionId = session.subscription;
+// ✅ User Schema & Model
+const UserSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true },
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  discordId: { type: String, unique: true, sparse: true, default: null },
+  verified: { type: Boolean, default: false }, // Verfication status
+  paidSubscription: { type: Boolean, default: false }, // Paid subscription status
+  subscriptionId: { type: String },
+});
+const User = mongoose.model("User", UserSchema);
 
-      if (!email || !subscriptionId) {
-        console.log("❌ No customer_email or subscriptionId in session!");
-        return res.status(400).send("Missing required session data.");
-      }
-
-      console.log("📧 Updating paidSubscription for:", email);
-
-      try {
-        const updatedUser = await User.findOneAndUpdate(
-          { email: new RegExp(`^${email}$`, "i") }, // case-insensitive match
-          {
-            paidSubscription: true,
-            subscriptionId: subscriptionId,
-          },
-          { new: true }
-        );
-
-        if (!updatedUser) {
-          console.log("⚠️ No matching user found in DB for email:", email);
-
-          // Debug: list all users for troubleshooting
-          const users = await User.find();
-          console.log(
-            "🧠 All user emails in DB:",
-            users.map((u) => u.email)
-          );
-        } else {
-          console.log("✅ User updated:", updatedUser.email);
-
-          // ✅ Discord logic removed, we still keep discordId in DB for bot use
-          if (!updatedUser.discordId) {
-            console.log("⚠️ User has no discordId stored (DB only)");
-          }
-        }
-      } catch (err) {
-        console.error("❌ Database update error:", err);
-        return res.status(500).send("Server error");
-      }
-    }
-
-    res.status(200).send("Webhook received");
-  }
+const GallerySchema = new mongoose.Schema(
+  {
+    title: String,
+    url: { type: String, required: true }, // Bunny.net URL
+    subscriptionLevel: {
+      type: String,
+      enum: ["free", "premium"],
+      default: "free"
+    },
+    uploadedAt: { type: Date, default: Date.now },
+  },
+  { collection: "gallery", timestamps: false } // match your existing collection
 );
+
+const Gallery = mongoose.model("Gallery", GallerySchema);
+
+
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // Allow max 5 login attempts per IP change to 5 later
+  message: { error: "Too many login attempts. Please try again later." },
+  standardHeaders: true, // Return rate limit info in headers
+  legacyHeaders: false, // Disable legacy headers
+});
+
+
+const authOptional = async (req, res, next) => {
+  const auth = req.headers.authorization || "";
+  const token = auth.startsWith("Bearer ") ? auth.slice(7) : null;
+  if (!token) return next();
+
+  try {
+    const payload = JWT.verify(token, process.env.JWT_SECRET);
+    // Lean lookup; if token carries email, you could also find by email
+    const user = await User.findById(payload.userId).lean();
+    req.user = user || null;
+  } catch (_) {
+    req.user = null;
+  }
+  next();
+};
+
+
+// ✅ Gallery API
+app.get('/api/gallery', authOptional, async (req, res) => {
+  const canSeePremium = !!(req.user && req.user.paidSubscription);
+  const query = canSeePremium ? {} : { subscriptionLevel: { $ne: 'premium' } };
+
+  const docs = await Gallery.find(query).sort({ uploadedAt: -1 }).lean();
+  const items = docs.map(d => ({
+    title: d.title,
+    bunnyUrl: d.url,
+    thumbnailUrl: null,
+    isPremium: d.subscriptionLevel === 'premium',
+    tags: [],
+    createdAt: d.uploadedAt
+  }));
+
+  res.json({ canSeePremium, items });
+});
+
+// (Optional) Admin create endpoint — protect however you prefer (role check / secret)
+// NOTE: make sure you only call this from a secure admin UI or with server-only tools.
+app.post("/api/gallery", async (req, res) => {
+  const { title, bunnyUrl, thumbnailUrl, isPremium, tags } = req.body || {};
+  if (!bunnyUrl) return res.status(400).json({ error: "bunnyUrl required" });
+
+  const created = await GalleryItem.create({
+    title,
+    bunnyUrl,
+    thumbnailUrl,
+    isPremium: !!isPremium,
+    tags: Array.isArray(tags) ? tags : [],
+  });
+
+  res.status(201).json(created);
+});
+
+// app.post(
+//   "/webhook",
+//   express.raw({ type: "application/json" }),
+//   async (req, res) => {
+//     console.log("🔥 Webhook triggered");
+
+//     const sig = req.headers["stripe-signature"];
+//     let event;
+
+//     try {
+//       event = stripe.webhooks.constructEvent(
+//         req.body,
+//         sig,
+//         process.env.STRIPE_WEBHOOK_SECRET
+//       );
+//     } catch (err) {
+//       console.error("❌ Webhook signature error:", err.message);
+//       return res.status(400).send(`Webhook Error: ${err.message}`);
+//     }
+
+//     console.log("🔔 Webhook event type:", event.type);
+//     console.log("📦 Full session payload:", event.data.object);
+
+//     if (event.type === "checkout.session.completed") {
+//       const session = event.data.object;
+//       const email = session.customer_email;
+//       const subscriptionId = session.subscription;
+
+//       if (!email || !subscriptionId) {
+//         console.log("❌ No customer_email or subscriptionId in session!");
+//         return res.status(400).send("Missing required session data.");
+//       }
+
+//       console.log("📧 Updating paidSubscription for:", email);
+
+//       try {
+//         const updatedUser = await User.findOneAndUpdate(
+//           { email: new RegExp(`^${email}$`, "i") }, // case-insensitive match
+//           {
+//             paidSubscription: true,
+//             subscriptionId: subscriptionId,
+//           },
+//           { new: true }
+//         );
+
+//         if (!updatedUser) {
+//           console.log("⚠️ No matching user found in DB for email:", email);
+
+//           // Debug: list all users for troubleshooting
+//           const users = await User.find();
+//           console.log(
+//             "🧠 All user emails in DB:",
+//             users.map((u) => u.email)
+//           );
+//         } else {
+//           console.log("✅ User updated:", updatedUser.email);
+
+//           // ✅ Discord logic removed, we still keep discordId in DB for bot use
+//           if (!updatedUser.discordId) {
+//             console.log("⚠️ User has no discordId stored (DB only)");
+//           }
+//         }
+//       } catch (err) {
+//         console.error("❌ Database update error:", err);
+//         return res.status(500).send("Server error");
+//       }
+//     }
+
+//     res.status(200).send("Webhook received");
+//   }
+// );
+
+// SINGLE Stripe Webhook (keep ABOVE app.use(express.json()))
+app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+  } catch (err) {
+    console.error('❌ Webhook signature error:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  try {
+    // small helpers
+    const markPaid = async ({ email, customerId, subscriptionId }) => {
+      let user = null;
+      if (customerId) user = await User.findOne({ stripeCustomerId: customerId });
+      if (!user && email) user = await User.findOne({ email: new RegExp(`^${email}$`, 'i') });
+
+      if (user) {
+        user.paidSubscription = true;
+        if (subscriptionId) user.subscriptionId = subscriptionId;
+        if (customerId) user.stripeCustomerId = customerId;
+        await user.save();
+      }
+    };
+
+    const markUnpaid = async ({ email, customerId, subscriptionId }) => {
+      let user = null;
+      if (subscriptionId) user = await User.findOne({ subscriptionId });
+      if (!user && customerId) user = await User.findOne({ stripeCustomerId: customerId });
+      if (!user && email) user = await User.findOne({ email: new RegExp(`^${email}$`, 'i') });
+
+      if (user) {
+        user.paidSubscription = false;
+        // keep stripeCustomerId for future, but clear subId
+        if (subscriptionId) user.subscriptionId = null;
+        await user.save();
+      }
+    };
+
+    switch (event.type) {
+      // User just completed checkout (subscription mode)
+      case 'checkout.session.completed': {
+        const s = event.data.object;
+        await markPaid({
+          email: s.customer_email || s.customer_details?.email,
+          customerId: s.customer,
+          subscriptionId: s.subscription,
+        });
+        break;
+      }
+
+      // Subscription lifecycle changes (covers resume/pause/cancel/past_due/unpaid)
+      case 'customer.subscription.created':
+      case 'customer.subscription.updated': {
+        const sub = event.data.object;
+        const status = sub.status; // 'active' | 'trialing' | 'past_due' | 'unpaid' | 'canceled' | 'paused' | etc.
+        const payload = {
+          email: sub?.customer_email, // usually null here
+          customerId: sub.customer,
+          subscriptionId: sub.id,
+        };
+
+        if (['active', 'trialing'].includes(status)) {
+          await markPaid(payload);
+        } else if (['canceled', 'unpaid', 'paused', 'incomplete_expired', 'past_due'].includes(status)) {
+          // you can decide if 'past_due' stays paid or not; most teams flip to false
+          await markUnpaid(payload);
+        }
+        break;
+      }
+
+      // Explicit deletion (cancel)
+      case 'customer.subscription.deleted': {
+        const sub = event.data.object;
+        await markUnpaid({
+          customerId: sub.customer,
+          subscriptionId: sub.id,
+        });
+        break;
+      }
+
+      // Payment failed (optional hard-stop)
+      case 'invoice.payment_failed': {
+        const inv = event.data.object;
+        await markUnpaid({
+          customerId: inv.customer,
+          subscriptionId: inv.subscription,
+        });
+        break;
+      }
+
+      default:
+        // ignore other events
+        break;
+    }
+
+    // Always 200 so Stripe stops retrying
+    res.sendStatus(200);
+  } catch (err) {
+    console.error('❌ Webhook handler error:', err);
+    // still return 200 to stop retries; log and investigate
+    res.sendStatus(200);
+  }
+});
+
 
 app.post("/role-update", async (req, res) => {
   const { discordId, paid } = req.body;
@@ -153,40 +372,6 @@ app.get("/check-sub-status", async (req, res) => {
   if (!user) return res.send("No user found");
 
   res.send(`Paid Subscription: ${user.paidSubscription}`);
-});
-
-// ✅ Serve Static Files BEFORE Routes
-app.use(express.static(path.join(__dirname, "/")));
-app.use(express.static(path.join(__dirname, "public")));
-app.use(express.static(path.join(__dirname, "pages")));
-
-// ✅ Connect to MongoDB
-mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch((err) => console.error("❌ MongoDB Connection Error:", err));
-
-// ✅ User Schema & Model
-const UserSchema = new mongoose.Schema({
-  email: { type: String, required: true, unique: true },
-  username: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  discordId: { type: String, unique: true, sparse: true, default: null },
-  verified: { type: Boolean, default: false }, // Verfication status
-  paidSubscription: { type: Boolean, default: false }, // Paid subscription status
-  subscriptionId: { type: String },
-});
-const User = mongoose.model("User", UserSchema);
-
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // Allow max 5 login attempts per IP change to 5 later
-  message: { error: "Too many login attempts. Please try again later." },
-  standardHeaders: true, // Return rate limit info in headers
-  legacyHeaders: false, // Disable legacy headers
 });
 
 // Create email transporter

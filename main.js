@@ -27,6 +27,71 @@ function swapDivsMonthly() {
   }
 }
 
+// --- replace your current loadGallery() with this version ---
+async function loadGallery() {
+  // accept either id
+  const root = document.getElementById("galleryGrid") || document.getElementById("gallery");
+  if (!root) return; // not on this page
+
+  // show a spinner while loading
+  root.innerHTML = `
+    <div class="d-flex justify-content-center py-5 w-100">
+      <div class="spinner-border" role="status" aria-label="Loading"></div>
+    </div>`;
+
+  const token = localStorage.getItem("token");
+
+  try {
+    // if your site is served from a different port than the API, use the full URL:
+    // const res = await fetch("http://localhost:5000/api/gallery", { ... });
+    const res = await fetch("/api/gallery", {
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    });
+
+    if (!res.ok) throw new Error(`Gallery fetch failed: ${res.status}`);
+    const data = await res.json();
+
+    if (!data.items || data.items.length === 0) {
+      root.innerHTML = `
+        <div class="col-12">
+          <div class="alert alert-info text-center">No content yet. Check back soon!</div>
+        </div>`;
+      return;
+    }
+
+    root.innerHTML = "";
+    data.items.forEach(item => {
+      const card = document.createElement("div");
+      card.className = "col-12 col-sm-6 col-md-4 col-lg-3";
+      card.innerHTML = `
+        <div class="card h-100 shadow-sm">
+          <a href="${item.bunnyUrl}" class="glightbox" data-gallery="gallery-set" data-title="${item.title ?? ""}">
+            <img src="${item.thumbnailUrl || item.bunnyUrl}" class="card-img-top" alt="${item.title ?? ""}">
+          </a>
+          <div class="card-body">
+            <h6 class="card-title mb-1">${item.title ?? ""} ${item.isPremium ? "🔒" : ""}</h6>
+            ${item.tags?.length ? `<div class="small text-muted">${item.tags.join(" • ")}</div>` : ""}
+          </div>
+        </div>`;
+      root.appendChild(card);
+    });
+  } catch (err) {
+    console.error(err);
+    root.innerHTML = `
+      <div class="col-12">
+        <div class="alert alert-danger text-center">Could not load gallery. Please try again.</div>
+      </div>`;
+  }
+}
+
+// --- add this once (near your other DOMContentLoaded handlers) ---
+document.addEventListener("DOMContentLoaded", () => {
+  // only run on pages that actually have the gallery container
+  if (document.getElementById("galleryGrid") || document.getElementById("gallery")) {
+    loadGallery();
+  }
+});
+
 // Enables persistency within the page elements when scrolling
 
 window.onscroll = function () {
@@ -43,6 +108,17 @@ window.onscroll = function () {
     document.getElementById("footer").classList.add("d-none");
   }
 };
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (document.querySelector(".glightbox")) {
+    const lightbox = GLightbox({
+      selector: ".glightbox",
+      touchNavigation: true,
+      loop: true,
+      zoomable: true,
+    });
+  }
+});
 
 document.addEventListener("DOMContentLoaded", () => {
   const savedUser = localStorage.getItem("user");
