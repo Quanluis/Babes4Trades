@@ -57,6 +57,23 @@ const GallerySchema = new mongoose.Schema(
 const Gallery = mongoose.model("Gallery", GallerySchema);
 
 
+const GallerySchema2 = new mongoose.Schema(
+  {
+    title: String,
+    url: { type: String, required: true }, // Bunny.net URL
+    subscriptionLevel: {
+      type: String,
+      enum: ["free", "premium"],
+      default: "free"
+    },
+    uploadedAt: { type: Date, default: Date.now },
+  },
+  { collection: "galleries", timestamps: false } // match your existing collection
+);
+
+const Galleries = mongoose.model("Galleries", GallerySchema2);
+
+
 
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -102,6 +119,23 @@ app.get('/api/gallery', authOptional, async (req, res) => {
   res.json({ canSeePremium, items });
 });
 
+app.get('/api/galleries', authOptional, async (req, res) => {
+  const canSeePremium = !!(req.user && req.user.paidSubscription);
+  const query = canSeePremium ? {} : { subscriptionLevel: { $ne: 'premium' } };
+
+  const docs = await Galleries.find(query).sort({ uploadedAt: -1 }).lean();
+  const items = docs.map(d => ({
+    title: d.title,
+    bunnyUrl: d.url,
+    thumbnailUrl: null,
+    isPremium: d.subscriptionLevel === 'premium',
+    tags: [],
+    createdAt: d.uploadedAt
+  }));
+
+  res.json({ canSeePremium, items });
+});
+
 // (Optional) Admin create endpoint — protect however you prefer (role check / secret)
 // NOTE: make sure you only call this from a secure admin UI or with server-only tools.
 app.post("/api/gallery", async (req, res) => {
@@ -119,77 +153,22 @@ app.post("/api/gallery", async (req, res) => {
   res.status(201).json(created);
 });
 
-// app.post(
-//   "/webhook",
-//   express.raw({ type: "application/json" }),
-//   async (req, res) => {
-//     console.log("🔥 Webhook triggered");
+// (Optional) Admin create endpoint — protect however you prefer (role check / secret)
+// NOTE: make sure you only call this from a secure admin UI or with server-only tools.
+app.post("/api/galleries", async (req, res) => {
+  const { title, bunnyUrl, thumbnailUrl, isPremium, tags } = req.body || {};
+  if (!bunnyUrl) return res.status(400).json({ error: "bunnyUrl required" });
 
-//     const sig = req.headers["stripe-signature"];
-//     let event;
+  const created = await GalleryItem.create({
+    title,
+    bunnyUrl,
+    thumbnailUrl,
+    isPremium: !!isPremium,
+    tags: Array.isArray(tags) ? tags : [],
+  });
 
-//     try {
-//       event = stripe.webhooks.constructEvent(
-//         req.body,
-//         sig,
-//         process.env.STRIPE_WEBHOOK_SECRET
-//       );
-//     } catch (err) {
-//       console.error("❌ Webhook signature error:", err.message);
-//       return res.status(400).send(`Webhook Error: ${err.message}`);
-//     }
-
-//     console.log("🔔 Webhook event type:", event.type);
-//     console.log("📦 Full session payload:", event.data.object);
-
-//     if (event.type === "checkout.session.completed") {
-//       const session = event.data.object;
-//       const email = session.customer_email;
-//       const subscriptionId = session.subscription;
-
-//       if (!email || !subscriptionId) {
-//         console.log("❌ No customer_email or subscriptionId in session!");
-//         return res.status(400).send("Missing required session data.");
-//       }
-
-//       console.log("📧 Updating paidSubscription for:", email);
-
-//       try {
-//         const updatedUser = await User.findOneAndUpdate(
-//           { email: new RegExp(`^${email}$`, "i") }, // case-insensitive match
-//           {
-//             paidSubscription: true,
-//             subscriptionId: subscriptionId,
-//           },
-//           { new: true }
-//         );
-
-//         if (!updatedUser) {
-//           console.log("⚠️ No matching user found in DB for email:", email);
-
-//           // Debug: list all users for troubleshooting
-//           const users = await User.find();
-//           console.log(
-//             "🧠 All user emails in DB:",
-//             users.map((u) => u.email)
-//           );
-//         } else {
-//           console.log("✅ User updated:", updatedUser.email);
-
-//           // ✅ Discord logic removed, we still keep discordId in DB for bot use
-//           if (!updatedUser.discordId) {
-//             console.log("⚠️ User has no discordId stored (DB only)");
-//           }
-//         }
-//       } catch (err) {
-//         console.error("❌ Database update error:", err);
-//         return res.status(500).send("Server error");
-//       }
-//     }
-
-//     res.status(200).send("Webhook received");
-//   }
-// );
+  res.status(201).json(created);
+});
 
 // SINGLE Stripe Webhook (keep ABOVE app.use(express.json()))
 app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
