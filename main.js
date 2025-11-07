@@ -306,105 +306,231 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-  const form = document.getElementById("signInForm");
-  const signInEmail = document.getElementById("signinMainEmail");
-  const signInPassword = document.getElementById("current-password");
+  // ---------- Helpers ----------
+  const $ = (id) => document.getElementById(id);
+  const getUser = () => {
+    try { return JSON.parse(localStorage.getItem("user") || "null"); }
+    catch { return null; }
+  };
 
-  // 🟢 Show username if already logged in
-  const savedUser = localStorage.getItem("user");
-  if (savedUser) {
-    const user = JSON.parse(savedUser);
-    document.getElementById(
-      "welcomeUser"
-    ).textContent = `Welcome, ${user.username}!`;
-    signInDropdown.classList.add("d-none");
-    signOutBtn.classList.remove("d-none");
+  function applyAuthUI(user) {
+    const welcomeUser   = $("welcomeUser");
+    const signOutBtn    = $("signOutBtn");
+    const signInDropdown= $("signInDropdown");
+
+    // Toggle welcome text + buttons
+    if (welcomeUser)   welcomeUser.textContent = user?.username ? `Welcome, ${user.username}!` : "";
+    if (signOutBtn)    signOutBtn.classList.toggle("d-none", !user);
+    if (signInDropdown)signInDropdown.classList.toggle("d-none", !!user);
+
+    // Class-based nav visibility (matches your HTML classes)
+    const showFree    = document.querySelectorAll(".show-when-free");
+    const showLogged  = document.querySelectorAll(".show-when-logged-in");
+    const showPaid    = document.querySelectorAll(".show-when-paid");
+    const hideLogged  = document.querySelectorAll(".hide-when-logged-in");
+
+    const isPaid = !!(user && (user.paidSubscription === true || user.tier === "basic" || user.tier === "premium"));
+
+    if (user) {
+      hideLogged.forEach(el => el.classList.add("d-none"));
+      showLogged.forEach(el => el.classList.remove("d-none"));
+      showFree.forEach(el => el.classList.remove("d-none"));    // keep free visible if you prefer
+      if (isPaid) showPaid.forEach(el => el.classList.remove("d-none"));
+      else        showPaid.forEach(el => el.classList.add("d-none"));
+    } else {
+      hideLogged.forEach(el => el.classList.remove("d-none"));
+      showLogged.forEach(el => el.classList.add("d-none"));
+      showPaid.forEach(el => el.classList.add("d-none"));
+      showFree.forEach(el => el.classList.remove("d-none"));
+    }
+
+    // Sign out handler (safe if missing)
+    if (signOutBtn) {
+      signOutBtn.onclick = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        location.reload();
+      };
+    }
   }
 
-  form.addEventListener("submit", async function (event) {
-    event.preventDefault();
+  // ---------- Initial UI from saved user ----------
+  applyAuthUI(getUser());
 
-    const signInData = {
-      email: signInEmail.value,
-      password: signInPassword.value,
-    };
+  // ---------- Main page form sign-in (if present) ----------
+  const form = $("signInForm");                          // your main sign-in form (if this page has it)
+  const signInEmail = $("signinMainEmail");
+  const signInPassword = $("current-password");
 
-    try {
-      const sent = await fetch("http://localhost:5000/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(signInData),
-      });
+  if (form) {
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const signInData = {
+        email:    signInEmail?.value || "",
+        password: signInPassword?.value || "",
+      };
 
-      const data = await sent.json();
+      try {
+        const res = await fetch("http://localhost:5000/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(signInData),
+        });
+        const data = await res.json();
 
-      if (sent.ok) {
-        alert("Data Checked successfully");
-
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
-
-        // ✅ Update welcome message
-        document.getElementById(
-          "welcomeUser"
-        ).textContent = `Welcome, ${data.user.username}!`;
-
-        // Optional redirect
-        window.location.href = "index.html";
-      } else {
-        alert("Error: " + data.error);
+        if (res.ok) {
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("user", JSON.stringify(data.user));
+          applyAuthUI(data.user);
+          // Optional: redirect (works from /video.html since it's served at /video.html)
+          window.location.href = "index.html";
+        } else {
+          alert("Error: " + (data?.error || "Login failed"));
+        }
+      } catch (err) {
+        console.error("Error:", err);
+        alert("Email or password is incorrect. Please try again.");
       }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("Email or password is incorrect. Please try again.");
-    }
-  });
+    });
+  }
+
+  // ---------- Navbar dropdown sign-in (if present) ----------
+  const loginForm = $("dropDownSignInForm");             // your navbar dropdown form
+  const ddEmail = $("signInDropDownEmail");
+  const ddPass  = $("signInDropDownPassword");
+
+  if (loginForm) {
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const email = ddEmail?.value || "";
+      const password = ddPass?.value || "";
+
+      try {
+        const res = await fetch("http://localhost:5000/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("user", JSON.stringify(data.user));
+          applyAuthUI(data.user);
+          window.location.href = "index.html";
+        } else {
+          alert(data?.error || "Login failed");
+        }
+      } catch (err) {
+        console.error("Login error:", err);
+        alert("Something went wrong.");
+      }
+    });
+  }
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-  const loginForm = document.getElementById("dropDownSignInForm");
 
-  loginForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
+// document.addEventListener("DOMContentLoaded", function () {
+//   const form = document.getElementById("signInForm");
+//   const signInEmail = document.getElementById("signinMainEmail");
+//   const signInPassword = document.getElementById("current-password");
 
-    const email = document.getElementById("signInDropDownEmail").value;
-    const password = document.getElementById("signInDropDownPassword").value;
+//   // 🟢 Show username if already logged in
+//   const savedUser = localStorage.getItem("user");
+//   if (savedUser) {
+//     const user = JSON.parse(savedUser);
+//     document.getElementById(
+//       "welcomeUser"
+//     ).textContent = `Welcome, ${user.username}!`;
+//     signInDropdown.classList.add("d-none");
+//     signOutBtn.classList.remove("d-none");
+//   }
 
-    try {
-      const response = await fetch("http://localhost:5000/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+//   form.addEventListener("submit", async function (event) {
+//     event.preventDefault();
 
-      const data = await response.json();
+//     const signInData = {
+//       email: signInEmail.value,
+//       password: signInPassword.value,
+//     };
 
-      if (response.ok) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
+//     try {
+//       const sent = await fetch("http://localhost:5000/api/login", {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify(signInData),
+//       });
 
-        document.getElementById(
-          "welcomeUser"
-        ).textContent = `Welcome, ${data.user.username}!`;
-        document.getElementById("signOutBtn").classList.remove("d-none");
-        document.getElementById("babesGallary").classList.remove("d-none");
-        document.getElementById("signInDropdown").classList.add("d-none");
+//       const data = await sent.json();
 
-        // Redirect to homepage or reload if needed
-        window.location.href = "index.html";
-      } else {
-        alert(data.error);
-      }
-    } catch (err) {
-      console.error("Login error:", err);
-      alert("Something went wrong.");
-    }
-  });
-});
+//       if (sent.ok) {
+//         alert("Data Checked successfully");
+
+//         localStorage.setItem("token", data.token);
+//         localStorage.setItem("user", JSON.stringify(data.user));
+
+//         // ✅ Update welcome message
+//         document.getElementById(
+//           "welcomeUser"
+//         ).textContent = `Welcome, ${data.user.username}!`;
+
+//         // Optional redirect
+//         window.location.href = "index.html";
+//       } else {
+//         alert("Error: " + data.error);
+//       }
+//     } catch (error) {
+//       console.error("Error:", error);
+//       alert("Email or password is incorrect. Please try again.");
+//     }
+//   });
+// });
+
+// document.addEventListener("DOMContentLoaded", () => {
+//   const loginForm = document.getElementById("dropDownSignInForm");
+
+//   loginForm.addEventListener("submit", async (e) => {
+//     e.preventDefault();
+
+//     const email = document.getElementById("signInDropDownEmail").value;
+//     const password = document.getElementById("signInDropDownPassword").value;
+
+//     try {
+//       const response = await fetch("http://localhost:5000/api/login", {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify({ email, password }),
+//       });
+
+//       const data = await response.json();
+
+//       if (response.ok) {
+//         localStorage.setItem("token", data.token);
+//         localStorage.setItem("user", JSON.stringify(data.user));
+
+//         document.getElementById(
+//           "welcomeUser"
+//         ).textContent = `Welcome, ${data.user.username}!`;
+//         document.getElementById("signOutBtn").classList.remove("d-none");
+//         document.getElementById("babesGallary").classList.remove("d-none");
+//         document.getElementById("signInDropdown").classList.add("d-none");
+
+//         // Redirect to homepage or reload if needed
+//         window.location.href = "index.html";
+//       } else {
+//         alert(data.error);
+//       }
+//     } catch (err) {
+//       console.error("Login error:", err);
+//       alert("Something went wrong.");
+//     }
+//   });
+// });
 
 document.addEventListener("DOMContentLoaded", () => {
   const signOutBtn = document.getElementById("signOutBtn");
