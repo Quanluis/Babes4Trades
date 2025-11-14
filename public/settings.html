@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link rel="stylesheet" href="/main.css">
-    <title>Frequently Asked Questions</title>
+    <title>About</title>
 </head>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark gradient-custom">
@@ -28,7 +28,7 @@
       <ul class="navbar-nav me-auto">
         <!-- Always visible -->
         <li class="nav-item">
-          <a class="nav-link" href="../index.html">Home</a>
+          <a class="nav-link" href="/">Home</a>
         </li>
       
         <!-- Guest or unpaid user -->
@@ -113,102 +113,57 @@
   </div>
 </nav>
 
-  <body  class="d-flex flex-column min-vh-100"  >
-  
-  <div class="container faq-section">
-    <h2 class="faq-title">Frequently Asked Questions</h2>
-    <div class="accordion" id="faqAccordion">
+<body class="d-flex flex-column min-vh-100 bg-light">
 
-      <!-- Question 1 -->
-      <div class="card">
-        <div class="card-header" id="headingOne">
-          <h5 class="mb-0">
-            <button class="btn btn-link text-white w-100 text-left" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-              <i class="bi bi-question-circle"></i> What is the course enrollment process?
-            </button>
-          </h5>
-        </div>
-        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
-          <div class="card-body">
-            To enroll in a course, simply navigate to the Sign In page on the top right of the screen and click "New around here? Sign Up", or click <a href="/pages/signUp.html">Here</a>. You will be prompted to create an account or log in before clicking subscribe on the top left.
-          </div>
-        </div>
-      </div>
+  <h3 class="text-center pt-5">Settings</h3>
 
-      <!-- Question 2 -->
-      <div class="card">
-        <div class="card-header" id="headingTwo">
-          <h5 class="mb-0">
-            <button class="btn btn-link text-white w-100 text-left" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-              <i class="bi bi-question-circle"></i> How do I access my courses?
-            </button>
-          </h5>
-        </div>
-        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
-          <div class="card-body">
-            Once you've subscribed to Babes4Trades, you can access "Babes Gallery" and "My Courses" via the top left of your account. From there, you can start learning immediately!
-          </div>
-        </div>
-      </div>
+  <div class="container mt-4">
+    <h2 class="text-center mb-4">Your Profile</h2>
 
-      <!-- Question 3 -->
-      <div class="card">
-        <div class="card-header" id="headingThree">
-          <h5 class="mb-0">
-            <button class="btn btn-link text-white w-100 text-left" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-              <i class="bi bi-question-circle"></i> Can I get a refund if I'm not satisfied with the course?
-            </button>
-          </h5>
+    <div class="card mx-auto shadow rounded-4 p-4" style="max-width: 500px;">
+      <div class="card-body text-center">
+        <img src="../PNG/icons8-user-100.png" alt="User Icon" width="80" class="mb-3">
+        
+        <div id="userProfile" class="mb-3">
+          <p id="profileUsername" class="mb-1 fw-bold"></p>
+          <p id="profileEmail" class="mb-1 text-muted"></p>
+          <p id="profileStatus" class="badge bg-secondary px-3 py-2"></p>
         </div>
-        <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
-          <div class="card-body">
-            Yes! We offer a 3 day money back guarentee or a two hour grace period of content watch, whichever comes first. 
-          </div>
-        </div>
-      </div>
 
-      <!-- Question 4 -->
-      <div class="card">
-        <div class="card-header" id="headingFour">
-          <h5 class="mb-0">
-            <button class="btn btn-link text-white w-100 text-left" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-              <i class="bi bi-question-circle"></i> Do I receive a certificate after completing a course?
-            </button>
-          </h5>
-        </div>
-        <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
-          <div class="card-body">
-            Yes, you will receive a certificate of completion after finishing a course. This certificate is available for download in your account under the "My Certificates" section.
-          </div>
-        </div>
-      </div>
+        <hr class="my-4">
 
-      <!-- Question 5 -->
-      <div class="card">
-        <div class="card-header" id="headingFive">
-          <h5 class="mb-0">
-            <button class="btn btn-link text-white w-100 text-left" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
-              <i class="bi bi-question-circle"></i> Can I take multiple courses at the same time?
-            </button>
-          </h5>
-        </div>
-        <div id="collapseFive" class="collapse" aria-labelledby="headingFive" data-bs-parent="#faqAccordion">
-          <div class="card-body">
-            Absolutely! You can enroll in multiple courses and study them at your own pace. 😜 There are no restrictions on how many courses you can take at once and the available gallary's you may view.
+        <!-- 🎮 Discord Update Form -->
+        <form id="updateDiscordForm" class="text-start">
+          <label for="discordId" class="form-label">Update Discord Username</label>
+          <input
+            type="text"
+            class="form-control mb-2"
+            id="discordId"
+            placeholder="e.g. MyName#1234"
+          />
+          <div id="discordUpdateFeedback" class="form-text text-success mb-2" style="display: none;">
+            ✅ Discord ID updated successfully!
           </div>
-        </div>
+          <button type="submit" class="btn btn-outline-primary w-100">Save Discord</button>
+        </form>
       </div>
+    </div>
+
+    <!-- 🔐 User Action Buttons -->
+    <div class="d-flex flex-column align-items-center mt-4 gap-3">
+      <button onclick="window.location.href='forgotPass.html'" class="btn btn-outline-secondary w-75">Reset Password</button>
+      <button id="unsubscribeBtn" class="btn btn-outline-danger w-75">Cancel My Subscription</button>
+      <button onclick="window.location.href='deleteAccount.html'" class="btn btn-danger w-75">Delete Account</button>
     </div>
   </div>
 
-  <button onclick="window.location.href='/signUp.html'" class="btn btn-primary w-auto mx-auto d-block mt-3">Start Today!</button>
-
-  </body>
+</body>
+  
 
   <footer class="mt-auto">
     <div class="fixed">
       <ul class="nav justify-content-center border-bottom pb-3 mb-3">
-        <li class="nav-item"><a href="../index.html" class="px-2 text-muted footer-links">Home</a></li>
+        <li class="nav-item"><a href="/index.html" class="px-2 text-muted footer-links">Home</a></li>
         <li class="nav-item"><a href="about.html" class="px-2 text-muted footer-links">About</a></li>
         <li class="nav-item"><a href="contact.html" class="px-2 text-muted footer-links">Contact</a></li>
       </ul>
@@ -235,5 +190,6 @@
   </footer> 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-<script src="main.js"></script>
+<script src="../main.js"></script>
+</script>
 </html>

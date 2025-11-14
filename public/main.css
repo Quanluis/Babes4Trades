@@ -13,7 +13,7 @@ nav {
 
 @font-face {
   font-family: "Lobster";
-  src: url("/public/Fonts/Lobster/Lobster-Regular.ttf") format("woff2");
+  src: url("/Fonts/Lobster/Lobster-Regular.ttf") format("woff2");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -119,7 +119,7 @@ footer {
 }
 
 #legal {
-  padding-bottom: 30px;
+  /* padding-bottom: 30px; */
   font-size: 10px;
 }
 

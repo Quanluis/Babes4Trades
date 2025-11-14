@@ -22,13 +22,13 @@
       <img id="logoSVG" src="..//SVG/babesSVG.svg" />
 
     </h1></span>
-
+    
     <!-- Navbar Links -->
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav me-auto">
         <!-- Always visible -->
         <li class="nav-item">
-          <a class="nav-link" href="../index.html">Home</a>
+          <a class="nav-link" href="/">Home</a>
         </li>
       
         <!-- Guest or unpaid user -->
@@ -115,36 +115,89 @@
 
   <body  class="d-flex flex-column min-vh-100">
 
-    <h2 class="d-flex justify-content-center pt-5">Sign In</h2>
+    <div class="pt-5">
 
-    <div class=" d-flex justify-content-center container mt-2">
-        <div class="col-6">
-            <div class="dropdown ">
-                <form id="signInForm" class="px-4 py-3">
-                  <div class="mb-3">
-                    <label for="exampleDropdownFormEmail1" class="form-label">Email address</label>
-                    <input type="email" class="form-control" id="signinMainEmail" placeholder="email@example.com">
-                  </div>
-                  <div class="mb-3">
-                    <label for="exampleDropdownFormPassword1" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="current-password" placeholder="Password" autocomplete="current-password">
-                  </div>
-                  <div class="mb-3">
-                    <div class="form-check">
-                      <input type="checkbox" class="form-check-input" id="dropdownCheck2">
-                      <label class="form-check-label" for="dropdownCheck">
-                        Remember me
-                      </label>
-                    </div>
-                  </div>
-                  <button type="submit" class="btn btn-primary">Sign in</button>
-                </form>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="signUp.html">New around here? Sign up</a>
-                <a class="dropdown-item" href="./forgotPass.html">Forgot password?</a>
-              </div>
-        </div>  
+      <h2>Contact</h2>
 
+      <div class="container">
+        <div class="row justify-content-evenly">
+          <div class="col-md-4 d-flex mb-4" >
+            <div class="w-100">
+
+              <h3>What's on your mind?</h3>
+
+              <form id="contactForm" action="">
+
+                <div class="mb-3">
+                  <label for="formGroupExampleInput" class="form-label">Email</label>
+                  <input type="text" class="form-control" id="contactUsEmail" placeholder="Babes4Trades@daddy.com">
+                </div>
+                <div class="mb-3">
+                  <label for="formGroupExampleInput2" class="form-label">Subject</label>
+                  <input type="text" class="form-control" id="contactUsSubject" placeholder="Babe One">
+                </div> 
+                <div class="mb-3">
+
+                  <div class="form-floating">
+                    <textarea class="form-control" placeholder="Leave a comment here" id="contactUsText"></textarea>
+                    <label for="floatingTextarea">Comments</label>
+                    <button class="btn btn-primary w-100">Submit</button>
+                  </div>
+
+                </div>    
+              </form>
+            </div>
+          </div>
+
+          <div class="col-md-4 d-flex mb-4 justify-content-center" >
+            <div class="w-100">
+              
+                <div class="vstack gap-3 justify-content-center">
+
+                  <h3 class= "justify-content-center" >Socials</h3>
+
+                  <div class="fw-bold">
+                    
+                  <img id="socialSVG" src="../SVG/icons8-instagram.svg">
+
+                  <a style="text-decoration: none;" class="lh-sm p3" href="https://www.instagram.com/babes4trades?igsh=dTdub3A4ZmNoZzZx&utm_source=qr" target="_blank" rel="noopener noreferrer">Instagram</a>
+
+                  </div>
+                  <div class="fw-bold">
+
+                    <img id="socialSVG" src="../SVG/icons8-youtube-squared.svg">
+
+                    <a style="text-decoration: none;" class="lh-sm p3" href="https://www.youtube.com/@Babes4Trades" target="_blank" rel="noopener noreferrer">YouTube</a>
+
+                  </div>
+
+                  <div class="fw-bold">
+                    
+                    <img id="socialSVG" src="..//SVG/icons8-discord.svg" />
+
+                    <a style="text-decoration: none;" href="https://discord.gg/aZxhAbA2kd" target="_blank" rel="noopener noreferrer">Discord</a>
+
+                  </div>
+
+                </div>
+              </div>           
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="d-flex justify-content-center pt-5">
+
+      <a href="/faq.html" style="text-decoration: none;" class=" link-danger">Frequently Asked Questions</a></p>
+  
+    </div>
+
+      <div class="d-flex justify-content-center pt-5">
+
+      <a href="becomeATradeBabe.html" style="text-decoration: none;" class=" link-info">Become a Trade Babe</a></p>
+  
     </div>
 
   </body>
@@ -152,7 +205,7 @@
   <footer class="mt-auto">
     <div class="fixed">
       <ul class="nav justify-content-center border-bottom pb-3 mb-3">
-        <li class="nav-item"><a href="../index.html" class="px-2 text-muted footer-links">Home</a></li>
+        <li class="nav-item"><a href="/index.html" class="px-2 text-muted footer-links">Home</a></li>
         <li class="nav-item"><a href="about.html" class="px-2 text-muted footer-links">About</a></li>
         <li class="nav-item"><a href="contact.html" class="px-2 text-muted footer-links">Contact</a></li>
       </ul>

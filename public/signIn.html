@@ -25,11 +25,10 @@
 
     <!-- Navbar Links -->
     <div class="collapse navbar-collapse" id="navbarNav">
-
       <ul class="navbar-nav me-auto">
         <!-- Always visible -->
         <li class="nav-item">
-          <a class="nav-link" href="../index.html">Home</a>
+          <a class="nav-link" href="/">Home</a>
         </li>
       
         <!-- Guest or unpaid user -->
@@ -116,31 +115,44 @@
 
   <body  class="d-flex flex-column min-vh-100">
 
-    <h3 class="d-flex justify-content-center pt-5">We'd hate to see you go. 😢 </h3>
+    <h2 class="d-flex justify-content-center pt-5">Sign In</h2>
 
- <div class="align-items-center d-flex justify-content-center container mt-1">
+    <div class=" d-flex justify-content-center container mt-2">
+        <div class="col-6">
+            <div class="dropdown ">
+                <form id="signInForm" class="px-4 py-3">
+                  <div class="mb-3">
+                    <label for="exampleDropdownFormEmail1" class="form-label">Email address</label>
+                    <input type="email" class="form-control" id="signinMainEmail" placeholder="email@example.com">
+                  </div>
+                  <div class="mb-3">
+                    <label for="exampleDropdownFormPassword1" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="current-password" placeholder="Password" autocomplete="current-password">
+                  </div>
+                  <div class="mb-3">
+                    <div class="form-check">
+                      <input type="checkbox" class="form-check-input" id="dropdownCheck2">
+                      <label class="form-check-label" for="dropdownCheck">
+                        Remember me
+                      </label>
+                    </div>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Sign in</button>
+                </form>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="signUp.html">New around here? Sign up</a>
+                <a class="dropdown-item" href="./forgotPass.html">Forgot password?</a>
+              </div>
+        </div>  
 
-    <form id="deleteAccountForm" class="px-4 py-3">
-        <div class="w-auto mx-auto d-block mt-3">
-            <label for="deleteAccountLabelEmail" class="form-label">Email address</label>
-            <input type="email" class="form-control" id="deleteAccountEmail" placeholder="email@example.com">
-        </div>
-        <div class="w-auto mx-auto d-block mt-3">
-            <label for="deleteAccountLabelPassword" class="form-label">Password</label>
-            <input type="password" class="form-control" id="deleteAccountPassword" placeholder="Password">
-        </div>
-
-        <button type="submit" class="btn btn-danger w-auto mx-auto d-block mt-3">Delete Account</button>
-    </form> 
-
- </div>
+    </div>
 
   </body>
-  
+
   <footer class="mt-auto">
     <div class="fixed">
       <ul class="nav justify-content-center border-bottom pb-3 mb-3">
-        <li class="nav-item"><a href="../index.html" class="px-2 text-muted footer-links">Home</a></li>
+        <li class="nav-item"><a href="/index.html" class="px-2 text-muted footer-links">Home</a></li>
         <li class="nav-item"><a href="about.html" class="px-2 text-muted footer-links">About</a></li>
         <li class="nav-item"><a href="contact.html" class="px-2 text-muted footer-links">Contact</a></li>
       </ul>

@@ -7,17 +7,20 @@ const rateLimit = require("express-rate-limit");
 const cors = require("cors");
 const nodemailer = require("nodemailer");
 const JWT = require("jsonwebtoken");
+const fs = require("fs");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const app = express();
+
+// const User = require("./models/User");
 
 app.use(cors());
 
 
 
 // ✅ Serve Static Files BEFORE Routes
-app.use(express.static(path.join(__dirname, "/")));
+// app.use(express.static(path.join(__dirname, "/")));
 app.use(express.static(path.join(__dirname, "public")));
-app.use(express.static(path.join(__dirname, "pages")));
+// app.use(express.static(path.join(__dirname, "pages")));
 
 // ✅ Connect to MongoDB
 mongoose
@@ -38,6 +41,7 @@ const UserSchema = new mongoose.Schema({
   paidSubscription: { type: Boolean, default: false }, // Paid subscription status
   subscriptionId: { type: String },
 });
+
 const User = mongoose.model("User", UserSchema);
 
 const GallerySchema = new mongoose.Schema(
@@ -73,6 +77,148 @@ const GallerySchema2 = new mongoose.Schema(
 
 const Galleries = mongoose.model("Galleries", GallerySchema2);
 
+
+// // Simple JWT-based middleware
+// function requireAuth(req, res, next) {
+//   const auth = req.headers.authorization || "";
+//   const token = auth.startsWith("Bearer ") ? auth.slice(7) : null;
+//   if (!token) return res.redirect("/pages/pricing.html");
+
+//   try {
+//     const decoded = JWT.verify(token, process.env.JWT_SECRET);
+//     req.user = decoded;
+//     next();
+//   } catch {
+//     return res.redirect("/pages/pricing.html");
+//   }
+// }
+
+// async function requirePaid(req, res, next) {
+//   try {
+//     const user = await User.findById(req.user.userId);
+//     if (!user || !user.paidSubscription) {
+//       return res.redirect("/pages/pricing.html");
+//     }
+//     next();
+//   } catch {
+//     return res.redirect("/pages/pricing.html");
+//   }
+// }
+
+// // ✅ Serve video page only for paid users
+// app.get("/my-courses", requireAuth, requirePaid, (req, res) => {
+//   const filePath = path.join(__dirname, "pages", "video.html");
+//   if (fs.existsSync(filePath)) res.sendFile(filePath);
+//   else res.status(404).send("Video page not found");
+// });
+
+// ============================
+// ✅ Protected Course Route
+// ============================
+
+
+// app.get("/my-courses", requireAuth, requirePaid, (req, res) => {
+//   res.sendFile(path.join(__dirname, "pages", "video.html"));
+// });
+
+// // Middleware: Check if the user is authenticated (has valid JWT)
+// function requireAuth(req, res, next) {
+//   const authHeader = req.headers.authorization || "";
+//   const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+
+//   if (!token) {
+//     return res.redirect("/pages/pricing.html"); // if no token, go to pricing
+//   }
+
+//   try {
+//     const decoded = JWT.verify(token, process.env.JWT_SECRET);
+//     req.user = decoded;
+//     next();
+//   } catch (err) {
+//     console.error("JWT verification failed:", err);
+//     return res.redirect("/pages/pricing.html");
+//   }
+// }
+
+// // Middleware: Check if the user has a paid subscription
+// async function requirePaid(req, res, next) {
+//   try {
+//     const user = await User.findById(req.user.userId);
+//     if (!user || !user.paidSubscription) {
+//       return res.redirect("/pages/pricing.html");
+//     }
+//     next();
+//   } catch (err) {
+//     console.error("Error verifying paid user:", err);
+//     res.redirect("/pages/pricing.html");
+//   }
+// }
+
+// // 🔐 Protected course route
+// app.get("/my-courses", (req, res) => {
+//   const authHeader = req.headers.authorization || "";
+//   const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+
+//   // if no token in header, redirect
+//   if (!token) {
+//     return res.redirect("/pricing.html");
+//   }
+
+//   try {
+//     const decoded = JWT.verify(token, process.env.JWT_SECRET);
+//     // Optional: verify paid status from MongoDB
+//     res.sendFile(path.join(__dirname, "pages", "video.html"));
+//   } catch (err) {
+//     console.error("JWT failed:", err);
+//     res.redirect("/pricing.html");
+//   }
+// });
+
+
+// 🔐 Middleware 1: Verify JWT (Authentication)
+function requireAuth(req, res, next) {
+  const authHeader = req.headers.authorization || "";
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+
+  if (!token) {
+    console.log("❌ No token found");
+    return res.redirect("/pricing.html");
+  }
+
+  try {
+    const decoded = JWT.verify(token, process.env.JWT_SECRET);
+    req.user = decoded; // Attach decoded payload for later
+    next();
+  } catch (err) {
+    console.error("JWT verification failed:", err.message);
+    return res.redirect("/pricing.html");
+  }
+}
+
+// 💳 Middleware 2: Check Paid Subscription in MongoDB
+async function requirePaid(req, res, next) {
+  try {
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      console.log("❌ User not found");
+      return res.redirect("/pricing.html");
+    }
+    if (!user.paidSubscription) {
+      console.log("⚠️ User is not a paid subscriber");
+      return res.redirect("/pricing.html");
+    }
+    console.log("✅ Paid user:", user.email);
+    next();
+  } catch (err) {
+    console.error("Error verifying paid user:", err.message);
+    res.redirect("/pricing.html");
+  }
+}
+
+app.get("/my-courses", requireAuth, requirePaid, (req, res) => {
+  const videoPage = path.join(__dirname, "pages", "video.html");
+  res.sendFile(videoPage);
+});
 
 
 const loginLimiter = rateLimit({
@@ -605,8 +751,8 @@ app.post("/checkout", async (req, res) => {
           quantity: 1,
         },
       ],
-      success_url: "http://localhost:5000/pages/paymentsuccess.html",
-      cancel_url: "http://localhost:5000/pages/paymentcancelled.html", // ✅ use full URLs
+      success_url: "http://localhost:5000/paymentsuccess.html",
+      cancel_url: "http://localhost:5000/paymentcancelled.html", // ✅ use full URLs
       customer_email: user.email,
     });
 

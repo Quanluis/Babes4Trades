@@ -383,7 +383,7 @@ document.addEventListener("DOMContentLoaded", function () {
           localStorage.setItem("user", JSON.stringify(data.user));
           applyAuthUI(data.user);
           // Optional: redirect (works from /video.html since it's served at /video.html)
-          window.location.href = "index.html";
+          window.location.href = "/";
         } else {
           alert("Error: " + (data?.error || "Login failed"));
         }
@@ -418,7 +418,7 @@ document.addEventListener("DOMContentLoaded", function () {
           localStorage.setItem("token", data.token);
           localStorage.setItem("user", JSON.stringify(data.user));
           applyAuthUI(data.user);
-          window.location.href = "index.html";
+          window.location.href = "/";
         } else {
           alert(data?.error || "Login failed");
         }
@@ -617,7 +617,7 @@ document.addEventListener("DOMContentLoaded", () => {
       signInDropdown.classList.remove("d-none");
       toggleAuthLinks(false);
 
-      window.location.href = "index.html";
+      window.location.href = "/";
     });
   }
 });
@@ -907,7 +907,7 @@ document.addEventListener("DOMContentLoaded", () => {
           // ✅ Clear localStorage and redirect to home
           localStorage.removeItem("user");
           localStorage.removeItem("token");
-          window.location.href = "/index.html";
+          window.location.href = "/";
         }
       } catch (error) {
         console.error("❌ Unsubscribe error:", error);
@@ -998,7 +998,7 @@ document.addEventListener("DOMContentLoaded", function () {
         localStorage.removeItem("user");
         localStorage.removeItem("token");
 
-        window.location.href = "/index.html"; // Redirect to homepage
+        window.location.href = "/"; // Redirect to homepage
       } else {
         alert(result.error || "Failed to delete account");
       }
@@ -1083,3 +1083,45 @@ document.addEventListener("DOMContentLoaded", () => {
   const user = JSON.parse(localStorage.getItem("user"));
   updateNavbarBasedOnUser(user);
 });
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const viewCourseButtons = document.querySelectorAll(".view-course-btn");
+
+  viewCourseButtons.forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      // 🧾 Get auth data from localStorage (adjust keys if yours are different)
+      const token = localStorage.getItem("token");
+      let user = null;
+
+      try {
+        const userRaw = localStorage.getItem("user");
+        if (userRaw) {
+          user = JSON.parse(userRaw);
+        }
+      } catch (err) {
+        console.error("Error parsing user from localStorage", err);
+      }
+
+      // 1) Not logged in → go to sign-up
+      if (!token || !user) {
+        window.location.href = "/signUp.html";
+        return;
+      }
+
+      // 2) Logged in but NOT paid → go to pricing / subscribe
+      //    (adjust 'paidSubscription' if your property name is different)
+      if (!user.paidSubscription) {
+        window.location.href = "/pricing.html";
+        return;
+      }
+
+      // 3) Logged in AND paid → send to course page
+      const courseSlug = btn.dataset.course; // e.g. "finance-101"
+      window.location.href = `/Courses/${courseSlug}.html`;
+    });
+  });
+});
+

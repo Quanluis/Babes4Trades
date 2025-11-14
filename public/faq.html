@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link rel="stylesheet" href="/main.css">
-    <title>About</title>
+    <title>Frequently Asked Questions</title>
 </head>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark gradient-custom">
@@ -22,13 +22,13 @@
       <img id="logoSVG" src="..//SVG/babesSVG.svg" />
 
     </h1></span>
-    
+
     <!-- Navbar Links -->
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav me-auto">
         <!-- Always visible -->
         <li class="nav-item">
-          <a class="nav-link" href="../index.html">Home</a>
+          <a class="nav-link" href="/">Home</a>
         </li>
       
         <!-- Guest or unpaid user -->
@@ -113,68 +113,102 @@
   </div>
 </nav>
 
-  <body  class="d-flex flex-column min-vh-100">
+  <body  class="d-flex flex-column min-vh-100"  >
+  
+  <div class="container faq-section">
+    <h2 class="faq-title">Frequently Asked Questions</h2>
+    <div class="accordion" id="faqAccordion">
 
-    <div class="pt-5">
-
-      <h2>Interested in becoming a Babe? Apply below. </h2>
-
-      <div class="pt-5" ></div>
-
-      <div class="container">
-        <div class="row justify-content-evenly">
-          <div class="col-md-4 d-flex mb-4" >
-            <div class="w-100">
-
-              <form id="applicationForm" enctype="multipart/form-data" action="/apply" method="POST">
-  <div class="mb-3">
-    <label for="applicantName" class="form-label">Name</label>
-    <input type="text" class="form-control" id="applicantName" name="name" placeholder="Your full name" required>
-  </div>
-
-  <div class="mb-3">
-    <label for="applicantEmail" class="form-label">Email</label>
-    <input type="email" class="form-control" id="applicantEmail" name="email" placeholder="you@example.com" required>
-  </div>
-
-  <div class="mb-3">
-    <label for="socialHandle" class="form-label">Instagram or Social Handle</label>
-    <input type="text" class="form-control" id="socialHandle" name="social" placeholder="@yourhandle" required>
-  </div>
-
-  <div class="mb-3">
-    <label for="whyJoin" class="form-label">Why do you want to join Babes4Trades?</label>
-    <textarea class="form-control" id="whyJoin" name="reason" rows="4" placeholder="Tell us why you’re interested..." required></textarea>
-  </div>
-
-  <div class="mb-3">
-    <label for="photoUpload" class="form-label">Upload a Photo (Optional)</label>
-    <input class="form-control" type="file" id="photoUpload" name="photo" accept="image/*">
-  </div>
-
-  <button type="submit" class="btn btn-primary w-100">Submit Application</button>
-</form>
-              
-            </div>
+      <!-- Question 1 -->
+      <div class="card">
+        <div class="card-header" id="headingOne">
+          <h5 class="mb-0">
+            <button class="btn btn-link text-white w-100 text-left" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+              <i class="bi bi-question-circle"></i> What is the course enrollment process?
+            </button>
+          </h5>
+        </div>
+        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+          <div class="card-body">
+            To enroll in a course, simply navigate to the Sign In page on the top right of the screen and click "New around here? Sign Up", or click <a href="/pages/signUp.html">Here</a>. You will be prompted to create an account or log in before clicking subscribe on the top left.
           </div>
+        </div>
+      </div>
+
+      <!-- Question 2 -->
+      <div class="card">
+        <div class="card-header" id="headingTwo">
+          <h5 class="mb-0">
+            <button class="btn btn-link text-white w-100 text-left" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+              <i class="bi bi-question-circle"></i> How do I access my courses?
+            </button>
+          </h5>
+        </div>
+        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+          <div class="card-body">
+            Once you've subscribed to Babes4Trades, you can access "Babes Gallery" and "My Courses" via the top left of your account. From there, you can start learning immediately!
+          </div>
+        </div>
+      </div>
+
+      <!-- Question 3 -->
+      <div class="card">
+        <div class="card-header" id="headingThree">
+          <h5 class="mb-0">
+            <button class="btn btn-link text-white w-100 text-left" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+              <i class="bi bi-question-circle"></i> Can I get a refund if I'm not satisfied with the course?
+            </button>
+          </h5>
+        </div>
+        <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+          <div class="card-body">
+            Yes! We offer a 3 day money back guarentee or a two hour grace period of content watch, whichever comes first. 
+          </div>
+        </div>
+      </div>
+
+      <!-- Question 4 -->
+      <div class="card">
+        <div class="card-header" id="headingFour">
+          <h5 class="mb-0">
+            <button class="btn btn-link text-white w-100 text-left" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+              <i class="bi bi-question-circle"></i> Do I receive a certificate after completing a course?
+            </button>
+          </h5>
+        </div>
+        <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+          <div class="card-body">
+            Yes, you will receive a certificate of completion after finishing a course. This certificate is available for download in your account under the "My Certificates" section.
+          </div>
+        </div>
+      </div>
+
+      <!-- Question 5 -->
+      <div class="card">
+        <div class="card-header" id="headingFive">
+          <h5 class="mb-0">
+            <button class="btn btn-link text-white w-100 text-left" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+              <i class="bi bi-question-circle"></i> Can I take multiple courses at the same time?
+            </button>
+          </h5>
+        </div>
+        <div id="collapseFive" class="collapse" aria-labelledby="headingFive" data-bs-parent="#faqAccordion">
+          <div class="card-body">
+            Absolutely! You can enroll in multiple courses and study them at your own pace. 😜 There are no restrictions on how many courses you can take at once and the available gallary's you may view.
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-
-    <div class="d-flex justify-content-center pt-5">
-
-      <a href="/faq.html" style="text-decoration: none;" class=" link-danger">Frequently Asked Questions</a></p>
-  
-    </div>
+  <button onclick="window.location.href='/signUp.html'" class="btn btn-primary w-auto mx-auto d-block mt-3">Start Today!</button>
 
   </body>
 
   <footer class="mt-auto">
     <div class="fixed">
       <ul class="nav justify-content-center border-bottom pb-3 mb-3">
-        <li class="nav-item"><a href="../index.html" class="px-2 text-muted footer-links">Home</a></li>
+        <li class="nav-item"><a href="/index.html" class="px-2 text-muted footer-links">Home</a></li>
         <li class="nav-item"><a href="about.html" class="px-2 text-muted footer-links">About</a></li>
         <li class="nav-item"><a href="contact.html" class="px-2 text-muted footer-links">Contact</a></li>
       </ul>
@@ -201,6 +235,5 @@
   </footer> 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-<script src="../main.js"></script>
-</script>
+<script src="main.js"></script>
 </html>
