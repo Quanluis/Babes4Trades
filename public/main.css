@@ -217,6 +217,117 @@ footer {
   cursor: pointer;
 }
 
+.qna-card .card-header {
+  background: linear-gradient(90deg, #ff4db8, #7b5cff);
+  color: #fff;
+}
+
+.qna-card .card-body p {
+  font-size: 0.95rem;
+}
+
+#moduleList .list-group-item.active {
+  background-color: #ff4db8;
+  border-color: #ff4db8;
+  color: #fff;
+  font-weight: 600;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.model-header {
+  background: radial-gradient(circle at top left, rgba(255, 77, 184, 0.12), transparent),
+              radial-gradient(circle at bottom right, rgba(123, 92, 255, 0.12), transparent);
+  border-radius: 1rem;
+}
+
+.model-badge {
+  background: linear-gradient(90deg, #ff4db8, #7b5cff);
+  color: #fff;
+  font-weight: 600;
+}
+
+.model-meta p {
+  font-size: 0.95rem;
+}
+
+.watch-qna-btn {
+  background: linear-gradient(90deg, #ff4db8, #7b5cff);
+  border: none;
+  font-weight: 600;
+}
+
+.watch-qna-btn:hover {
+  opacity: 0.9;
+}
+
+#karaQnaList .list-group-item.active {
+  background: linear-gradient(90deg, #ff4db8, #7b5cff);
+  border-color: #ff4db8;
+  color: #fff;
+  font-weight: 600;
+}
+
+.model-header {
+  background: radial-gradient(circle at top left, rgba(255, 77, 184, 0.12), transparent),
+              radial-gradient(circle at bottom right, rgba(123, 92, 255, 0.12), transparent);
+  border-radius: 1rem;
+}
+
+.model-badge {
+  background: linear-gradient(90deg, #ff4db8, #7b5cff);
+  color: #fff;
+  font-weight: 600;
+}
+
+.model-meta p {
+  font-size: 0.95rem;
+}
+
+/* Gallery card styling */
+.gallery-card {
+  border-radius: 1rem;
+}
+
+.gallery-card .card-header {
+  background-color: #111827;
+  color: #f9fafb;
+  border-radius: 1rem 1rem 0 0;
+}
+
+/* Q&A card styling */
+.qna-card {
+  border-radius: 1rem;
+  background: radial-gradient(circle at top right, rgba(123, 92, 255, 0.10), transparent),
+              radial-gradient(circle at bottom left, rgba(255, 77, 184, 0.10), transparent);
+}
+
+.qna-card .card-header {
+  background-color: #111827;
+  color: #f9fafb;
+  border-radius: 1rem 1rem 0 0;
+}
+
+.qna-badge {
+  background: linear-gradient(90deg, #ff4db8, #7b5cff);
+  color: #fff;
+  font-size: 0.7rem;
+}
+
+.watch-qna-btn {
+  background: linear-gradient(90deg, #ff4db8, #7b5cff);
+  border: none;
+  font-weight: 600;
+}
+
+
+/* .qna-card .card-header {
+  background: linear-gradient(90deg, #ff4db8, #7b5cff);
+  color: #fff;
+}  */
+
 /* Fix dropdown positioning on small screens */
 @media (max-width: 991px) {
   .dropdown-menu {

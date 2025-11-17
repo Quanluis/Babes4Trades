@@ -56,7 +56,7 @@
           <li class="nav-item show-when-free d-none"><a class="nav-link" href="course.html">Courses</a></li>
 
           <!-- Logged-in paid -->
-          <li class="nav-item show-when-paid d-none"><a class="nav-link" href="/my-courses">My Courses</a></li>
+          <li class="nav-item show-when-paid d-none"><a class="nav-link" href="course.html">My Courses</a></li>
 
           <!-- Guests only -->
           <li class="nav-item hide-when-logged-in"><a class="nav-link" href="about.html">About</a></li>
@@ -203,7 +203,7 @@
 
 <section class="py-5">
   <div class="container">
-    <h2 class="text-center mb-3">Courses</h2>
+    <h2 id="courseHeading" class="text-center mb-3">Courses</h2>
     <p class="text-center text-muted mb-5">
       Learn the essentials of money, markets, and modern finance — all taught the Babes4Trades way.
     </p>
@@ -358,7 +358,7 @@
     </div>
 
     <div class="text-center my-4">
-      <button onclick="location.href='signUp.html'" class="btn btn-primary">Get Started</button>
+      <button id="getStartedBtn" onclick="location.href='signUp.html'" class="btn btn-primary">Get Started</button>
     </div>
 
   </div>

@@ -196,6 +196,21 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+// 🔥 Update "Courses" heading dynamically if the page has it
+document.addEventListener("DOMContentLoaded", () => {
+  const savedUser = localStorage.getItem("user");
+  if (!savedUser) return;
+
+  const user = JSON.parse(savedUser);
+  const courseHeading = document.getElementById("courseHeading");
+
+  // Only change the title if the element exists (course.html)
+  if (courseHeading && user.username) {
+    courseHeading.textContent = `${user.username}'s Courses`;
+  }
+});
+
+
 // The formData from the SignUp content page below needs to be linked to the Server.js file.
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -425,6 +440,30 @@ document.addEventListener("DOMContentLoaded", function () {
       } catch (err) {
         console.error("Login error:", err);
         alert("Something went wrong.");
+      }
+    });
+  }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const btn = document.getElementById("getStartedBtn");
+
+  // Only run on pages that have the button
+  if (!btn) return;
+
+  // If logged in AND premium → hide button
+  if (user && user.paidSubscription === true) {
+    btn.style.display = "none";
+  } else {
+    // If guest OR not premium → show and send to signUp/pricing
+    btn.style.display = "inline-block";
+
+    btn.addEventListener("click", () => {
+      if (!user) {
+        window.location.href = "/signUp.html";
+      } else {
+        window.location.href = "/pricing.html";
       }
     });
   }
