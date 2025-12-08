@@ -36,11 +36,12 @@ const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  discordId: { type: String, unique: true, sparse: true, default: null },
+  discordId: { type: String, unique: true, sparse: true, required: false },
   verified: { type: Boolean, default: false }, // Verfication status
   paidSubscription: { type: Boolean, default: false }, // Paid subscription status
   subscriptionId: { type: String },
 });
+
 
 const User = mongoose.model("User", UserSchema);
 
