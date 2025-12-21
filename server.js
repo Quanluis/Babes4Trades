@@ -541,9 +541,13 @@ app.post("/api/register", async (req, res) => {
       username,
       password: hashedPassword,
       verified: false,
-      discordId,
+      // discordId,
       // Can store raw string or resolve to ID later
     }); // Not yet verified
+
+    if (discordId && discordId.trim() !== "") {
+    newUser.discordId = discordId.trim();
+}
 
     await newUser.save();
 
