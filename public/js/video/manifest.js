@@ -18,6 +18,16 @@ window.__COURSE__ = {
       id: "v3",
       title: "Income Statement Walkthrough",
       embedUrl: "https://iframe.mediadelivery.net/embed/410534/70fb39db-51e6-49b0-8567-ab2cccb65b4f?autoplay=false&loop=true&muted=false&preload=true&responsive=true"
+    },
+    {
+      id: "v4",
+      title: "Cash Flow",
+      embedUrl: "https://iframe.mediadelivery.net/embed/410534/baa3b6e5-0a68-475c-a2b5-bd34beb3eb0a?autoplay=false&loop=true&muted=false&preload=true&responsive=true"
+    },
+    {
+      id: "v5",
+      title: "Assets & Liabilities",
+      embedUrl: "https://iframe.mediadelivery.net/embed/410534/70fb39db-51e6-49b0-8567-ab2cccb65b4f?autoplay=false&loop=true&muted=false&preload=true&responsive=true"
     }
   ]
 };

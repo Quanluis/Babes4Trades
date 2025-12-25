@@ -95,12 +95,13 @@
 // });
 
 // public/js/video/player.js
+// public/js/video/player.js
 console.log("🎬 player.js loaded");
 
 const REDIRECT_FOR_UNPAID = true;
 const appRoot = document.getElementById("app");
 
-// 🔐 Gating logic (same as you had)
+// 🔐 Gating logic
 const rawUser = localStorage.getItem("user");
 const user = rawUser ? JSON.parse(rawUser) : null;
 const isPaid = !!(
@@ -165,6 +166,10 @@ window.addEventListener("DOMContentLoaded", () => {
       li.className =
         "list-group-item d-flex justify-content-between align-items-center";
       li.dataset.index = i;
+
+      // ✅ Stable key for quizzes (match this in KaraQuiz1.js)
+      li.dataset.quizKey = v.id || `index_${i}`;
+
       li.innerHTML = `
         <span>${i + 1}. ${v.title || "Untitled"}</span>
       `;
@@ -192,14 +197,22 @@ window.addEventListener("DOMContentLoaded", () => {
     // Highlight active module
     if (moduleList) {
       [...moduleList.children].forEach((li) => {
-        li.classList.toggle(
-          "active",
-          Number(li.dataset.index) === i
-        );
+        li.classList.toggle("active", Number(li.dataset.index) === i);
       });
     }
 
     console.log("[diag] rendered index", i, v);
+
+    // ✅ Notify quiz panel which module is active
+    window.dispatchEvent(
+      new CustomEvent("b4t:module-changed", {
+        detail: {
+          index: i,
+          videoId: v.id || `index_${i}`,
+          title: v.title || "Untitled",
+        },
+      })
+    );
   }
 
   // ⬅️➡️ Prev / Next
@@ -236,4 +249,3 @@ window.addEventListener("DOMContentLoaded", () => {
   renderModuleList();
   render(index);
 });
-
