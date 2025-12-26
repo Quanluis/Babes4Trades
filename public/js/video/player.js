@@ -138,8 +138,18 @@ window.addEventListener("DOMContentLoaded", () => {
     markComplete,
   });
 
-  const course = window.__COURSE__;
-  console.log("[diag] manifest present?", !!course, course);
+
+  const courseId = document.body.dataset.course || "course-101";
+  const course = window.__COURSES__[courseId];
+
+
+
+  // // const courseId = new URLSearchParams(location.search).get("course") || "course-101";
+  // const course = window.__COURSES__["course-101"];
+  // console.log("[diag] manifest present?", !!course, course);
+
+
+  
 
   // Fallback if manifest missing
   const videos =
