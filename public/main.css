@@ -89,7 +89,7 @@ footer {
 
 .footer-links:hover,
 #legal .nav-link:hover {
-  color: #6a11cb !important; /* or your brand color */
+  color: #fda0f9 !important; /* or your brand color */
   text-decoration: none; /* optional */
 }
 
@@ -320,6 +320,52 @@ html {
   background: linear-gradient(90deg, #ff4db8, #7b5cff);
   border: none;
   font-weight: 600;
+}
+
+
+.site-footer {
+  background: #280f50; /* dark slate */
+  color: #cbd5f5;
+  margin-top: 4rem;
+}
+
+.site-footer .border-bottom {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Footer links */
+.footer-links {
+  color: #cbd5f5;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.footer-links:hover {
+  color: #ff4db8;
+}
+
+/* Legal links */
+.footer-legal {
+  color: #94a3b8;
+  font-size: 0.75rem;
+  transition: color 0.3s ease;
+}
+
+.footer-legal:hover {
+  color: #ffe17c;
+}
+
+/* Social icons */
+.social-icon {
+  height: 28px;
+  opacity: 0.7;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.social-icon:hover {
+  opacity: 1;
+  transform: translateY(-2px) scale(1.05);
+  cursor: pointer;
 }
 
 /* .qna-card .card-header {
