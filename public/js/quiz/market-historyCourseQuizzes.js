@@ -20,7 +20,21 @@ const quizzes = {
         ],
         correctIndex: 3,
         explanation: "The year was 1929"
-      }
+      },
+
+      // Add each new block to add more questions for each indiviudal quiz
+      {
+        text: "Assest are defined as: ?",
+        options: [
+          "Money owed by others to the business",
+          "Resources the business owns that bring value",
+          "Costs that reduce net profit",
+          "Debts owed to banks"
+        ],
+        correctIndex: 1,
+        explanation: "The year was 1929"
+      },
+
     ]
   },
 
@@ -153,6 +167,8 @@ function renderQuiz(quiz) {
 
   // Load the first question by default for now
   let currentIndex = 0;
+  let score = 0; // <-- Track correct answers on quiz score
+  const total = quiz.questions.length;
   loadQuestion(currentIndex);
 
   function loadQuestion(i) {
@@ -189,6 +205,9 @@ function renderQuiz(quiz) {
 
     const chosenIndex = Number(selected.value);
 
+    const correct = (chosenIndex === q.correctIndex);
+    if(correct) score++; 
+
     if (chosenIndex === q.correctIndex) {
       feedbackEl.innerHTML = `
         <span class="text-success fw-bold">Correct ✔</span><br>
@@ -199,6 +218,63 @@ function renderQuiz(quiz) {
         <span class="text-danger fw-bold">Incorrect ❌</span><br>
         <small class="text-muted">${q.explanation}</small>
       `;
+    }
+
+    if (currentIndex < quiz.questions.length - 1) {
+    setTimeout(() => {
+      currentIndex++;
+      loadQuestion(currentIndex);
+    }, 1500);
+  } else {
+
+    const percentage = Math.round((score / total) * 100);
+    const passed = percentage >= 80;
+    const emoji = passed ? "😊" : "😢";
+    const message = passed
+      ? "Great job! You passed! 🎉"
+      : "Keep studying! Try again! 💪";
+
+
+    // 👉 End of quiz
+    setTimeout(() => {
+      // feedbackEl.innerHTML = `<span class="text-info fw-bold">🎉 Quiz complete!</span>`;
+      
+      submitBtn.style.display = "none"; // Hide on completion
+
+      qEl.textContent = `Quiz Complete!`;
+      optEl.innerHTML = "";
+      feedbackEl.innerHTML = `
+        <div class="mt-3 p-3 border rounded bg-light">
+          <h5>Your Score: ${score}/${total} = ${percentage}% ${emoji}</h5>
+          <p class="fw-bold ${passed ? "text-success" : "text-danger"}">${message}</p>
+        </div>
+
+      <!-- Always offer retry -->
+        <button id="retryQuiz" class="btn btn-primary btn-sm mt-3">
+          🔁 Try Quiz Again
+        </button>
+      </div>
+      `;
+
+       const retryBtn = document.getElementById("retryQuiz");
+      if (retryBtn) {
+        retryBtn.onclick = () => {
+          score = 0;
+          currentIndex = 0;
+          
+          submitBtn.style.display = "block"; // 👉 show submit again
+          loadQuestion(currentIndex);
+          feedbackEl.innerHTML = "";
+
+          loadQuestion(currentIndex);
+
+
+
+        };
+      }
+
+
+    }, 1500);
     }
   };
 }
