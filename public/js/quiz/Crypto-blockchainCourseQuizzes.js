@@ -1,23 +1,21 @@
 // public/js/video/KaraQuiz1.js
 
 // -------------------------
-// 1. QUIZ QUESTION DATA (keyed by videoId from manifest)
+// 1. QUIZ QUESTION DATA
 // -------------------------
-// IMPORTANT:
-// - Keys should match the `id` values in your manifest videos[] (player.js dispatches detail.videoId)
-// - If a quiz key is missing, it will fall back to quizzes.default
 const quizzes = {
   v1: {
     title: "Module 1 Quiz",
     questions: [
       {
         text: "What is the biggest crypto?",
-        options: [
-          "Bitcoin",
-          "Etherum",
-          "Dogecoin",
-          "Hello"
-        ],
+        options: ["Bitcoin", "Etherum", "Dogecoin", "Hello"],
+        correctIndex: 0,
+        explanation: "Bitcoin"
+      },
+      {
+        text: "Hello world?",
+        options: ["B", "E", "D", "H"],
         correctIndex: 0,
         explanation: "Bitcoin"
       }
@@ -29,14 +27,9 @@ const quizzes = {
     questions: [
       {
         text: "What is the second biggest crypto?",
-        options: [
-          "Etherum",
-          "Your monthly rent",
-          "Cash in your savings account",
-          "Your streaming subscriptions"
-        ],
+        options: ["Etherum", "Your monthly rent", "Cash in your savings account", "Your streaming subscriptions"],
         correctIndex: 0,
-        explanation: "Cash you own is an asset. Debt and expenses are not assets."
+        explanation: "Ethereum is typically second in market cap."
       }
     ]
   },
@@ -45,47 +38,34 @@ const quizzes = {
     title: "Module 3 Quiz",
     questions: [
       {
-        text: "Crypto to the?: ",
-        options: [
-          "Moon",
-          "A plan for how you’ll use your money",
-          "Only for people who are broke",
-          "A list of your debts"
-        ],
+        text: "Crypto to the?:",
+        options: ["Moon", "A plan for how you’ll use your money", "Only for people who are broke", "A list of your debts"],
         correctIndex: 0,
-        explanation: "A budget is just a plan for your money. Rich people use them too."
+        explanation: "To the moon 🚀"
       }
     ]
   },
+
   v4: {
     title: "Module 4 Quiz",
     questions: [
       {
         text: "What crypto is currently the most popular?",
-        options: [
-          "Bitcoin",
-          "DogeCoin",
-          "Ethereum",
-          "None of these"
-        ],
+        options: ["Bitcoin","DogeCoin","Ethereum","None of these"],
         correctIndex: 0,
-        explanation: "Bitcoin"
+        explanation: "Bitcoin is the market leader by cap."
       }
     ]
   },
+
   v5: {
     title: "Module 5 Quiz",
     questions: [
       {
-        text: "What color USD?",
-        options: [
-          "Red",
-          "Blue",
-          "Green",
-          "Black"
-        ],
+        text: "What color is USD?",
+        options: ["Red", "Blue", "Green", "Black"],
         correctIndex: 2,
-        explanation: "Green."
+        explanation: "USD bills are traditionally green."
       }
     ]
   },
@@ -95,14 +75,9 @@ const quizzes = {
     questions: [
       {
         text: "Quick check: Why track your spending?",
-        options: [
-          "So you can shame yourself",
-          "To see where your money is going",
-          "So you can buy more stuff",
-          "To avoid learning investing"
-        ],
+        options: ["Shame yourself","To see where money is going","Buy more stuff","Avoid investing"],
         correctIndex: 1,
-        explanation: "Tracking spending helps you spot leaks and make a plan."
+        explanation: "Tracking helps you improve decisions."
       }
     ]
   }
@@ -110,10 +85,9 @@ const quizzes = {
 
 
 // -------------------------
-// 2. (Optional) helpers for fallback matching
+// 2. UTILITIES
 // -------------------------
 function slugifyModuleText(text) {
-  // "1. Assets & Liabilities" -> "assets_liabilities"
   return String(text || "")
     .replace(/^\s*\d+\.\s*/, "")
     .trim()
@@ -132,52 +106,50 @@ function getActiveModuleFallbackKey() {
     moduleList.querySelector(".list-group-item");
 
   if (!activeLi) return null;
-
-  // If player.js set dataset.quizKey, prefer it:
   const keyFromData = activeLi.dataset?.quizKey;
   if (keyFromData) return keyFromData;
 
   return slugifyModuleText(activeLi.textContent);
 }
 
+
 // -------------------------
-// 3. RENDER QUIZ INTO SIDEBAR
+// 3. RENDER & QUIZ LOGIC
 // -------------------------
 function renderQuiz(quiz) {
   const qEl = document.getElementById("quizQuestion");
   const optEl = document.getElementById("quizOptions");
   const feedbackEl = document.getElementById("quizFeedback");
   const submitBtn = document.getElementById("submitQuizBtn");
-
   if (!qEl || !optEl || !feedbackEl || !submitBtn) return;
 
-  // Load the first question by default for now
+    // ✅ ADD THIS
+  submitBtn.style.display = "inline-block";
+  submitBtn.disabled = false;
+
+  // scoring + index
   let currentIndex = 0;
+  let score = 0;
+  const total = quiz.questions.length;
+
   loadQuestion(currentIndex);
 
   function loadQuestion(i) {
     const q = quiz.questions[i];
-
     qEl.textContent = `${quiz.title}: ${i + 1}. ${q.text}`;
 
-    optEl.innerHTML = q.options.map((opt, idx) => {
-      return `
-        <div class="form-check mb-1">
-          <input class="form-check-input" type="radio" 
-                 name="quizOption" 
-                 id="opt${idx}" 
-                 value="${idx}">
-          <label class="form-check-label small" for="opt${idx}">
-            ${opt}
-          </label>
-        </div>
-      `;
-    }).join("");
+    optEl.innerHTML = q.options.map((opt, idx) => `
+      <div class="form-check mb-1">
+        <input class="form-check-input" type="radio" name="quizOption" id="opt${idx}" value="${idx}">
+        <label class="form-check-label small" for="opt${idx}">${opt}</label>
+      </div>
+    `).join("");
 
     feedbackEl.innerHTML = "";
   }
 
-  // Handle submit button
+
+  // submission & next question logic
   submitBtn.onclick = () => {
     const q = quiz.questions[currentIndex];
     const selected = document.querySelector("input[name='quizOption']:checked");
@@ -188,45 +160,77 @@ function renderQuiz(quiz) {
     }
 
     const chosenIndex = Number(selected.value);
+    const correct = chosenIndex === q.correctIndex;
+    if (correct) score++;
 
-    if (chosenIndex === q.correctIndex) {
-      feedbackEl.innerHTML = `
-        <span class="text-success fw-bold">Correct ✔</span><br>
-        <small class="text-muted">${q.explanation}</small>
-      `;
+    // show feedback
+    feedbackEl.innerHTML = correct
+      ? `<span class="text-success fw-bold">Correct ✔</span><br><small class="text-muted">${q.explanation}</small>`
+      : `<span class="text-danger fw-bold">Incorrect ❌</span><br><small class="text-muted">${q.explanation}</small>`;
+
+    // next or finish
+    if (currentIndex < total - 1) {
+      setTimeout(() => {
+        currentIndex++;
+        loadQuestion(currentIndex);
+      }, 1500);
     } else {
-      feedbackEl.innerHTML = `
-        <span class="text-danger fw-bold">Incorrect ❌</span><br>
-        <small class="text-muted">${q.explanation}</small>
-      `;
+      // final result screen
+      const percentage = Math.round((score / total) * 100);
+      const perfect = score === total;
+      const passed = percentage >= 80;
+      const emoji = perfect ? "🏆" : passed ? "😊" : "😢";
+      const message = perfect
+        ? "PERFECT SCORE! 🏆 You got every question correct!"
+        : passed
+        ? "Great job! You passed! 🎉"
+        : "Keep studying and try again! 💪";
+
+      setTimeout(() => {
+        submitBtn.style.display = "none";
+
+        qEl.textContent = `Quiz Complete!`;
+        optEl.innerHTML = "";
+        feedbackEl.innerHTML = `
+          <div class="mt-3 p-3 border rounded bg-light text-center">
+            <h5>Your Score: ${score}/${total} = ${percentage}% ${emoji}</h5>
+            <p class="fw-bold ${passed ? "text-success" : "text-danger"}">${message}</p>
+            <button id="retryQuiz" class="btn btn-primary btn-sm mt-3">🔁 Try Quiz Again</button>
+          </div>
+        `;
+
+        const retryBtn = document.getElementById("retryQuiz");
+        retryBtn.onclick = () => {
+          score = 0;
+          currentIndex = 0;
+          submitBtn.style.display = "block";
+          loadQuestion(currentIndex);
+          feedbackEl.innerHTML = "";
+        };
+      }, 1500);
     }
   };
 }
 
+
+// -------------------------
+// 4. WIRING / EVENT LISTENERS
+// -------------------------
 function renderQuizForKey(key) {
   const quiz = (key && quizzes[key]) ? quizzes[key] : quizzes.default;
   renderQuiz(quiz);
 }
 
-// -------------------------
-// 4. DYNAMIC WIRING (event-driven, plus a safety fallback)
-// -------------------------
 window.addEventListener("b4t:module-changed", (e) => {
   const detail = e.detail || {};
-  // Primary: videoId from player.js (manifest id)
   const key = detail.videoId || null;
-
-  // Secondary: try slug(title) if you prefer using titles as keys
   const titleKey = detail.title ? slugifyModuleText(detail.title) : null;
-
   renderQuizForKey(key || titleKey || "default");
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Show something immediately
   renderQuizForKey(getActiveModuleFallbackKey() || "default");
 
-  // Safety fallback: if moduleList gets rebuilt/active changes and event doesn't fire for some reason
   const moduleList = document.getElementById("moduleList");
   if (!moduleList) return;
 
