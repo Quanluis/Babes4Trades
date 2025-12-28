@@ -8,6 +8,7 @@ const cors = require("cors");
 const nodemailer = require("nodemailer");
 const JWT = require("jsonwebtoken");
 const fs = require("fs");
+const { type } = require("os");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const app = express();
 
@@ -40,26 +41,27 @@ const UserSchema = new mongoose.Schema({
   verified: { type: Boolean, default: false }, // Verfication status
   paidSubscription: { type: Boolean, default: false }, // Paid subscription status
   subscriptionId: { type: String },
+  tier: {type: String, enum: ["basic", "premium", null], default: null},
 });
 
 
 const User = mongoose.model("User", UserSchema);
 
-const GallerySchema = new mongoose.Schema(
-  {
-    title: String,
-    url: { type: String, required: true }, // Bunny.net URL
-    subscriptionLevel: {
-      type: String,
-      enum: ["free", "premium"],
-      default: "free"
-    },
-    uploadedAt: { type: Date, default: Date.now },
-  },
-  { collection: "gallery", timestamps: false } // match your existing collection
-);
+// const GallerySchema = new mongoose.Schema(
+//   {
+//     title: String,
+//     url: { type: String, required: true }, // Bunny.net URL
+//     subscriptionLevel: {
+//       type: String,
+//       enum: ["free", "premium"],
+//       default: "free"
+//     },
+//     uploadedAt: { type: Date, default: Date.now },
+//   },
+//   { collection: "gallery", timestamps: false } // match your existing collection
+// );
 
-const Gallery = mongoose.model("Gallery", GallerySchema);
+// const Gallery = mongoose.model("Gallery", GallerySchema);
 
 
 const GallerySchema2 = new mongoose.Schema(
@@ -79,101 +81,7 @@ const GallerySchema2 = new mongoose.Schema(
 const Galleries = mongoose.model("Galleries", GallerySchema2);
 
 
-// // Simple JWT-based middleware
-// function requireAuth(req, res, next) {
-//   const auth = req.headers.authorization || "";
-//   const token = auth.startsWith("Bearer ") ? auth.slice(7) : null;
-//   if (!token) return res.redirect("/pages/pricing.html");
 
-//   try {
-//     const decoded = JWT.verify(token, process.env.JWT_SECRET);
-//     req.user = decoded;
-//     next();
-//   } catch {
-//     return res.redirect("/pages/pricing.html");
-//   }
-// }
-
-// async function requirePaid(req, res, next) {
-//   try {
-//     const user = await User.findById(req.user.userId);
-//     if (!user || !user.paidSubscription) {
-//       return res.redirect("/pages/pricing.html");
-//     }
-//     next();
-//   } catch {
-//     return res.redirect("/pages/pricing.html");
-//   }
-// }
-
-// // ✅ Serve video page only for paid users
-// app.get("/my-courses", requireAuth, requirePaid, (req, res) => {
-//   const filePath = path.join(__dirname, "pages", "video.html");
-//   if (fs.existsSync(filePath)) res.sendFile(filePath);
-//   else res.status(404).send("Video page not found");
-// });
-
-// ============================
-// ✅ Protected Course Route
-// ============================
-
-
-// app.get("/my-courses", requireAuth, requirePaid, (req, res) => {
-//   res.sendFile(path.join(__dirname, "pages", "video.html"));
-// });
-
-// // Middleware: Check if the user is authenticated (has valid JWT)
-// function requireAuth(req, res, next) {
-//   const authHeader = req.headers.authorization || "";
-//   const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
-
-//   if (!token) {
-//     return res.redirect("/pages/pricing.html"); // if no token, go to pricing
-//   }
-
-//   try {
-//     const decoded = JWT.verify(token, process.env.JWT_SECRET);
-//     req.user = decoded;
-//     next();
-//   } catch (err) {
-//     console.error("JWT verification failed:", err);
-//     return res.redirect("/pages/pricing.html");
-//   }
-// }
-
-// // Middleware: Check if the user has a paid subscription
-// async function requirePaid(req, res, next) {
-//   try {
-//     const user = await User.findById(req.user.userId);
-//     if (!user || !user.paidSubscription) {
-//       return res.redirect("/pages/pricing.html");
-//     }
-//     next();
-//   } catch (err) {
-//     console.error("Error verifying paid user:", err);
-//     res.redirect("/pages/pricing.html");
-//   }
-// }
-
-// // 🔐 Protected course route
-// app.get("/my-courses", (req, res) => {
-//   const authHeader = req.headers.authorization || "";
-//   const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
-
-//   // if no token in header, redirect
-//   if (!token) {
-//     return res.redirect("/pricing.html");
-//   }
-
-//   try {
-//     const decoded = JWT.verify(token, process.env.JWT_SECRET);
-//     // Optional: verify paid status from MongoDB
-//     res.sendFile(path.join(__dirname, "pages", "video.html"));
-//   } catch (err) {
-//     console.error("JWT failed:", err);
-//     res.redirect("/pricing.html");
-//   }
-// });
 
 
 // 🔐 Middleware 1: Verify JWT (Authentication)
@@ -247,74 +155,33 @@ const authOptional = async (req, res, next) => {
   next();
 };
 
-
-// ✅ Gallery API
-app.get('/api/gallery', authOptional, async (req, res) => {
-  const canSeePremium = !!(req.user && req.user.paidSubscription);
-  const query = canSeePremium ? {} : { subscriptionLevel: { $ne: 'premium' } };
-
-  const docs = await Gallery.find(query).sort({ uploadedAt: -1 }).lean();
-  const items = docs.map(d => ({
-    title: d.title,
-    bunnyUrl: d.url,
-    thumbnailUrl: null,
-    isPremium: d.subscriptionLevel === 'premium',
-    tags: [],
-    createdAt: d.uploadedAt
-  }));
-
-  res.json({ canSeePremium, items });
-});
-
+// ✅ GET galleries (supports ?model=kara)
 app.get('/api/galleries', authOptional, async (req, res) => {
-  const canSeePremium = !!(req.user && req.user.paidSubscription);
-  const query = canSeePremium ? {} : { subscriptionLevel: { $ne: 'premium' } };
+  // ✅ Only premium tier can see premium items
+  const canSeePremium = req.user?.tier === "premium";
 
+  const model = String(req.query.model || "").trim().toLowerCase();
+
+  const query = {};
+  if (model) query.modelSlug = model; // requires modelSlug on docs
+
+  if (!canSeePremium) {
+    query.subscriptionLevel = { $ne: 'premium' };
+  }
+
+  // ✅ Use ONE mongoose model here (pick the correct one)
   const docs = await Galleries.find(query).sort({ uploadedAt: -1 }).lean();
+
   const items = docs.map(d => ({
     title: d.title,
-    bunnyUrl: d.url,
+    bunnyUrl: d.url, // your DB field is url
     thumbnailUrl: null,
-    isPremium: d.subscriptionLevel === 'premium',
+    isPremium: String(d.subscriptionLevel || "").toLowerCase() === 'premium',
     tags: [],
     createdAt: d.uploadedAt
   }));
 
   res.json({ canSeePremium, items });
-});
-
-// (Optional) Admin create endpoint — protect however you prefer (role check / secret)
-// NOTE: make sure you only call this from a secure admin UI or with server-only tools.
-app.post("/api/gallery", async (req, res) => {
-  const { title, bunnyUrl, thumbnailUrl, isPremium, tags } = req.body || {};
-  if (!bunnyUrl) return res.status(400).json({ error: "bunnyUrl required" });
-
-  const created = await GalleryItem.create({
-    title,
-    bunnyUrl,
-    thumbnailUrl,
-    isPremium: !!isPremium,
-    tags: Array.isArray(tags) ? tags : [],
-  });
-
-  res.status(201).json(created);
-});
-
-// (Optional) Admin create endpoint — protect however you prefer (role check / secret)
-// NOTE: make sure you only call this from a secure admin UI or with server-only tools.
-app.post("/api/galleries", async (req, res) => {
-  const { title, bunnyUrl, thumbnailUrl, isPremium, tags } = req.body || {};
-  if (!bunnyUrl) return res.status(400).json({ error: "bunnyUrl required" });
-
-  const created = await GalleryItem.create({
-    title,
-    bunnyUrl,
-    thumbnailUrl,
-    isPremium: !!isPremium,
-    tags: Array.isArray(tags) ? tags : [],
-  });
-
-  res.status(201).json(created);
 });
 
 // SINGLE Stripe Webhook (keep ABOVE app.use(express.json()))
@@ -334,8 +201,17 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
   }
 
   try {
+
+   // ✅ Tier mapping by Price ID (recommended)
+    const tierFromPriceId = (priceId) => {
+      if (!priceId) return null;
+      if (priceId === process.env.STRIPE_PRICE_PREMIUM) return "premium";
+      if (priceId === process.env.STRIPE_PRICE_BASIC) return "basic";
+      return "basic"; // fallback
+    };
+
     // small helpers
-    const markPaid = async ({ email, customerId, subscriptionId }) => {
+    const markPaid = async ({ email, customerId, subscriptionId, tier }) => {
       let user = null;
       if (customerId) user = await User.findOne({ stripeCustomerId: customerId });
       if (!user && email) user = await User.findOne({ email: new RegExp(`^${email}$`, 'i') });
@@ -344,6 +220,9 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
         user.paidSubscription = true;
         if (subscriptionId) user.subscriptionId = subscriptionId;
         if (customerId) user.stripeCustomerId = customerId;
+
+        if(typeof tier === "string") user.tier = tier;
+
         await user.save();
       }
     };
@@ -355,8 +234,12 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
       if (!user && email) user = await User.findOne({ email: new RegExp(`^${email}$`, 'i') });
 
       if (user) {
+
         user.paidSubscription = false;
+
         // keep stripeCustomerId for future, but clear subId
+        user.tier = null;
+
         if (subscriptionId) user.subscriptionId = null;
         await user.save();
       }
@@ -366,10 +249,26 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
       // User just completed checkout (subscription mode)
       case 'checkout.session.completed': {
         const s = event.data.object;
+
+        let tier = null;
+
+        if (s.subscription) {
+        const sub = await stripe.subscriptions.retrieve(s.subscription, {
+          expand: ["items.data.price"],
+        });
+        const priceId = sub.items.data[0]?.price?.id;
+
+        tier =
+            priceId === process.env.STRIPE_PRICE_PREMIUM ? "premium" :
+            priceId === process.env.STRIPE_PRICE_BASIC ? "basic" :
+            "basic";
+        }
+
         await markPaid({
           email: s.customer_email || s.customer_details?.email,
           customerId: s.customer,
           subscriptionId: s.subscription,
+          tier,
         });
         break;
       }
@@ -383,6 +282,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
           email: sub?.customer_email, // usually null here
           customerId: sub.customer,
           subscriptionId: sub.id,
+          tier: sub.tier,
         };
 
         if (['active', 'trialing'].includes(status)) {
@@ -646,6 +546,8 @@ app.post("/api/login", loginLimiter, async (req, res) => {
       user: {
         email: user.email,
         username: user.username,
+        paidSubscription: user.paidSubscription,
+        tier: user.tier
       },
     });
   } catch (error) {
@@ -820,6 +722,7 @@ app.post("/api/cancel-subscription", authenticate, async (req, res) => {
     try {
       user.paidSubscription = false;
       user.subscriptionId = null;
+      user.tier = null; 
       await user.save();
       console.log(`✅ Subscription canceled and DB updated for ${user.email}`);
     } catch (dbError) {
@@ -883,6 +786,7 @@ app.get("/api/user/:email", async (req, res) => {
       email: user.email,
       paidSubscription: user.paidSubscription,
       discordId: user.discordId,
+      tier: user.tier,
     });
   } catch (error) {
     console.error("User fetch error:", error);
@@ -938,6 +842,7 @@ app.post(
       const session = event.data.object;
       const email = session.customer_email;
       const subscriptionId = session.subscription;
+      let tier = "basic";
 
       if (!email || !subscriptionId) {
         console.log("❌ Missing email or subscription ID");
@@ -951,6 +856,7 @@ app.post(
           {
             paidSubscription: true,
             subscriptionId,
+            tier,
           },
           { new: true }
         );
@@ -1012,6 +918,7 @@ app.post(
           {
             paidSubscription: false,
             subscriptionId: null, // clear old sub ID
+            tier: null,
           },
           { new: true }
         );

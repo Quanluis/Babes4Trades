@@ -27,136 +27,347 @@ function swapDivsMonthly() {
   }
 }
 
+// // --- replace your current loadGallery() with this version ---
+// async function loadGallery() {
+//   // accept either id
+//   const root = document.getElementById("galleryGrid") || document.getElementById("gallery");
+//   if (!root) return; // not on this page
+
+//   // show a spinner while loading
+//   root.innerHTML = `
+//     <div class="d-flex justify-content-center py-5 w-100">
+//       <div class="spinner-border" role="status" aria-label="Loading"></div>
+//     </div>`;
+
+//   const token = localStorage.getItem("token");
+
+//   try {
+//     // if your site is served from a different port than the API, use the full URL:
+//     // const res = await fetch("http://localhost:5000/api/gallery", { ... });
+//     const res = await fetch("/api/gallery", {
+//       headers: token ? { Authorization: `Bearer ${token}` } : {}
+//     });
+
+//     if (!res.ok) throw new Error(`Gallery fetch failed: ${res.status}`);
+//     const data = await res.json();
+
+//     if (!data.items || data.items.length === 0) {
+//       root.innerHTML = `
+//         <div class="col-12">
+//           <div class="alert alert-info text-center">No content yet. Check back soon!</div>
+//         </div>`;
+//       return;
+//     }
+
+//     root.innerHTML = "";
+//     data.items.forEach(item => {
+//       const card = document.createElement("div");
+//       card.className = "col-12 col-sm-6 col-md-4 col-lg-3";
+//       card.innerHTML = `
+//         <div class="card h-100 shadow-sm">
+//           <a href="${item.bunnyUrl}" class="glightbox" data-gallery="gallery-set" data-title="${item.title ?? ""}">
+//             <img src="${item.thumbnailUrl || item.bunnyUrl}" class="card-img-top" alt="${item.title ?? ""}">
+//           </a>
+//           <div class="card-body">
+//             <h6 class="card-title mb-1">${item.title ?? ""} ${item.isPremium ? "🔒" : ""}</h6>
+//             ${item.tags?.length ? `<div class="small text-muted">${item.tags.join(" • ")}</div>` : ""}
+//           </div>
+//         </div>`;
+//       root.appendChild(card);
+//     });
+//   } catch (err) {
+//     console.error(err);
+//     root.innerHTML = `
+//       <div class="col-12">
+//         <div class="alert alert-danger text-center">Could not load gallery. Please try again.</div>
+//       </div>`;
+//   }
+// }
+
+
 // --- replace your current loadGallery() with this version ---
-async function loadGallery() {
-  // accept either id
-  const root = document.getElementById("galleryGrid") || document.getElementById("gallery");
-  if (!root) return; // not on this page
+// async function loadGallery2() {
+//   // accept either id
+//   const root = document.getElementById("galleryGrid2") || document.getElementById("galleries");
+//   if (!root) return; // not on this page
 
-  // show a spinner while loading
-  root.innerHTML = `
-    <div class="d-flex justify-content-center py-5 w-100">
-      <div class="spinner-border" role="status" aria-label="Loading"></div>
-    </div>`;
+//   // ✅ Tier gating
+//   const user = JSON.parse(localStorage.getItem("user") || "null");
+//   const isPaid = user?.paidSubscription === true;
+//   const isPremium = user?.tier === "premium";
 
-  const token = localStorage.getItem("token");
+//   // If you want to hard-redirect unpaid users:
+//   if (!isPaid) {
+//     window.location.replace("pricing.html");
+//     return;
+//   }
 
-  try {
-    // if your site is served from a different port than the API, use the full URL:
-    // const res = await fetch("http://localhost:5000/api/gallery", { ... });
-    const res = await fetch("/api/gallery", {
-      headers: token ? { Authorization: `Bearer ${token}` } : {}
-    });
+//   // If paid but not premium: show locked premium message
+//   if (!isPremium) {
+//     root.innerHTML = `
+//       <div class="col-12">
+//         <div class="p-4 text-center border rounded bg-light">
+//           <h5 class="mb-2">🔒 Premium Gallery Locked</h5>
+//           <p class="text-muted mb-3">Upgrade to Premium to unlock these photos.</p>
+//           <a href="pricing.html" class="btn btn-primary btn-sm">Upgrade to Premium</a>
+//         </div>
+//       </div>`;
+//     return;
+//   }
 
-    if (!res.ok) throw new Error(`Gallery fetch failed: ${res.status}`);
-    const data = await res.json();
+//   // show a spinner while loading
+//   root.innerHTML = `
+//     <div class="d-flex justify-content-center py-5 w-100">
+//       <div class="spinner-border" role="status" aria-label="Loading"></div>
+//     </div>`;
 
-    if (!data.items || data.items.length === 0) {
-      root.innerHTML = `
-        <div class="col-12">
-          <div class="alert alert-info text-center">No content yet. Check back soon!</div>
-        </div>`;
-      return;
-    }
+//   const token = localStorage.getItem("token");
 
-    root.innerHTML = "";
-    data.items.forEach(item => {
-      const card = document.createElement("div");
-      card.className = "col-12 col-sm-6 col-md-4 col-lg-3";
-      card.innerHTML = `
-        <div class="card h-100 shadow-sm">
-          <a href="${item.bunnyUrl}" class="glightbox" data-gallery="gallery-set" data-title="${item.title ?? ""}">
-            <img src="${item.thumbnailUrl || item.bunnyUrl}" class="card-img-top" alt="${item.title ?? ""}">
-          </a>
-          <div class="card-body">
-            <h6 class="card-title mb-1">${item.title ?? ""} ${item.isPremium ? "🔒" : ""}</h6>
-            ${item.tags?.length ? `<div class="small text-muted">${item.tags.join(" • ")}</div>` : ""}
-          </div>
-        </div>`;
-      root.appendChild(card);
-    });
-  } catch (err) {
-    console.error(err);
-    root.innerHTML = `
-      <div class="col-12">
-        <div class="alert alert-danger text-center">Could not load gallery. Please try again.</div>
-      </div>`;
-  }
-}
+//   try {
+//     const res = await fetch("/api/galleries", {
+//       headers: token ? { Authorization: `Bearer ${token}` } : {}
+//     });
+
+//     if (!res.ok) throw new Error(`Gallery fetch failed: ${res.status}`);
+//     const data = await res.json();
+
+//     // ✅ Only premium items in this premium grid
+//     const premiumItems = (data.items || []).filter(item => item.isPremium === true);
+
+//     if (!premiumItems.length) {
+//       root.innerHTML = `
+//         <div class="col-12">
+//           <div class="alert alert-info text-center">No premium content yet. Check back soon!</div>
+//         </div>`;
+//       return;
+//     }
+
+//     root.innerHTML = "";
+//     premiumItems.forEach(item => {
+//       const card = document.createElement("div");
+//       card.className = "col-12 col-sm-6 col-md-4 col-lg-3";
+//       card.innerHTML = `
+//         <div class="card h-100 shadow-sm">
+//           <a href="${item.bunnyUrl}" class="glightbox" data-gallery="premium-gallery" data-title="${item.title ?? ""}">
+//             <img src="${item.thumbnailUrl || item.bunnyUrl}" class="card-img-top" alt="${item.title ?? ""}">
+//           </a>
+//           <div class="card-body">
+//             <h6 class="card-title mb-1">${item.title ?? ""}</h6>
+//             ${item.tags?.length ? `<div class="small text-muted">${item.tags.join(" • ")}</div>` : ""}
+//           </div>
+//         </div>`;
+//       root.appendChild(card);
+//     });
+
+//   } catch (err) {
+//     console.error(err);
+//     root.innerHTML = `
+//       <div class="col-12">
+//         <div class="alert alert-danger text-center">Could not load gallery. Please try again.</div>
+//       </div>`;
+//   }
+// }
+
+// async function loadGalleriesForKaraPage() {
+//   const basicRoot = document.getElementById("galleryGridBasic");
+//   const premiumRoot = document.getElementById("galleryGridPremium");
+
+//   // Only run on pages that have either container
+//   if (!basicRoot && !premiumRoot) return;
+
+//   const user = JSON.parse(localStorage.getItem("user") || "null");
+//   const isPaid = user?.paidSubscription === true;
+//   const isPremium = user?.tier === "premium";
+//   const token = localStorage.getItem("token");
+
+//   // If you want to hard redirect unpaid users from this page:
+//   if (!isPaid) {
+//     window.location.replace("pricing.html");
+//     return;
+//   }
+
+//   // Spinners
+//   if (basicRoot) {
+//     basicRoot.innerHTML = `
+//       <div class="d-flex justify-content-center py-5 w-100">
+//         <div class="spinner-border" role="status" aria-label="Loading"></div>
+//       </div>`;
+//   }
+
+//   if (premiumRoot) {
+//     premiumRoot.innerHTML = `
+//       <div class="d-flex justify-content-center py-5 w-100">
+//         <div class="spinner-border" role="status" aria-label="Loading"></div>
+//       </div>`;
+//   }
+
+//   try {
+//     const res = await fetch("/api/galleries", {
+//       headers: token ? { Authorization: `Bearer ${token}` } : {}
+//     });
+
+//     if (!res.ok) throw new Error(`Gallery fetch failed: ${res.status}`);
+//     const data = await res.json();
+
+//     const items = data.items || [];
+
+//     // Basic items (anything not premium)
+//     const basicItems = items.filter(item => !item.isPremium);
+
+//     // Premium items (be tolerant if your DB uses true/"true"/1)
+//     const premiumItems = items.filter(item => {
+//       const v = item.isPremium;
+//       return v === true || v === "true" || v === 1 || v === "1";
+//     });
+
+//     // Render BASIC
+//     if (basicRoot) {
+//       if (!basicItems.length) {
+//         basicRoot.innerHTML = `
+//           <div class="col-12">
+//             <div class="alert alert-info text-center">No basic content yet. Check back soon!</div>
+//           </div>`;
+//       } else {
+//         basicRoot.innerHTML = "";
+//         basicItems.forEach(item => basicRoot.appendChild(makeGalleryCard(item, "basic-gallery")));
+//       }
+//     }
+
+//     // Render PREMIUM
+//     if (premiumRoot) {
+//       // If not premium user: lock message
+//       if (!isPremium) {
+//         premiumRoot.innerHTML = `
+//           <div class="col-12">
+//             <div class="p-4 text-center border rounded bg-light">
+//               <h5 class="mb-2">🔒 Premium Gallery Locked</h5>
+//               <p class="text-muted mb-3">Upgrade to Premium to unlock these photos.</p>
+//               <a href="pricing.html" class="btn btn-primary btn-sm">Upgrade to Premium</a>
+//             </div>
+//           </div>`;
+//       } else {
+//         // Premium user: show premium images (or "none yet")
+//         if (!premiumItems.length) {
+//           premiumRoot.innerHTML = `
+//             <div class="col-12">
+//               <div class="alert alert-info text-center">No premium content yet. Check back soon!</div>
+//             </div>`;
+//         } else {
+//           premiumRoot.innerHTML = "";
+//           premiumItems.forEach(item => premiumRoot.appendChild(makeGalleryCard(item, "premium-gallery")));
+//         }
+//       }
+//     }
+
+//   } catch (err) {
+//     console.error(err);
+
+//     if (basicRoot) {
+//       basicRoot.innerHTML = `
+//         <div class="col-12">
+//           <div class="alert alert-danger text-center">Could not load basic gallery. Please try again.</div>
+//         </div>`;
+//     }
+
+//     if (premiumRoot) {
+//       premiumRoot.innerHTML = `
+//         <div class="col-12">
+//           <div class="alert alert-danger text-center">Could not load premium gallery. Please try again.</div>
+//         </div>`;
+//     }
+//   }
+// }
 
 
-// --- replace your current loadGallery() with this version ---
-async function loadGallery2() {
-  // accept either id
-  const root = document.getElementById("galleryGrid2") || document.getElementById("galleries");
-  if (!root) return; // not on this page
+// // Helper: build one card
+// function makeGalleryCard(item, galleryName) {
+//   const card = document.createElement("div");
+//   card.className = "col-12 col-sm-6 col-md-4 col-lg-3";
+//   card.innerHTML = `
+//     <div class="card h-100 shadow-sm">
+//       <a href="${item.bunnyUrl}" class="glightbox" data-gallery="${galleryName}" data-title="${item.title ?? ""}">
+//         <img src="${item.thumbnailUrl || item.bunnyUrl}" class="card-img-top" alt="${item.title ?? ""}">
+//       </a>
+//       <div class="card-body">
+//         <h6 class="card-title mb-1">${item.title ?? ""}</h6>
+//         ${item.tags?.length ? `<div class="small text-muted">${item.tags.join(" • ")}</div>` : ""}
+//       </div>
+//     </div>`;
+//   return card;
+// }
 
-  // show a spinner while loading
-  root.innerHTML = `
-    <div class="d-flex justify-content-center py-5 w-100">
-      <div class="spinner-border" role="status" aria-label="Loading"></div>
-    </div>`;
 
-  const token = localStorage.getItem("token");
 
-  try {
-    // if your site is served from a different port than the API, use the full URL:
-    // const res = await fetch("http://localhost:5000/api/gallery", { ... });
-    const res = await fetch("/api/galleries", {
-      headers: token ? { Authorization: `Bearer ${token}` } : {}
-    });
 
-    if (!res.ok) throw new Error(`Gallery fetch failed: ${res.status}`);
-    const data = await res.json();
+// document.addEventListener("DOMContentLoaded", async () => {
+//   const user = JSON.parse(localStorage.getItem("user") || "null");
+//   const isPremium = user?.tier === "premium";
+//   const isPaid = user?.paidSubscription === true;
 
-    if (!data.items || data.items.length === 0) {
-      root.innerHTML = `
-        <div class="col-12">
-          <div class="alert alert-info text-center">No content yet. Check back soon!</div>
-        </div>`;
-      return;
-    }
+//   const grid = document.getElementById("galleryGrid2");
+//   if (!grid) return;
 
-    root.innerHTML = "";
-    data.items.forEach(item => {
-      const card = document.createElement("div");
-      card.className = "col-12 col-sm-6 col-md-4 col-lg-3";
-      card.innerHTML = `
-        <div class="card h-100 shadow-sm">
-          <a href="${item.bunnyUrl}" class="glightbox" data-gallery="gallery-set" data-title="${item.title ?? ""}">
-            <img src="${item.thumbnailUrl || item.bunnyUrl}" class="card-img-top" alt="${item.title ?? ""}">
-          </a>
-          <div class="card-body">
-            <h6 class="card-title mb-1">${item.title ?? ""} ${item.isPremium ? "🔒" : ""}</h6>
-            ${item.tags?.length ? `<div class="small text-muted">${item.tags.join(" • ")}</div>` : ""}
-          </div>
-        </div>`;
-      root.appendChild(card);
-    });
-  } catch (err) {
-    console.error(err);
-    root.innerHTML = `
-      <div class="col-12">
-        <div class="alert alert-danger text-center">Could not load gallery. Please try again.</div>
-      </div>`;
-  }
-}
+//   // If you want: hard redirect for unpaid
+//   if (!isPaid) {
+//     window.location.replace("pricing.html");
+//     return;
+//   }
 
-// --- add this once (near your other DOMContentLoaded handlers) ---
-document.addEventListener("DOMContentLoaded", () => {
-  // only run on pages that actually have the gallery container
-  if (document.getElementById("galleryGrid") || document.getElementById("gallery")) {
-    loadGallery();
-  }
-});
+//   // If not premium: show locked premium message instead of photos
+//   if (!isPremium) {
+//     grid.innerHTML = `
+//       <div class="col-12">
+//         <div class="p-4 text-center border rounded bg-light">
+//           <h5 class="mb-2">🔒 Premium Gallery Locked</h5>
+//           <p class="text-muted mb-3">Upgrade to Premium to unlock Kara’s premium photos.</p>
+//           <a href="pricing.html" class="btn btn-primary btn-sm">Upgrade to Premium</a>
+//         </div>
+//       </div>
+//     `;
+//     return;
+//   }
 
-// --- add this once (near your other DOMContentLoaded handlers) ---
-document.addEventListener("DOMContentLoaded", () => {
-  // only run on pages that actually have the gallery container
-  if (document.getElementById("galleryGrid2") || document.getElementById("galleries")) {
-    loadGallery2();
-  }
-});
+//   // Premium user: load premium photos
+//   await loadPremiumGallery(grid);
+// });
+
+// document.addEventListener("DOMContentLoaded", () => {
+//   if (document.querySelector("#galleryGridBasic, #galleryGridPremium")) {
+//     loadGalleriesForKaraPage();
+//   }
+// });
+
+
+
+// // --- add this once (near your other DOMContentLoaded handlers) ---
+// document.addEventListener("DOMContentLoaded", () => {
+//   // only run on pages that actually have the gallery container
+//   if (document.getElementById("galleryGrid") || document.getElementById("gallery")) {
+//     loadGallery();
+//   }
+// });
+
+// // --- add this once (near your other DOMContentLoaded handlers) ---
+// document.addEventListener("DOMContentLoaded", () => {
+//   // only run on pages that actually have the gallery container
+//   if (document.getElementById("galleryGrid2") || document.getElementById("galleries")) {
+//     loadGallery2();
+//   }
+// });
+
+// document.addEventListener("DOMContentLoaded", async () => {
+//   const hasGallery = document.querySelector("#galleryGrid2, #galleries");
+//   if (hasGallery) await loadGallery2();
+// });
+
+// document.addEventListener("DOMContentLoaded", async () => {
+//   // only run on pages that actually have the gallery container
+//   if (document.getElementById("galleryGrid2") || document.getElementById("galleries")) {
+//     await loadGallery2();
+//   }
+// });
+
+
 
 // Enables persistency within the page elements when scrolling
 
