@@ -771,15 +771,36 @@ app.post("/delete-account", async (req, res) => {
 
 // End of user actions
 
+// app.get("/api/user/:email", async (req, res) => {
+//   try {
+//     const user = await User.findOne({
+//       email: new RegExp(`^${req.params.email}$`, "i"),
+//     });
+
+//     if (!user) {
+//       return res.status(404).json({ error: "User not found" });
+//     }
+
+//     res.json({
+//       username: user.username,
+//       email: user.email,
+//       paidSubscription: user.paidSubscription,
+//       discordId: user.discordId,
+//       tier: user.tier,
+//     });
+//   } catch (error) {
+//     console.error("User fetch error:", error);
+//     res.status(500).json({ error: "Internal Server Error" });
+//   }
+// });
+
 app.get("/api/user/:email", async (req, res) => {
   try {
     const user = await User.findOne({
       email: new RegExp(`^${req.params.email}$`, "i"),
-    });
+    }).select("username email paidSubscription discordId tier");
 
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
+    if (!user) return res.status(404).json({ error: "User not found" });
 
     res.json({
       username: user.username,
@@ -793,6 +814,7 @@ app.get("/api/user/:email", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
 
 app.post("/api/user/discord", async (req, res) => {
   const { email, discordId } = req.body;

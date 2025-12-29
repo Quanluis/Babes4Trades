@@ -1259,50 +1259,108 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-document.addEventListener("DOMContentLoaded", async () => {
-  const storedUser = localStorage.getItem("user");
+// document.addEventListener("DOMContentLoaded", async () => {
+//   const storedUser = localStorage.getItem("user");
 
-  if (!storedUser) {
-    document.getElementById("userProfile").innerHTML =
-      "<p class='text-center'>Please log in to view your profile.</p>";
-    return;
-  }
+//   if (!storedUser) {
+//     document.getElementById("userProfile").innerHTML =
+//       "<p class='text-center'>Please log in to view your profile.</p>";
+//     return;
+//   }
 
-  const user = JSON.parse(storedUser);
+//   const user = JSON.parse(storedUser);
 
-  try {
-    const response = await fetch(`/api/user/${encodeURIComponent(user.email)}`);
-    const data = await response.json();
+//   try {
+//     const response = await fetch(`/api/user/${encodeURIComponent(user.email)}`);
+//     const data = await response.json();
 
-    if (data.error) {
-      return console.error("User fetch error:", data.error);
-    }
+//     if (data.error) {
+//       return console.error("User fetch error:", data.error);
+//     }
 
-    document.getElementById(
-      "profileUsername"
-    ).textContent = `Username: ${data.username}`;
-    document.getElementById(
-      "profileEmail"
-    ).textContent = `Email: ${data.email}`;
+//     document.getElementById(
+//       "profileUsername"
+//     ).textContent = `Username: ${data.username}`;
+//     document.getElementById(
+//       "profileEmail"
+//     ).textContent = `Email: ${data.email}`;
 
-    const statusEl = document.getElementById("profileStatus");
-    statusEl.textContent = data.paidSubscription
-      ? "Paid Subscriber"
-      : "Free Account";
-    statusEl.className = `badge fs-6 px-3 py-2 mt-2 ${
-      data.paidSubscription
-        ? "bg-success text-white"
-        : "bg-secondary text-white"
-    }`;
+//     const statusEl = document.getElementById("profileStatus");
+//     statusEl.textContent = data.paidSubscription
+//       ? "Paid Subscriber"
+//       : "Free Account";
+//     statusEl.className = `badge fs-6 px-3 py-2 mt-2 ${
+//       data.paidSubscription
+//         ? "bg-success text-white"
+//         : "bg-secondary text-white"
+//     }`;
 
-    // ✅ Autofill Discord input if available
-    if (data.discordId) {
-      document.getElementById("discordId").value = data.discordId;
-    }
-  } catch (err) {
-    console.error("Failed to load user profile:", err);
-  }
-});
+//     // ✅ Autofill Discord input if available
+//     if (data.discordId) {
+//       document.getElementById("discordId").value = data.discordId;
+//     }
+//   } catch (err) {
+//     console.error("Failed to load user profile:", err);
+//   }
+// });
+
+// document.addEventListener("DOMContentLoaded", async () => {
+//   const storedUser = localStorage.getItem("user");
+
+//   if (!storedUser) {
+//     document.getElementById("userProfile").innerHTML =
+//       "<p class='text-center'>Please log in to view your profile.</p>";
+//     return;
+//   }
+
+//   const user = JSON.parse(storedUser);
+
+//   try {
+//     const response = await fetch(`/api/user/${encodeURIComponent(user.email)}`);
+//     const data = await response.json();
+
+//     if (data.error) {
+//       return console.error("User fetch error:", data.error);
+//     }
+
+//     document.getElementById("profileUsername").textContent = `Username: ${data.username}`;
+//     document.getElementById("profileEmail").textContent = `Email: ${data.email}`;
+
+//     // ✅ Tier-aware status badge (B4T CSS classes)
+//     const statusEl = document.getElementById("profileStatus");
+//     if (statusEl) {
+//       const tier = String(data.tier || "").trim().toLowerCase();
+//       const isPaid = data.paidSubscription === true;
+
+//       let label = "Free Account";
+//       let cls = "badge-b4t badge-b4t-free";
+
+//       if (tier === "premium") {
+//         label = "Tier: Premium";
+//         cls = "badge-b4t badge-b4t-premium";
+//       } else if (tier === "basic") {
+//         label = "Tier: Basic";
+//         cls = "badge-b4t badge-b4t-basic";
+//       } else if (isPaid) {
+//         // fallback if tier missing but paid is true
+//         label = "Paid Subscriber";
+//         cls = "badge-b4t badge-b4t-purple";
+//       }
+
+//       statusEl.textContent = label;
+//       statusEl.className = cls;
+//     }
+
+//     // ✅ Autofill Discord input if available
+//     if (data.discordId) {
+//       const discordInput = document.getElementById("discordId");
+//       if (discordInput) discordInput.value = data.discordId;
+//     }
+//   } catch (err) {
+//     console.error("Failed to load user profile:", err);
+//   }
+// });
+
 
 function updateNavbarBasedOnUser(user) {
   const guestOnly = document.querySelectorAll(".hide-when-logged-in");

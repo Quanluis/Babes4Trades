@@ -323,6 +323,43 @@ html {
 }
 
 
+  /* Base look for the profile status badge */
+  #profileStatus.badge-b4t {
+    display: inline-block;
+    padding: 0.55rem 0.9rem;
+    border-radius: 999px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    border: 1px solid rgba(255,255,255,0.18);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.10);
+  }
+
+  #profileStatus.badge-b4t-free {
+    background: #6c757d;
+    color: #ffffff;
+  }
+
+  #profileStatus.badge-b4t-basic {
+    background: #1f6fff;
+    color: #ffffff;
+    box-shadow: 0 10px 24px rgba(31,111,255,0.28);
+  }
+
+  #profileStatus.badge-b4t-premium {
+    background: #66237a;
+    color: #ffffff;
+    box-shadow: 0 10px 24px rgba(255,62,165,0.30);
+  }
+
+  #profileStatus.badge-b4t-purple {
+    background: #7b2cff;
+    color: #ffffff;
+    box-shadow: 0 10px 24px rgba(123,44,255,0.30);
+  }
+
+
+
+
 .site-footer {
   background: #280f50; /* dark slate */
   color: #cbd5f5;
