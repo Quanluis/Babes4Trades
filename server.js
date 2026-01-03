@@ -1132,6 +1132,29 @@ app.post(
   }
 );
 
+app.get("/api/course-embed", authOptional, async (req, res) => {
+  try {
+    const videoId = String(req.query.videoId || "").trim();
+    if (!videoId) return res.status(400).json({ error: "videoId is required" });
+
+    if (!req.user) return res.status(401).json({ error: "Login required" });
+
+    const libraryId = process.env.BUNNY_STREAM_LIBRARY_ID;
+    const tokenKey = process.env.BUNNY_STREAM_EMBED_TOKEN_KEY;
+    if (!libraryId || !tokenKey) {
+      return res.status(500).json({ error: "Missing Bunny env vars" });
+    }
+
+    const embedUrl = signBunnyEmbedUrl({ libraryId, videoId, tokenKey, ttlSeconds: 900 });
+    res.set("Cache-Control", "no-store");
+    res.json({ embedUrl });
+  } catch (err) {
+    console.error("❌ /api/course-embed error:", err?.stack || err);
+    res.status(500).json({ error: String(err?.message || err) });
+  }
+});
+
+
 
 app.get("/api/qna", authOptional, async (req, res) => {
   try {

@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const host = document.getElementById("qnaPage");
   if (!host) {
     console.warn("[qna] Missing #qnaPage");
-    return;  
+    return;
   }
 
   const modelSlug = (host.dataset.model || "").trim().toLowerCase();
@@ -18,21 +18,28 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  // ✅ Try generic IDs first, then fallback to your current Kara IDs
+  // ✅ Try generic IDs, then dynamic per-model IDs, then fallbacks
   const qnaPlayer =
     document.getElementById("qnaPlayer") ||
-    document.getElementById("karaQnaPlayer");
+    document.getElementById(`${modelSlug}QnaPlayer`) ||
+    host.querySelector("iframe"); // fallback: iframe inside #qnaPage
 
   const qnaList =
     document.getElementById("qnaList") ||
-    document.getElementById("karaQnaList");
+    document.getElementById(`${modelSlug}QnaList`) ||
+    document.querySelector(`#qnaSection ul.list-group`); // fallback
 
   if (!qnaPlayer || !qnaList) {
-    console.warn("[qna] Missing player or list element", { qnaPlayer, qnaList });
+    console.warn("[qna] Missing player or list element", {
+      qnaPlayerFound: !!qnaPlayer,
+      qnaListFound: !!qnaList,
+      expectedPlayerId: `${modelSlug}QnaPlayer`,
+      expectedListId: `${modelSlug}QnaList`,
+    });
     return;
   }
 
-  // NOTE: Make sure this matches how you store your JWT
+  // NOTE: Must match how you store your JWT
   const token = localStorage.getItem("token");
   console.log("[qna] token exists:", Boolean(token));
 
