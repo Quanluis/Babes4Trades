@@ -11,6 +11,14 @@ const fs = require("fs");
 const { type } = require("os");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const app = express();
+const crypto = require("crypto");
+const signBunnyEmbedUrl = require("./utils/signBunnyEmbedUrl");
+const QnaVideo = require("./models/QnaVideo")
+// const authOptional = require("./models/authOptional");
+
+// const QnaVideo = require("/models/model-qna");
+
+
 
 // const User = require("./models/User");
 
@@ -43,6 +51,37 @@ const UserSchema = new mongoose.Schema({
   subscriptionId: { type: String },
   tier: {type: String, enum: ["basic", "premium", null], default: null},
 });
+
+// const QnaVideoSchema = new mongoose.Schema(
+//   {
+//     title: { type: String, required: true },
+//     modelSlug: { type: String, required: true, lowercase: true, trim: true },
+//     videoId: { type: String, required: true }, // Bunny Stream GUID
+//     tier: { type: String, default: "basic" }, // "basic" | "premium"
+//     uploadedAt: { type: Date, default: Date.now },
+//   },
+//   { collection: "qnaVideos" } // must match your actual collection name
+// );
+
+// // ✅ Model name = "QnaVideo" (collection is set above)
+// module.exports = mongoose.model("qnaVideos", QnaVideoSchema);
+
+
+// models/model-qna.js
+
+// const QnaVideoSchema = new mongoose.Schema(
+//   {
+//     title: { type: String, required: true },
+//     modelSlug: { type: String, required: true, lowercase: true, trim: true },
+//     videoId: { type: String, required: true }, // Bunny Stream GUID
+//     tier: { type: String, default: "basic" },  // "basic" | "premium"
+//     uploadedAt: { type: Date, default: Date.now },
+//   },
+//   { collection: "qnaVideos" } // ✅ must match your actual collection name
+// );
+
+// // ✅ Model name can be "QnaVideo" (independent of collection name)
+// module.exports = mongoose.model("QnaVideos", QnaVideoSchema);
 
 
 const User = mongoose.model("User", UserSchema);
@@ -79,9 +118,6 @@ const GallerySchema2 = new mongoose.Schema(
 );
 
 const Galleries = mongoose.model("Galleries", GallerySchema2);
-
-
-
 
 
 // 🔐 Middleware 1: Verify JWT (Authentication)
@@ -139,21 +175,54 @@ const loginLimiter = rateLimit({
 });
 
 
-const authOptional = async (req, res, next) => {
-  const auth = req.headers.authorization || "";
-  const token = auth.startsWith("Bearer ") ? auth.slice(7) : null;
+// const authOptional = async (req, res, next) => {
+//   const auth = req.headers.authorization || "";
+//   const token = auth.startsWith("Bearer ") ? auth.slice(7) : null;
+//   if (!token) return next();
+
+//   try {
+//     const payload = JWT.verify(token, process.env.JWT_SECRET);
+//     // Lean lookup; if token carries email, you could also find by email
+//     const user = await User.findById(payload.userId).lean();
+//     req.user = user || null;
+//   } catch (_) {
+//     req.user = null;
+//   }
+//   next();
+// };
+
+// ✅ Optional auth (does NOT redirect). Attaches req.user if token is valid.
+async function authOptional(req, res, next) {
+  const authHeader = req.headers.authorization || "";
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+
   if (!token) return next();
 
   try {
+    // Your codebase uses JWT as the imported name
     const payload = JWT.verify(token, process.env.JWT_SECRET);
-    // Lean lookup; if token carries email, you could also find by email
-    const user = await User.findById(payload.userId).lean();
-    req.user = user || null;
-  } catch (_) {
-    req.user = null;
+
+    // IMPORTANT: your JWT payload looks like it contains userId (not "id")
+    const user = await User.findById(payload.userId)
+      .select("_id email username tier paidSubscription")
+      .lean();
+
+    if (user) {
+      req.user = {
+        userId: user._id, // keep consistent with your requirePaid middleware usage
+        email: user.email,
+        username: user.username,
+        tier: user.tier,
+        paidSubscription: user.paidSubscription,
+      };
+    }
+  } catch (e) {
+    // ignore bad/expired token
   }
+
   next();
-};
+}
+
 
 // ✅ GET galleries (supports ?model=kara)
 app.get('/api/galleries', authOptional, async (req, res) => {
@@ -183,6 +252,74 @@ app.get('/api/galleries', authOptional, async (req, res) => {
 
   res.json({ canSeePremium, items });
 });
+
+
+// async function authOptional(req, res, next) {
+//   const header = req.headers.authorization || "";
+//   const token = header.startsWith("Bearer ") ? header.slice(7) : null;
+//   if (!token) return next();
+
+//   try {
+//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+//     // IMPORTANT: load fresh user from DB to get tier
+//     const user = await User.findById(decoded.id).lean();
+//     if (user) {
+//       req.user = {
+//         id: user._id,
+//         email: user.email,
+//         tier: user.tier,
+//         paidSubscription: user.paidSubscription,
+//       };
+//     }
+//   } catch (e) {
+//     // ignore bad token
+//   }
+//   next();
+// }
+
+
+// app.get("/api/qna", authOptional, async (req, res) => {
+//   try {
+//     const modelSlug = String(req.query.model || "").trim().toLowerCase();
+//     if (!modelSlug) return res.status(400).json({ error: "model is required" });
+
+//     if (!req.user) return res.status(401).json({ error: "Login required" });
+
+//     const isPremiumUser = req.user?.tier === "premium";
+
+//     const query = { modelSlug };
+//     if (!isPremiumUser) query.tier = { $ne: "premium" };
+
+//     const docs = await QnaVideo.find(query).sort({ uploadedAt: 1 }).lean();
+
+//     const libraryId = process.env.BUNNY_STREAM_LIBRARY_ID;
+//     const tokenKey = process.env.BUNNY_STREAM_EMBED_TOKEN_KEY;
+
+//     if (!libraryId || !tokenKey) {
+//       return res.status(500).json({ error: "Missing Bunny env vars" });
+//     }
+
+//     const items = docs.map((d) => ({
+//       id: d._id,
+//       title: d.title,
+//       tier: d.tier,
+//       embedUrl: signBunnyEmbedUrl({
+//         libraryId,
+//         videoId: d.videoId,
+//         tokenKey,
+//         ttlSeconds: 900,
+//       }),
+//       uploadedAt: d.uploadedAt,
+//     }));
+
+//     res.json({ model: modelSlug, items });
+//   } catch (err) {
+//     console.error("❌ /api/qna error (FULL):", err?.stack || err);
+//     return res.status(500).json({ error: String(err?.message || err) });
+//   }
+// });
+
 
 // SINGLE Stripe Webhook (keep ABOVE app.use(express.json()))
 app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
@@ -994,6 +1131,49 @@ app.post(
     res.status(200).send("Event type not handled");
   }
 );
+
+
+app.get("/api/qna", authOptional, async (req, res) => {
+  try {
+    const modelSlug = String(req.query.model || "").trim().toLowerCase();
+    if (!modelSlug) return res.status(400).json({ error: "model is required" });
+
+    if (!req.user) return res.status(401).json({ error: "Login required" });
+
+    const isPremiumUser =
+      req.user?.tier === "premium" || req.user?.paidSubscription === true;
+
+    const query = { modelSlug };
+    if (!isPremiumUser) query.tier = { $ne: "premium" };
+
+    const docs = await QnaVideo.find(query).sort({ uploadedAt: 1 }).lean();
+
+    const libraryId = process.env.BUNNY_STREAM_LIBRARY_ID;
+    const tokenKey = process.env.BUNNY_STREAM_EMBED_TOKEN_KEY;
+    if (!libraryId || !tokenKey) {
+      return res.status(500).json({ error: "Missing Bunny env vars" });
+    }
+
+    const items = docs.map((d) => ({
+      id: d._id,
+      title: d.title,
+      tier: d.tier,
+      embedUrl: signBunnyEmbedUrl({
+        libraryId,
+        videoId: d.videoId,
+        tokenKey,
+        ttlSeconds: 900,
+      }),
+      uploadedAt: d.uploadedAt,
+    }));
+
+    res.set("Cache-Control", "no-store");
+    res.json({ model: modelSlug, items });
+  } catch (err) {
+    console.error("❌ /api/qna error:", err?.stack || err);
+    res.status(500).json({ error: String(err?.message || err) });
+  }
+});
 
 app.post(
   "/webhook",
