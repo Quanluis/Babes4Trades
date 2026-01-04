@@ -1,245 +1,376 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-    <link rel="stylesheet" href="/main.css">
-    <title>About</title>
-</head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark gradient-custom">
-  <div class="container-fluid">
-    <!-- Navbar Toggle Button (for Mobile) -->
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+    <!-- Bootstrap -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+      crossorigin="anonymous"
+    />
 
-    <!-- Centered Company Name -->
-    <span class="navbar-brand position-absolute start-50 translate-middle-x text-white fs-4"><h1>
+    <!-- Your CSS -->
+    <link rel="stylesheet" href="/main.css" />
 
-      <img id="logoSVG" src="..//SVG/babesSVG.svg" />
+    <title>Contact</title>
 
-    </h1></span>
-    
-    <!-- Navbar Links -->
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav me-auto">
-        <!-- Always visible -->
-        <li class="nav-item">
-          <a class="nav-link" href="/">Home</a>
-        </li>
-      
-        <!-- Guest or unpaid user -->
-        <li class="nav-item show-when-free d-none">
-          <a class="nav-link" href="meetTheGirls.html">Meet the Babes</a>
-        </li>
-      
-        <!-- Guests only -->
-        <li class="nav-item hide-when-logged-in">
-          <a class="nav-link" href="pricing.html">Pricing</a>
-        </li>
-      
-        <!-- Logged-in users (unpaid or paid) -->
-        <li class="nav-item show-when-logged-in d-none">
-          <a class="nav-link" href="pricing.html">Subscribe</a>
-        </li>
-      
-        <!-- Paid subscribers only -->
-        <li class="nav-item show-when-paid d-none">
-          <a class="nav-link" href="babesGallery.html">BabesGallery</a>
-        </li>
-      
-        <!-- Guest or unpaid users -->
-        <li class="nav-item show-when-free d-none">
-          <a class="nav-link" href="course.html">Courses</a>
-        </li>
-      
-        <!-- Logged-in paid subscribers -->
-        <li class="nav-item show-when-paid d-none">
-          <a class="nav-link" href="course.html">My Courses</a>
-        </li>
-      
-        <!-- Guests only -->
-        <li class="nav-item hide-when-logged-in">
-          <a class="nav-link" href="about.html">About</a>
-        </li>
-      </ul>
+  </head>
 
-      <!-- ✅ Username + Auth Button -->
-      <div class="d-flex align-items-center gap-3">
-        <span id="welcomeUser" class="navbar-text text-white"></span>
+  <body class="d-flex flex-column min-vh-100">
+    <!-- ✅ NAV (moved inside body) -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark gradient-custom">
+      <div class="container-fluid">
+        <!-- Navbar Toggle Button (for Mobile) -->
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
 
-        <span class="show-when-logged-in d-none">
-          
-          <a href="settings.html">
-            
-          <img id="gear" src="/SVG/gear-svgrepo-com.svg"/>
-          
-          </a>
-        </span>
+        <!-- Centered Logo -->
+        <a
+          class="navbar-brand position-absolute start-50 translate-middle-x text-white fs-4"
+          href="/"
+          aria-label="Babes4Trades"
+        >
+          <img id="logoSVG" src="/SVG/babesSVG.svg" alt="Babes4Trades Logo" />
+        </a>
 
-        <div id="authContainer" class="d-flex align-items-center">
-          <!-- Sign In Button (Visible when user is logged out) -->
-          <div id="signInDropdown" class="d-block">
-            <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-              Sign In
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <form id="dropDownSignInForm" class="px-4 py-3">
-                <div class="mb-3">
-                  <label for="signInDropDownEmail" class="form-label">Email address</label>
-                  <input type="email" class="form-control" id="signInDropDownEmail" placeholder="email@example.com">
-                </div>
-                <div class="mb-3">
-                  <label for="signInDropDownPassword" class="form-label">Password</label>
-                  <input type="password" class="form-control" id="signInDropDownPassword" placeholder="Password">
-                </div>
-                <button type="submit" class="btn btn-primary w-100">Sign in</button>
-              </form> 
-              <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="signUp.html">New around here? Sign up</a>
-              <a class="dropdown-item" href="forgotPass.html">Forgot password?</a>
-            </ul>
+        <!-- Navbar Links -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto">
+            <!-- Always visible -->
+            <li class="nav-item">
+              <a class="nav-link" href="/">Home</a>
+            </li>
+
+            <!-- Guest or unpaid user -->
+            <li class="nav-item show-when-free d-none">
+              <a class="nav-link" href="meetTheGirls.html">Meet the Babes</a>
+            </li>
+
+            <!-- Guests only -->
+            <li class="nav-item hide-when-logged-in">
+              <a class="nav-link" href="pricing.html">Pricing</a>
+            </li>
+
+            <!-- Logged-in users (unpaid or paid) -->
+            <li class="nav-item show-when-logged-in d-none">
+              <a class="nav-link" href="pricing.html">Subscribe</a>
+            </li>
+
+            <!-- Paid subscribers only -->
+            <li class="nav-item show-when-paid d-none">
+              <a class="nav-link" href="babesGallery.html">BabesGallery</a>
+            </li>
+
+            <!-- Guest or unpaid users -->
+            <li class="nav-item show-when-free d-none">
+              <a class="nav-link" href="course.html">Courses</a>
+            </li>
+
+            <!-- Logged-in paid subscribers -->
+            <li class="nav-item show-when-paid d-none">
+              <a class="nav-link" href="course.html">My Courses</a>
+            </li>
+
+            <!-- Guests only -->
+            <li class="nav-item hide-when-logged-in">
+              <a class="nav-link" href="about.html">About</a>
+            </li>
+          </ul>
+
+          <!-- ✅ Username + Auth Button -->
+          <div class="d-flex align-items-center gap-3">
+            <span id="welcomeUser" class="navbar-text text-white"></span>
+
+            <span class="show-when-logged-in d-none">
+              <a href="settings.html" aria-label="Settings">
+                <img id="gear" src="/SVG/gear-svgrepo-com.svg" alt="Settings" />
+              </a>
+            </span>
+
+            <div id="authContainer" class="d-flex align-items-center">
+              <!-- Sign In Button (Visible when user is logged out) -->
+              <div id="signInDropdown" class="d-block">
+                <button
+                  type="button"
+                  class="btn btn-primary dropdown-toggle"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  Sign In
+                </button>
+
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <form id="dropDownSignInForm" class="px-4 py-3">
+                    <div class="mb-3">
+                      <label for="signInDropDownEmail" class="form-label"
+                        >Email address</label
+                      >
+                      <input
+                        type="email"
+                        class="form-control"
+                        id="signInDropDownEmail"
+                        placeholder="email@example.com"
+                      />
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="signInDropDownPassword" class="form-label"
+                        >Password</label
+                      >
+                      <input
+                        type="password"
+                        class="form-control"
+                        id="signInDropDownPassword"
+                        placeholder="Password"
+                      />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                      Sign in
+                    </button>
+                  </form>
+
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="signUp.html"
+                    >New around here? Sign up</a
+                  >
+                  <a class="dropdown-item" href="forgotPass.html"
+                    >Forgot password?</a
+                  >
+                </ul>
+              </div>
+
+              <!-- Sign Out Button (Visible when user is logged in) -->
+              <button id="signOutBtn" class="btn btn-danger d-none">
+                Sign Out
+              </button>
+            </div>
           </div>
-
-          <!-- Sign Out Button (Visible when user is logged in) -->
-          <button id="signOutBtn" class="btn btn-danger d-none">Sign Out</button>
-          
         </div>
       </div>
-    </div>
-  </div>
-</nav>
+    </nav>
 
-  <body  class="d-flex flex-column min-vh-100">
+    <!-- ✅ MAIN -->
+    <main class="container py-5">
+      <header class="text-center mb-5">
+        <h2 class="display-6 fw-bold mb-2">Contact</h2>
+        <p class="text-muted mb-0">
+          Questions, feedback, or collabs — hit us up.
+        </p>
+      </header>
 
-    <div class="pt-5">
-
-      <h2>Contact</h2>
-
-      <div class="container">
-        <div class="row justify-content-evenly">
-          <div class="col-md-4 d-flex mb-4" >
-            <div class="w-100">
-
-              <h3>What's on your mind?</h3>
+      <div class="row g-4 align-items-stretch">
+        <!-- Contact form -->
+        <div class="col-12 col-lg-7">
+          <div class="card contact-card shadow-sm border-0 h-100">
+            <div class="card-body p-4">
+              <h3 class="h5 fw-bold mb-3">What’s on your mind?</h3>
 
               <form id="contactForm" action="">
-
                 <div class="mb-3">
-                  <label for="formGroupExampleInput" class="form-label">Email</label>
-                  <input type="text" class="form-control" id="contactUsEmail" placeholder="Babes4Trades@daddy.com">
+                  <label for="contactUsEmail" class="form-label">Email</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="contactUsEmail"
+                    placeholder="you@example.com"
+                    required
+                  />
                 </div>
-                <div class="mb-3">
-                  <label for="formGroupExampleInput2" class="form-label">Subject</label>
-                  <input type="text" class="form-control" id="contactUsSubject" placeholder="Babe One">
-                </div> 
-                <div class="mb-3">
 
-                  <div class="form-floating">
-                    <textarea class="form-control" placeholder="Leave a comment here" id="contactUsText"></textarea>
-                    <label for="floatingTextarea">Comments</label>
-                    <button class="btn btn-primary w-100">Submit</button>
-                  </div>
+                <div class="mb-3">
+                  <label for="contactUsSubject" class="form-label"
+                    >Subject</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="contactUsSubject"
+                    placeholder="What’s this about?"
+                    required
+                  />
+                </div>
 
-                </div>    
+                <div class="form-floating mb-3">
+                  <textarea
+                    class="form-control"
+                    placeholder="Leave a comment here"
+                    id="contactUsText"
+                    style="height: 140px"
+                    required
+                  ></textarea>
+                  <label for="contactUsText">Message</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">
+                  Submit
+                </button>
               </form>
             </div>
           </div>
+        </div>
 
-          <div class="col-md-4 d-flex mb-4 justify-content-center" >
-            <div class="w-100">
-              
-                <div class="vstack gap-3 justify-content-center">
+        <!-- Socials -->
+        <div class="col-12 col-lg-5">
+          <div class="card contact-card shadow-sm border-0 h-100">
+            <div class="card-body p-4">
+              <h3 class="h5 fw-bold mb-3">Socials</h3>
 
-                  <h3 class= "justify-content-center" >Socials</h3>
-
-                  <div class="fw-bold">
-                    
-                  <img id="socialSVG" src="../SVG/icons8-instagram.svg">
-
-                  <a style="text-decoration: none;" class="lh-sm p3" href="https://www.instagram.com/babes4trades?igsh=dTdub3A4ZmNoZzZx&utm_source=qr" target="_blank" rel="noopener noreferrer">Instagram</a>
-
+              <div class="list-group list-group-flush">
+                <a
+                  class="list-group-item list-group-item-action d-flex align-items-center gap-3"
+                  href="https://www.instagram.com/babes4trades?igsh=dTdub3A4ZmNoZzZx&utm_source=qr"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    class="social-icon-sm"
+                    src="/SVG/icons8-instagram.svg"
+                    alt="Instagram"
+                  />
+                  <div>
+                    <div class="fw-semibold">Instagram</div>
+                    <div class="text-muted small">Daily clips + updates</div>
                   </div>
-                  <div class="fw-bold">
+                </a>
 
-                    <img id="socialSVG" src="../SVG/icons8-youtube-squared.svg">
-
-                    <a style="text-decoration: none;" class="lh-sm p3" href="https://www.youtube.com/@Babes4Trades" target="_blank" rel="noopener noreferrer">YouTube</a>
-
+                <a
+                  class="list-group-item list-group-item-action d-flex align-items-center gap-3"
+                  href="https://www.youtube.com/@Babes4Trades"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    class="social-icon-sm"
+                    src="/SVG/icons8-youtube-squared.svg"
+                    alt="YouTube"
+                  />
+                  <div>
+                    <div class="fw-semibold">YouTube</div>
+                    <div class="text-muted small">Long-form content</div>
                   </div>
+                </a>
 
-                  <div class="fw-bold">
-                    
-                    <img id="socialSVG" src="..//SVG/icons8-discord.svg" />
-
-                    <a style="text-decoration: none;" href="https://discord.gg/aZxhAbA2kd" target="_blank" rel="noopener noreferrer">Discord</a>
-
+                <a
+                  class="list-group-item list-group-item-action d-flex align-items-center gap-3"
+                  href="https://discord.gg/aZxhAbA2kd"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    class="social-icon-sm"
+                    src="/SVG/icons8-discord.svg"
+                    alt="Discord"
+                  />
+                  <div>
+                    <div class="fw-semibold">Discord</div>
+                    <div class="text-muted small">Community + drops</div>
                   </div>
+                </a>
+              </div>
 
-                </div>
-              </div>           
+              <hr class="my-4" />
+
+              <div class="d-grid gap-2">
+                <a href="/faq.html" class="btn btn-outline-danger"
+                  >Frequently Asked Questions</a
+                >
+                <a href="becomeATradeBabe.html" class="btn btn-outline-info"
+                  >Become a Trade Babe</a
+                >
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </main>
 
+    <!-- ✅ FOOTER -->
+    <footer class="site-footer gradient-custom mt-auto">
+      <div class="container py-4">
+        <!-- Top links -->
+        <ul class="nav justify-content-center border-bottom pb-3 mb-3">
+          <li class="nav-item">
+            <a href="/" class="px-3 footer-links">Home</a>
+          </li>
+          <li class="nav-item">
+            <a href="about.html" class="px-3 footer-links">About</a>
+          </li>
+          <li class="nav-item">
+            <a href="contact.html" class="px-3 footer-links">Contact</a>
+          </li>
+        </ul>
 
-    <div class="d-flex justify-content-center pt-5">
+        <!-- Social icons -->
+        <div class="d-flex justify-content-center gap-3 mb-3">
+          <a
+            href="https://www.instagram.com/babes4trades/?igsh=dTdub3A4ZmNoZzZx&utm_source=qr#"
+            target="_blank"
+            aria-label="Instagram"
+            rel="noopener noreferrer"
+          >
+            <img class="social-icon" src="/SVG/icons8-instagram.svg" alt="Instagram" />
+          </a>
+          <a
+            href="https://www.youtube.com/@Babes4Trades"
+            target="_blank"
+            aria-label="YouTube"
+            rel="noopener noreferrer"
+          >
+            <img
+              class="social-icon"
+              src="/SVG/icons8-youtube-squared.svg"
+              alt="YouTube"
+            />
+          </a>
+          <a
+            href="https://discord.gg/aZxhAbA2kd"
+            target="_blank"
+            aria-label="Discord"
+            rel="noopener noreferrer"
+          >
+            <img class="social-icon" src="/SVG/icons8-discord.svg" alt="Discord" />
+          </a>
+        </div>
 
-      <a href="/faq.html" style="text-decoration: none;" class=" link-danger">Frequently Asked Questions</a></p>
-  
-    </div>
+        <!-- Legal -->
+        <ul class="nav justify-content-center small mb-2">
+          <li class="nav-item">
+            <a href="/privacypolicy.html" class="nav-link px-2 footer-legal"
+              >Privacy Policy</a
+            >
+          </li>
+          <li class="nav-item">
+            <a href="/termsofuse.html" class="nav-link px-2 footer-legal"
+              >Terms of Use</a
+            >
+          </li>
+        </ul>
 
-      <div class="d-flex justify-content-center pt-5">
+        <!-- Copyright -->
+        <p class="text-center text-muted small mb-0">© 2025 Company, Inc</p>
+      </div>
+    </footer>
 
-      <a href="becomeATradeBabe.html" style="text-decoration: none;" class=" link-info">Become a Trade Babe</a></p>
-  
-    </div>
-
+    <!-- Scripts -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+      crossorigin="anonymous"
+    ></script>
+    <script src="main.js"></script>
   </body>
-
-<footer class="site-footer gradient-custom mt-auto">
-  <div class="container py-4">
-
-    <!-- Top links -->
-    <ul class="nav justify-content-center border-bottom pb-3 mb-3">
-      <li class="nav-item"><a href="/" class="px-3 footer-links">Home</a></li>
-      <li class="nav-item"><a href="about.html" class="px-3 footer-links">About</a></li>
-      <li class="nav-item"><a href="contact.html" class="px-3 footer-links">Contact</a></li>
-    </ul>
-
-    <!-- Social icons -->
-    <div class="d-flex justify-content-center gap-3 mb-3">
-      <a href="https://www.instagram.com/babes4trades/?igsh=dTdub3A4ZmNoZzZx&utm_source=qr#" target="_blank" aria-label="Instagram">
-        <img class="social-icon" src="/SVG/icons8-instagram.svg" />
-      </a>
-      <a href="https://www.youtube.com/@Babes4Trades" target="_blank" aria-label="YouTube">
-        <img class="social-icon" src="/SVG/icons8-youtube-squared.svg" />
-      </a>
-      <a href="https://discord.gg/aZxhAbA2kd" target="_blank" aria-label="Discord">
-        <img class="social-icon" src="/SVG/icons8-discord.svg" />
-      </a>
-    </div>
-
-    <!-- Legal -->
-    <ul class="nav justify-content-center small mb-2">
-      <li class="nav-item"><a href="/privacypolicy.html" class="nav-link px-2 footer-legal">Privacy Policy</a></li>
-      <li class="nav-item"><a href="/termsofuse.html" class="nav-link px-2 footer-legal">Terms of Use</a></li>
-    </ul>
-
-    <!-- Copyright -->
-    <p class="text-center text-muted small mb-0">
-      © 2025 Company, Inc
-    </p>
-
-  </div>
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-<script src="main.js"></script>
-</script>
 </html>

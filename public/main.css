@@ -357,7 +357,29 @@ html {
     box-shadow: 0 10px 24px rgba(123,44,255,0.30);
   }
 
+.model-card {
+  border-radius: 1rem;
+  overflow: hidden; /* keeps carousel corners rounded */
+}
 
+.gallery-img {
+  height: 25rem;
+  object-fit: cover;
+}
+
+@media (max-width: 576px) {
+  .gallery-img {
+    height: 18rem;
+  }
+}
+
+.contact-card {
+border-radius: 1rem;
+}
+.social-icon-sm {
+width: 28px;
+height: 28px;
+}
 
 
 .site-footer {

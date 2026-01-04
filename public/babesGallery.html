@@ -115,93 +115,135 @@
 
   <body class="d-flex flex-column min-vh-100">
 
-  <div class="pt-5">
+ <main class="container py-5">
+  <header class="text-center mb-5">
+    <h2 class="display-6 fw-bold mb-2">Babes Gallery</h2>
+    <p class="text-muted mb-0">Pick a model to preview — then jump into the full set.</p>
+  </header>
 
-    <h2>Babes Gallary</h2>
+  <div class="row g-4">
+    <!-- Model 1 -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="card model-card h-100 shadow-sm border-0">
+        <div id="carouselKara" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselKara" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselKara" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselKara" data-bs-slide-to="2" aria-label="Slide 3"></button>
+          </div>
 
-    <div class="container">
-      <div class="row">
-        <div class="col-md-6">
-          <div class="card-container pt-5">
-            <div class="card">
-              <div class="card-body">
-                <div id="carouselExampleIndicators" class="carousel slide">
-                  <div class="carousel-indicators">
-                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
-                  </div>
-                  <div class="carousel-inner">
-                    <div class="carousel-item active">
-                      <img src="..//babes/Kara1.JPG" class="d-block w-100" alt="..." style="width:6.25;height:25rem;">
-                    </div>
-                    <div class="carousel-item">
-                      <img src="..//babes/Kara2.JPG" class="d-block w-100" alt="..." style="width:6.25;height:25rem;">
-                    </div>
-                    <div class="carousel-item">
-                      <img src="..//babes/Kara3.JPG" class="d-block w-100" alt="..." style="width:6.25;height:25rem;">
-                    </div>
-                  </div>
-                  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                  </button>
-                  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                  </button>
-                </div>
-                <br>
-                <div class="text-center">Kara Love: Wisconsin beauty with a love for compound interest. Full gallery <a href="modelOne.html">Here</a></div>
-               </div>
+          <div class="carousel-inner">
+            <div class="carousel-item active">
+              <img src="../babes/Kara1.JPG" class="d-block w-100 gallery-img" alt="Kara Love - photo 1" loading="lazy">
+            </div>
+            <div class="carousel-item">
+              <img src="../babes/Kara2.JPG" class="d-block w-100 gallery-img" alt="Kara Love - photo 2" loading="lazy">
+            </div>
+            <div class="carousel-item">
+              <img src="../babes/Kara3.JPG" class="d-block w-100 gallery-img" alt="Kara Love - photo 3" loading="lazy">
             </div>
           </div>
+
+          <button class="carousel-control-prev" type="button" data-bs-target="#carouselKara" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#carouselKara" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
         </div>
-  
-        <div class="col-md-6">
-          <div class="card-container pt-5">
-            <div class="card">
-              <div class="card-body" >
-                <div id="carouselExampleIndicators2" class="carousel slide">
-                  <div class="carousel-indicators">
-                    <button type="button1" data-bs-target="#carouselExampleIndicators2" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                    <button type="button1" data-bs-target="#carouselExampleIndicators2" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                    <button type="button1" data-bs-target="#carouselExampleIndicators2" data-bs-slide-to="2" aria-label="Slide 3"></button>
-                  </div>
-                  <div class="carousel-inner">
-                    <div class="carousel-item active">
-                      <img src="..//babes/Christy4.JPG" class="d-block w-100" alt="..." style="width:6.25;height:25rem;">
-                    </div>
-                    <div class="carousel-item">
-                      <img src="..//babes/Christy2.JPG" class="d-block w-100" alt="..." style="width:6.25;height:25rem;">
-                    </div>
-                    <div class="carousel-item">
-                      <img src="..//babes/Christy3.JPG" class="d-block w-100" alt="..." style="width:6.25;height:25rem;">
-                    </div>
-                  </div>
-                  <button class="carousel-control-prev" type="button1" data-bs-target="#carouselExampleIndicators2" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                  </button>
-                  <button class="carousel-control-next" type="button1" data-bs-target="#carouselExampleIndicators2" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                  </button>
-                </div>
-                <br>
-                <div class="text-center">Christy Summer: loves making money alongside nature. Full gallery <a href="modelTwo.html"> Here</a></div>
-              </div>
-              </div>
-            </div>
-          </div>
+
+        <div class="card-body">
+          <h5 class="card-title mb-2">Kara Love</h5>
+          <p class="card-text text-muted mb-3">Wisconsin beauty with a love for compound interest.</p>
+          <a class="btn btn-primary w-100" href="modelOne.html">View full gallery</a>
         </div>
       </div>
     </div>
 
-    <div class="pt-5" ></div>
-    <div class="pt-5" ></div>
+    <!-- Model 2 -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="card model-card h-100 shadow-sm border-0">
+        <div id="carouselChristy" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselChristy" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselChristy" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselChristy" data-bs-slide-to="2" aria-label="Slide 3"></button>
+          </div>
 
-  </body>
+          <div class="carousel-inner">
+            <div class="carousel-item active">
+              <img src="../babes/Christy4.JPG" class="d-block w-100 gallery-img" alt="Christy Summer - photo 1" loading="lazy">
+            </div>
+            <div class="carousel-item">
+              <img src="../babes/Christy2.JPG" class="d-block w-100 gallery-img" alt="Christy Summer - photo 2" loading="lazy">
+            </div>
+            <div class="carousel-item">
+              <img src="../babes/Christy3.JPG" class="d-block w-100 gallery-img" alt="Christy Summer - photo 3" loading="lazy">
+            </div>
+          </div>
+
+          <button class="carousel-control-prev" type="button" data-bs-target="#carouselChristy" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#carouselChristy" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+
+        <div class="card-body">
+          <h5 class="card-title mb-2">Christy Summer</h5>
+          <p class="card-text text-muted mb-3">Loves making money alongside nature. She will make you fall in love.</p>
+          <a class="btn btn-primary w-100" href="modelTwo.html">View full gallery</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Model 3 (NEW) -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="card model-card h-100 shadow-sm border-0">
+        <div id="carouselModel3" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselModel3" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselModel3" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselModel3" data-bs-slide-to="2" aria-label="Slide 3"></button>
+          </div>
+
+          <div class="carousel-inner">
+            <div class="carousel-item active">
+              <img src="../babes/Mallory3.JPG" class="d-block w-100 gallery-img" alt="Model 3 - photo 1" loading="lazy">
+            </div>
+            <div class="carousel-item">
+              <img src="../babes/Mallory2.JPG" class="d-block w-100 gallery-img" alt="Model 3 - photo 2" loading="lazy">
+            </div>
+            <div class="carousel-item">
+              <img src="../babes/Mallory1.JPG" class="d-block w-100 gallery-img" alt="Model 3 - photo 3" loading="lazy">
+            </div>
+          </div>
+
+          <button class="carousel-control-prev" type="button" data-bs-target="#carouselModel3" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#carouselModel3" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+
+        <div class="card-body">
+          <h5 class="card-title mb-2">Mallory Love</h5>
+          <p class="card-text text-muted mb-3">Petite little figure with brains and a love for making money.</p>
+          <a class="btn btn-primary w-100" href="modelThree.html">View full gallery</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
 
 <footer class="site-footer gradient-custom mt-auto">
   <div class="container py-4">

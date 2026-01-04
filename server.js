@@ -11,25 +11,15 @@ const fs = require("fs");
 const { type } = require("os");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const app = express();
-const crypto = require("crypto");
+// const crypto = require("crypto");
 const signBunnyEmbedUrl = require("./utils/signBunnyEmbedUrl");
-const QnaVideo = require("./models/QnaVideo")
-// const authOptional = require("./models/authOptional");
-
-// const QnaVideo = require("/models/model-qna");
-
-
-
-// const User = require("./models/User");
+const QnaVideo = require("./models/QnaVideo");
 
 app.use(cors());
 
-
-
 // ✅ Serve Static Files BEFORE Routes
-// app.use(express.static(path.join(__dirname, "/")));
+
 app.use(express.static(path.join(__dirname, "public")));
-// app.use(express.static(path.join(__dirname, "pages")));
 
 // ✅ Connect to MongoDB
 mongoose
@@ -49,59 +39,10 @@ const UserSchema = new mongoose.Schema({
   verified: { type: Boolean, default: false }, // Verfication status
   paidSubscription: { type: Boolean, default: false }, // Paid subscription status
   subscriptionId: { type: String },
-  tier: {type: String, enum: ["basic", "premium", null], default: null},
+  tier: { type: String, enum: ["basic", "premium", null], default: null },
 });
 
-// const QnaVideoSchema = new mongoose.Schema(
-//   {
-//     title: { type: String, required: true },
-//     modelSlug: { type: String, required: true, lowercase: true, trim: true },
-//     videoId: { type: String, required: true }, // Bunny Stream GUID
-//     tier: { type: String, default: "basic" }, // "basic" | "premium"
-//     uploadedAt: { type: Date, default: Date.now },
-//   },
-//   { collection: "qnaVideos" } // must match your actual collection name
-// );
-
-// // ✅ Model name = "QnaVideo" (collection is set above)
-// module.exports = mongoose.model("qnaVideos", QnaVideoSchema);
-
-
-// models/model-qna.js
-
-// const QnaVideoSchema = new mongoose.Schema(
-//   {
-//     title: { type: String, required: true },
-//     modelSlug: { type: String, required: true, lowercase: true, trim: true },
-//     videoId: { type: String, required: true }, // Bunny Stream GUID
-//     tier: { type: String, default: "basic" },  // "basic" | "premium"
-//     uploadedAt: { type: Date, default: Date.now },
-//   },
-//   { collection: "qnaVideos" } // ✅ must match your actual collection name
-// );
-
-// // ✅ Model name can be "QnaVideo" (independent of collection name)
-// module.exports = mongoose.model("QnaVideos", QnaVideoSchema);
-
-
 const User = mongoose.model("User", UserSchema);
-
-// const GallerySchema = new mongoose.Schema(
-//   {
-//     title: String,
-//     url: { type: String, required: true }, // Bunny.net URL
-//     subscriptionLevel: {
-//       type: String,
-//       enum: ["free", "premium"],
-//       default: "free"
-//     },
-//     uploadedAt: { type: Date, default: Date.now },
-//   },
-//   { collection: "gallery", timestamps: false } // match your existing collection
-// );
-
-// const Gallery = mongoose.model("Gallery", GallerySchema);
-
 
 const GallerySchema2 = new mongoose.Schema(
   {
@@ -110,7 +51,7 @@ const GallerySchema2 = new mongoose.Schema(
     subscriptionLevel: {
       type: String,
       enum: ["free", "premium"],
-      default: "free"
+      default: "free",
     },
     uploadedAt: { type: Date, default: Date.now },
   },
@@ -118,7 +59,6 @@ const GallerySchema2 = new mongoose.Schema(
 );
 
 const Galleries = mongoose.model("Galleries", GallerySchema2);
-
 
 // 🔐 Middleware 1: Verify JWT (Authentication)
 function requireAuth(req, res, next) {
@@ -165,7 +105,6 @@ app.get("/my-courses", requireAuth, requirePaid, (req, res) => {
   res.sendFile(videoPage);
 });
 
-
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 10, // Allow max 5 login attempts per IP change to 5 later
@@ -173,23 +112,6 @@ const loginLimiter = rateLimit({
   standardHeaders: true, // Return rate limit info in headers
   legacyHeaders: false, // Disable legacy headers
 });
-
-
-// const authOptional = async (req, res, next) => {
-//   const auth = req.headers.authorization || "";
-//   const token = auth.startsWith("Bearer ") ? auth.slice(7) : null;
-//   if (!token) return next();
-
-//   try {
-//     const payload = JWT.verify(token, process.env.JWT_SECRET);
-//     // Lean lookup; if token carries email, you could also find by email
-//     const user = await User.findById(payload.userId).lean();
-//     req.user = user || null;
-//   } catch (_) {
-//     req.user = null;
-//   }
-//   next();
-// };
 
 // ✅ Optional auth (does NOT redirect). Attaches req.user if token is valid.
 async function authOptional(req, res, next) {
@@ -223,248 +145,196 @@ async function authOptional(req, res, next) {
   next();
 }
 
-
 // ✅ GET galleries (supports ?model=kara)
-app.get('/api/galleries', authOptional, async (req, res) => {
+app.get("/api/galleries", authOptional, async (req, res) => {
   // ✅ Only premium tier can see premium items
   const canSeePremium = req.user?.tier === "premium";
 
-  const model = String(req.query.model || "").trim().toLowerCase();
+  const model = String(req.query.model || "")
+    .trim()
+    .toLowerCase();
 
   const query = {};
   if (model) query.modelSlug = model; // requires modelSlug on docs
 
   if (!canSeePremium) {
-    query.subscriptionLevel = { $ne: 'premium' };
+    query.subscriptionLevel = { $ne: "premium" };
   }
 
   // ✅ Use ONE mongoose model here (pick the correct one)
   const docs = await Galleries.find(query).sort({ uploadedAt: -1 }).lean();
 
-  const items = docs.map(d => ({
+  const items = docs.map((d) => ({
     title: d.title,
     bunnyUrl: d.url, // your DB field is url
     thumbnailUrl: null,
-    isPremium: String(d.subscriptionLevel || "").toLowerCase() === 'premium',
+    isPremium: String(d.subscriptionLevel || "").toLowerCase() === "premium",
     tags: [],
-    createdAt: d.uploadedAt
+    createdAt: d.uploadedAt,
   }));
 
   res.json({ canSeePremium, items });
 });
 
-
-// async function authOptional(req, res, next) {
-//   const header = req.headers.authorization || "";
-//   const token = header.startsWith("Bearer ") ? header.slice(7) : null;
-//   if (!token) return next();
-
-//   try {
-//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-//     // IMPORTANT: load fresh user from DB to get tier
-//     const user = await User.findById(decoded.id).lean();
-//     if (user) {
-//       req.user = {
-//         id: user._id,
-//         email: user.email,
-//         tier: user.tier,
-//         paidSubscription: user.paidSubscription,
-//       };
-//     }
-//   } catch (e) {
-//     // ignore bad token
-//   }
-//   next();
-// }
-
-
-// app.get("/api/qna", authOptional, async (req, res) => {
-//   try {
-//     const modelSlug = String(req.query.model || "").trim().toLowerCase();
-//     if (!modelSlug) return res.status(400).json({ error: "model is required" });
-
-//     if (!req.user) return res.status(401).json({ error: "Login required" });
-
-//     const isPremiumUser = req.user?.tier === "premium";
-
-//     const query = { modelSlug };
-//     if (!isPremiumUser) query.tier = { $ne: "premium" };
-
-//     const docs = await QnaVideo.find(query).sort({ uploadedAt: 1 }).lean();
-
-//     const libraryId = process.env.BUNNY_STREAM_LIBRARY_ID;
-//     const tokenKey = process.env.BUNNY_STREAM_EMBED_TOKEN_KEY;
-
-//     if (!libraryId || !tokenKey) {
-//       return res.status(500).json({ error: "Missing Bunny env vars" });
-//     }
-
-//     const items = docs.map((d) => ({
-//       id: d._id,
-//       title: d.title,
-//       tier: d.tier,
-//       embedUrl: signBunnyEmbedUrl({
-//         libraryId,
-//         videoId: d.videoId,
-//         tokenKey,
-//         ttlSeconds: 900,
-//       }),
-//       uploadedAt: d.uploadedAt,
-//     }));
-
-//     res.json({ model: modelSlug, items });
-//   } catch (err) {
-//     console.error("❌ /api/qna error (FULL):", err?.stack || err);
-//     return res.status(500).json({ error: String(err?.message || err) });
-//   }
-// });
-
-
 // SINGLE Stripe Webhook (keep ABOVE app.use(express.json()))
-app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
-  const sig = req.headers['stripe-signature'];
-  let event;
+app.post(
+  "/webhook",
+  express.raw({ type: "application/json" }),
+  async (req, res) => {
+    const sig = req.headers["stripe-signature"];
+    let event;
 
-  try {
-    event = stripe.webhooks.constructEvent(
-      req.body,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET
-    );
-  } catch (err) {
-    console.error('❌ Webhook signature error:', err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
-  }
-
-  try {
-
-   // ✅ Tier mapping by Price ID (recommended)
-    const tierFromPriceId = (priceId) => {
-      if (!priceId) return null;
-      if (priceId === process.env.STRIPE_PRICE_PREMIUM) return "premium";
-      if (priceId === process.env.STRIPE_PRICE_BASIC) return "basic";
-      return "basic"; // fallback
-    };
-
-    // small helpers
-    const markPaid = async ({ email, customerId, subscriptionId, tier }) => {
-      let user = null;
-      if (customerId) user = await User.findOne({ stripeCustomerId: customerId });
-      if (!user && email) user = await User.findOne({ email: new RegExp(`^${email}$`, 'i') });
-
-      if (user) {
-        user.paidSubscription = true;
-        if (subscriptionId) user.subscriptionId = subscriptionId;
-        if (customerId) user.stripeCustomerId = customerId;
-
-        if(typeof tier === "string") user.tier = tier;
-
-        await user.save();
-      }
-    };
-
-    const markUnpaid = async ({ email, customerId, subscriptionId }) => {
-      let user = null;
-      if (subscriptionId) user = await User.findOne({ subscriptionId });
-      if (!user && customerId) user = await User.findOne({ stripeCustomerId: customerId });
-      if (!user && email) user = await User.findOne({ email: new RegExp(`^${email}$`, 'i') });
-
-      if (user) {
-
-        user.paidSubscription = false;
-
-        // keep stripeCustomerId for future, but clear subId
-        user.tier = null;
-
-        if (subscriptionId) user.subscriptionId = null;
-        await user.save();
-      }
-    };
-
-    switch (event.type) {
-      // User just completed checkout (subscription mode)
-      case 'checkout.session.completed': {
-        const s = event.data.object;
-
-        let tier = null;
-
-        if (s.subscription) {
-        const sub = await stripe.subscriptions.retrieve(s.subscription, {
-          expand: ["items.data.price"],
-        });
-        const priceId = sub.items.data[0]?.price?.id;
-
-        tier =
-            priceId === process.env.STRIPE_PRICE_PREMIUM ? "premium" :
-            priceId === process.env.STRIPE_PRICE_BASIC ? "basic" :
-            "basic";
-        }
-
-        await markPaid({
-          email: s.customer_email || s.customer_details?.email,
-          customerId: s.customer,
-          subscriptionId: s.subscription,
-          tier,
-        });
-        break;
-      }
-
-      // Subscription lifecycle changes (covers resume/pause/cancel/past_due/unpaid)
-      case 'customer.subscription.created':
-      case 'customer.subscription.updated': {
-        const sub = event.data.object;
-        const status = sub.status; // 'active' | 'trialing' | 'past_due' | 'unpaid' | 'canceled' | 'paused' | etc.
-        const payload = {
-          email: sub?.customer_email, // usually null here
-          customerId: sub.customer,
-          subscriptionId: sub.id,
-          tier: sub.tier,
-        };
-
-        if (['active', 'trialing'].includes(status)) {
-          await markPaid(payload);
-        } else if (['canceled', 'unpaid', 'paused', 'incomplete_expired', 'past_due'].includes(status)) {
-          // you can decide if 'past_due' stays paid or not; most teams flip to false
-          await markUnpaid(payload);
-        }
-        break;
-      }
-
-      // Explicit deletion (cancel)
-      case 'customer.subscription.deleted': {
-        const sub = event.data.object;
-        await markUnpaid({
-          customerId: sub.customer,
-          subscriptionId: sub.id,
-        });
-        break;
-      }
-
-      // Payment failed (optional hard-stop)
-      case 'invoice.payment_failed': {
-        const inv = event.data.object;
-        await markUnpaid({
-          customerId: inv.customer,
-          subscriptionId: inv.subscription,
-        });
-        break;
-      }
-
-      default:
-        // ignore other events
-        break;
+    try {
+      event = stripe.webhooks.constructEvent(
+        req.body,
+        sig,
+        process.env.STRIPE_WEBHOOK_SECRET
+      );
+    } catch (err) {
+      console.error("❌ Webhook signature error:", err.message);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
-    // Always 200 so Stripe stops retrying
-    res.sendStatus(200);
-  } catch (err) {
-    console.error('❌ Webhook handler error:', err);
-    // still return 200 to stop retries; log and investigate
-    res.sendStatus(200);
-  }
-});
+    try {
+      // ✅ Tier mapping by Price ID (recommended)
+      const tierFromPriceId = (priceId) => {
+        if (!priceId) return null;
+        if (priceId === process.env.STRIPE_PRICE_PREMIUM) return "premium";
+        if (priceId === process.env.STRIPE_PRICE_BASIC) return "basic";
+        return "basic"; // fallback
+      };
 
+      // small helpers
+      const markPaid = async ({ email, customerId, subscriptionId, tier }) => {
+        let user = null;
+        if (customerId)
+          user = await User.findOne({ stripeCustomerId: customerId });
+        if (!user && email)
+          user = await User.findOne({ email: new RegExp(`^${email}$`, "i") });
+
+        if (user) {
+          user.paidSubscription = true;
+          if (subscriptionId) user.subscriptionId = subscriptionId;
+          if (customerId) user.stripeCustomerId = customerId;
+
+          if (typeof tier === "string") user.tier = tier;
+
+          await user.save();
+        }
+      };
+
+      const markUnpaid = async ({ email, customerId, subscriptionId }) => {
+        let user = null;
+        if (subscriptionId) user = await User.findOne({ subscriptionId });
+        if (!user && customerId)
+          user = await User.findOne({ stripeCustomerId: customerId });
+        if (!user && email)
+          user = await User.findOne({ email: new RegExp(`^${email}$`, "i") });
+
+        if (user) {
+          user.paidSubscription = false;
+
+          // keep stripeCustomerId for future, but clear subId
+          user.tier = null;
+
+          if (subscriptionId) user.subscriptionId = null;
+          await user.save();
+        }
+      };
+
+      switch (event.type) {
+        // User just completed checkout (subscription mode)
+        case "checkout.session.completed": {
+          const s = event.data.object;
+
+          let tier = null;
+
+          if (s.subscription) {
+            const sub = await stripe.subscriptions.retrieve(s.subscription, {
+              expand: ["items.data.price"],
+            });
+            const priceId = sub.items.data[0]?.price?.id;
+
+            tier =
+              priceId === process.env.STRIPE_PRICE_PREMIUM
+                ? "premium"
+                : priceId === process.env.STRIPE_PRICE_BASIC
+                ? "basic"
+                : "basic";
+          }
+
+          await markPaid({
+            email: s.customer_email || s.customer_details?.email,
+            customerId: s.customer,
+            subscriptionId: s.subscription,
+            tier,
+          });
+          break;
+        }
+
+        // Subscription lifecycle changes (covers resume/pause/cancel/past_due/unpaid)
+        case "customer.subscription.created":
+        case "customer.subscription.updated": {
+          const sub = event.data.object;
+          const status = sub.status; // 'active' | 'trialing' | 'past_due' | 'unpaid' | 'canceled' | 'paused' | etc.
+          const payload = {
+            email: sub?.customer_email, // usually null here
+            customerId: sub.customer,
+            subscriptionId: sub.id,
+            tier: sub.tier,
+          };
+
+          if (["active", "trialing"].includes(status)) {
+            await markPaid(payload);
+          } else if (
+            [
+              "canceled",
+              "unpaid",
+              "paused",
+              "incomplete_expired",
+              "past_due",
+            ].includes(status)
+          ) {
+            // you can decide if 'past_due' stays paid or not; most teams flip to false
+            await markUnpaid(payload);
+          }
+          break;
+        }
+
+        // Explicit deletion (cancel)
+        case "customer.subscription.deleted": {
+          const sub = event.data.object;
+          await markUnpaid({
+            customerId: sub.customer,
+            subscriptionId: sub.id,
+          });
+          break;
+        }
+
+        // Payment failed (optional hard-stop)
+        case "invoice.payment_failed": {
+          const inv = event.data.object;
+          await markUnpaid({
+            customerId: inv.customer,
+            subscriptionId: inv.subscription,
+          });
+          break;
+        }
+
+        default:
+          // ignore other events
+          break;
+      }
+
+      // Always 200 so Stripe stops retrying
+      res.sendStatus(200);
+    } catch (err) {
+      console.error("❌ Webhook handler error:", err);
+      // still return 200 to stop retries; log and investigate
+      res.sendStatus(200);
+    }
+  }
+);
 
 app.post("/role-update", async (req, res) => {
   const { discordId, paid } = req.body;
@@ -583,8 +453,8 @@ app.post("/api/register", async (req, res) => {
     }); // Not yet verified
 
     if (discordId && discordId.trim() !== "") {
-    newUser.discordId = discordId.trim();
-}
+      newUser.discordId = discordId.trim();
+    }
 
     await newUser.save();
 
@@ -684,7 +554,7 @@ app.post("/api/login", loginLimiter, async (req, res) => {
         email: user.email,
         username: user.username,
         paidSubscription: user.paidSubscription,
-        tier: user.tier
+        tier: user.tier,
       },
     });
   } catch (error) {
@@ -859,7 +729,7 @@ app.post("/api/cancel-subscription", authenticate, async (req, res) => {
     try {
       user.paidSubscription = false;
       user.subscriptionId = null;
-      user.tier = null; 
+      user.tier = null;
       await user.save();
       console.log(`✅ Subscription canceled and DB updated for ${user.email}`);
     } catch (dbError) {
@@ -906,31 +776,6 @@ app.post("/delete-account", async (req, res) => {
   }
 });
 
-// End of user actions
-
-// app.get("/api/user/:email", async (req, res) => {
-//   try {
-//     const user = await User.findOne({
-//       email: new RegExp(`^${req.params.email}$`, "i"),
-//     });
-
-//     if (!user) {
-//       return res.status(404).json({ error: "User not found" });
-//     }
-
-//     res.json({
-//       username: user.username,
-//       email: user.email,
-//       paidSubscription: user.paidSubscription,
-//       discordId: user.discordId,
-//       tier: user.tier,
-//     });
-//   } catch (error) {
-//     console.error("User fetch error:", error);
-//     res.status(500).json({ error: "Internal Server Error" });
-//   }
-// });
-
 app.get("/api/user/:email", async (req, res) => {
   try {
     const user = await User.findOne({
@@ -951,7 +796,6 @@ app.get("/api/user/:email", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
 
 app.post("/api/user/discord", async (req, res) => {
   const { email, discordId } = req.body;
@@ -1145,7 +989,12 @@ app.get("/api/course-embed", authOptional, async (req, res) => {
       return res.status(500).json({ error: "Missing Bunny env vars" });
     }
 
-    const embedUrl = signBunnyEmbedUrl({ libraryId, videoId, tokenKey, ttlSeconds: 900 });
+    const embedUrl = signBunnyEmbedUrl({
+      libraryId,
+      videoId,
+      tokenKey,
+      ttlSeconds: 900,
+    });
     res.set("Cache-Control", "no-store");
     res.json({ embedUrl });
   } catch (err) {
@@ -1154,11 +1003,11 @@ app.get("/api/course-embed", authOptional, async (req, res) => {
   }
 });
 
-
-
 app.get("/api/qna", authOptional, async (req, res) => {
   try {
-    const modelSlug = String(req.query.model || "").trim().toLowerCase();
+    const modelSlug = String(req.query.model || "")
+      .trim()
+      .toLowerCase();
     if (!modelSlug) return res.status(400).json({ error: "model is required" });
 
     if (!req.user) return res.status(401).json({ error: "Login required" });
